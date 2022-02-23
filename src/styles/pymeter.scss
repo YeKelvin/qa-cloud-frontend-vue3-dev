@@ -1,0 +1,16 @@
+
+.pymeter-component-container {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  height: 100%;
+  padding: 10px;
+
+  &.el-divider--horizontal {
+    margin: 10px 0;
+  }
+
+  .el-input__inner {
+    letter-spacing: 0.6px;
+  }
+}
