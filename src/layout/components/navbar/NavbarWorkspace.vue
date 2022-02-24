@@ -2,8 +2,8 @@
   <el-popover ref="popover" placement="bottom" width="400" trigger="click">
 
     <!-- 切换工作空间的按钮 -->
-    <el-button slot="reference" type="text" style="color:#606266; font:14px; font-family:inherit">
-      <svg-icon icon-class="workspace" style="height:1.5em; width:1.5em; vertical-align:-0.25em;" />
+    <el-button slot="reference" type="text" style="color: #606266; font: 14px; font-family: inherit">
+      <svg-icon icon-class="workspace" style="height: 1.5em; width: 1.5em; vertical-align: -0.25em" />
       {{ workspaceName }}
       <i class="el-icon-caret-bottom" />
     </el-button>
@@ -14,7 +14,7 @@
     <!-- 工作空间列表 -->
     <el-tree
       ref="tree"
-      style="margin-top:10px;"
+      style="margin-top: 10px"
       highlight-current
       :props="{ label: 'workspaceName' }"
       :data="workspaceList"
@@ -23,26 +23,29 @@
     >
       <span slot-scope="{ node, data }">
         <!-- 空间名称 -->
-        <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ node.label }}</span>
+        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ node.label }}</span>
         <!-- 标签 -->
         <el-tag
           v-if="data.workspaceScope == 'PRIVATE'"
           size="mini"
           type="danger"
           style="margin-left:5px;"
-        >Private</el-tag>
+          Private
+        </el-tag>
         <el-tag
           v-if="data.workspaceScope == 'PROTECTED'"
           size="mini"
           type="warning"
           style="margin-left:5px;"
-        >Protected</el-tag>
+          Protected
+        </el-tag>
         <el-tag
           v-if="data.workspaceScope == 'PUBLIC'"
           size="mini"
           type="success"
           style="margin-left:5px;"
-        >Public</el-tag>
+          Public
+        </el-tag>
       </span>
     </el-tree>
 
@@ -64,10 +67,10 @@ export default {
 
   computed: {
     ...mapState('workspace', {
-      workspaceList: state => state.workspaceList,
-      workspaceNo: state => state.workspaceNo,
-      workspaceName: state => state.workspaceName,
-      workspaceScope: state => state.workspaceScope
+      workspaceList: (state) => state.workspaceList,
+      workspaceNo: (state) => state.workspaceNo,
+      workspaceName: (state) => state.workspaceName,
+      workspaceScope: (state) => state.workspaceScope
     })
   },
 

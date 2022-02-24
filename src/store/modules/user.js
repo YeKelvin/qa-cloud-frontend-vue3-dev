@@ -10,8 +10,8 @@ const getDefaultState = () => {
     number: '',
     name: '',
     avatar: '',
-    introduction: '',
-    roles: [] }
+    roles: []
+  }
 }
 
 const state = getDefaultState()
@@ -43,20 +43,20 @@ const actions = {
     return new Promise((resolve, reject) => {
       // 获取加密公钥
       UsercenterService.encryptionFactor({ loginName: loginName.trim() })
-        .then(response => {
+        .then((response) => {
           const { result } = response
           const rsaPublicKey = result['publicKey']
           const jse = new JSEncrypt()
           jse.setPublicKey(rsaPublicKey)
           return UsercenterService.login({ loginName: loginName.trim(), password: jse.encrypt(password) })
         })
-        .then(response => {
+        .then((response) => {
           const { result } = response
           commit('SET_TOKEN', result.accessToken)
           setToken(result.accessToken)
           resolve()
         })
-        .catch(error => {
+        .catch((error) => {
           reject(error)
         })
     })
@@ -65,7 +65,7 @@ const actions = {
   queryInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
       UsercenterService.queryInfo()
-        .then(response => {
+        .then((response) => {
           if (!response) {
             reject('身份认证失败或过期，请重新登录')
             return
@@ -78,7 +78,7 @@ const actions = {
           commit('SET_ROLES', result.roles)
           resolve(result)
         })
-        .catch(error => {
+        .catch((error) => {
           reject(error)
         })
     })
@@ -93,14 +93,14 @@ const actions = {
           commit('RESET_STATE')
           resolve()
         })
-        .catch(error => {
+        .catch((error) => {
           reject(error)
         })
     })
   },
 
   resetToken({ commit }) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       removeToken() // must remove token first
       commit('RESET_STATE')
       resolve()

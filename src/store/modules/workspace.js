@@ -10,7 +10,12 @@ const state = {
   /**
    * 当前选择的工作空间名称（优先从localStorage读取）
    */
-  workspaceName: localStorage.getItem('workspaceName') || '工作空间',
+  workspaceName: localStorage.getItem('workspaceName') || '请选择工作空间',
+
+  /**
+   * 当前选择的工作空间作用域（优先从localStorage读取）
+   */
+  workspaceScope: localStorage.getItem('workspaceScope') || '',
 
   /**
    * 工作空间列表
@@ -35,6 +40,10 @@ const mutations = {
     state.workspaceName = data
     localStorage.setItem('workspaceName', data)
   },
+  setWorkspaceScope: (state, data) => {
+    state.workspaceScope = data
+    localStorage.setItem('workspaceScope', data)
+  },
   setWorkspaceList: (state, data) => {
     state.workspaceList = data
   }
@@ -45,22 +54,22 @@ const actions = {
    * 查询所有工作空间
    */
   setWorkspaceList({ commit, state }) {
-    WorkspaceService.queryWorkspaceAll({ userNo: store.getters.userNo })
-      .then(response => {
-        commit('setWorkspaceList', response.result)
-        // 当前工作空间不为空且不在工作空间列表中时（表示该工作空间已无效），清空localStorage
-        if (state.workspaceNo !== '') {
-          if (response.result.findIndex(item => item.workspaceNo === state.workspaceNo) < 0) {
-            state.workspaceNo = ''
-            state.workspaceName = '工作空间'
-            localStorage.removeItem('workspaceNo')
-            localStorage.removeItem('workspaceName')
-          }
-        } else {
-          // 如果当前未选择工作空间，清空已选择的脚本列表
-          localStorage.removeItem('selectedCollectionNumberList')
+    WorkspaceService.queryWorkspaceAll({ userNo: store.getters.userNo }).then((response) => {
+      commit('setWorkspaceList', response.result)
+      // 当前工作空间不为空且不在工作空间列表中时（表示该工作空间已无效），清空localStorage
+      if (state.workspaceNo !== '') {
+        if (response.result.findIndex((item) => item.workspaceNo === state.workspaceNo) < 0) {
+          state.workspaceNo = ''
+          state.workspaceName = '工作空间'
+          localStorage.removeItem('workspaceNo')
+          localStorage.removeItem('workspaceName')
+          localStorage.removeItem('workspaceScope')
         }
-      })
+      } else {
+        // 如果当前未选择工作空间，清空已选择的脚本列表
+        localStorage.removeItem('selectedCollectionNumberList')
+      }
+    })
   }
 }
 

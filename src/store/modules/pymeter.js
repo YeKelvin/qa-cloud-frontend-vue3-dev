@@ -37,9 +37,11 @@ const state = {
   // 显示执行结果视图
   showResultDrawer: false,
 
+  // 显示执行日志视图
+  showLogDrawer: false,
+
   // 请求头模板列表
   httpHeaderTemplateList: []
-
 }
 
 const mutations = {
@@ -104,15 +106,17 @@ const mutations = {
         }
       }
     }
-    state.tabs = tabs.filter(tab => tab.editorNo !== editorNo)
+    state.tabs = tabs.filter((tab) => tab.editorNo !== editorNo)
 
     // 手动删除 keep-alive 缓存
     const instance = state.cachedInstance[editorNo]
-
     if (!instance) return
-    const keepalive = instance.$vnode.parent.componentInstance.$vnode.componentInstance
-    const cache = keepalive.cache
-    const keys = keepalive.keys
+
+    const keepaliveComponent = instance?.$vnode?.parent?.componentInstance?.$vnode?.componentInstance
+    if (!keepaliveComponent) return
+
+    const cache = keepaliveComponent.cache
+    const keys = keepaliveComponent.keys
     if (cache[editorNo]) {
       if (keys.length) {
         const index = keys.indexOf(editorNo)
@@ -173,6 +177,22 @@ const mutations = {
 
   openResultDrawer: (state) => {
     state.showResultDrawer = true
+  },
+
+  closeResultDrawer: (state) => {
+    state.showResultDrawer = false
+  },
+
+  setShowLogDrawer: (state, data) => {
+    state.showLogDrawer = data
+  },
+
+  openLogDrawer: (state) => {
+    state.showLogDrawer = true
+  },
+
+  closeLogDrawer: (state) => {
+    state.showLogDrawer = false
   }
 }
 
@@ -181,7 +201,7 @@ const actions = {
    * 关闭所有已打开的 tab 页
    */
   removeAllTab: ({ commit, state }) => {
-    state.tabs.forEach(tab => commit('removeTab', tab))
+    state.tabs.forEach((tab) => commit('removeTab', tab))
     state.activeTabNo = ''
   },
 
@@ -193,19 +213,23 @@ const actions = {
     const workspaceNo = store.state.workspace.workspaceNo
 
     // 查询变量集列表
-    state.globalDatasetList = (
-      await VariablesService.queryVariableDatasetAll({ datasetType: 'GLOBAL' })).result
+    // 全局变量
+    state.globalDatasetList = (await VariablesService.queryVariableDatasetAll({ datasetType: 'GLOBAL' })).result
+    // 环境变量
     state.environmentDatasetList = (
-      await VariablesService.queryVariableDatasetAll({ workspaceNo: workspaceNo, datasetType: 'ENVIRONMENT' })).result
+      await VariablesService.queryVariableDatasetAll({ workspaceNo: workspaceNo, datasetType: 'ENVIRONMENT' })
+    ).result
+    // 自定义变量
     state.customDatasetList = (
-      await VariablesService.queryVariableDatasetAll({ workspaceNo: workspaceNo, datasetType: 'CUSTOM' })).result
+      await VariablesService.queryVariableDatasetAll({ workspaceNo: workspaceNo, datasetType: 'CUSTOM' })
+    ).result
 
     // 判断是否存在无效数据，存在则删除
     const datasetNumberList = [
       ...state.globalDatasetList,
       ...state.environmentDatasetList,
       ...state.customDatasetList
-    ].map(item => item.datasetNo)
+    ].map((item) => item.datasetNo)
 
     // 当前选择的变量集不为空且不在变量集列表中时（表示该变量集已无效），删除该变量集编号
     for (let i = state.selectedDatasetNumberList.length - 1; i >= 0; i--) {
@@ -233,21 +257,21 @@ const actions = {
   disableOtherUnselectedEnvironmentDataset({ state }) {
     // 没有选中任何变量集时，开放所有环境变量集
     if (state.selectedDatasetNumberList.length === 0) {
-      state.environmentDatasetList.forEach(env => {
+      state.environmentDatasetList.forEach((env) => {
         env.disabled = false
       })
     }
     // 判断当前选中的变量集是否需要禁用
-    state.selectedDatasetNumberList.forEach(datasetNo => {
-      const index = state.environmentDatasetList.findIndex(item => item.datasetNo === datasetNo)
+    state.selectedDatasetNumberList.forEach((datasetNo) => {
+      const index = state.environmentDatasetList.findIndex((item) => item.datasetNo === datasetNo)
       // 已经选择了环境变量集，禁用其余环境变量集
       if (index > -1) {
-        state.environmentDatasetList.forEach(env => {
+        state.environmentDatasetList.forEach((env) => {
           env.disabled = env.datasetNo !== datasetNo
         })
-      // 没有选择环境变量集时，开放所有环境变量集
+        // 没有选择环境变量集时，开放所有环境变量集
       } else {
-        state.environmentDatasetList.forEach(env => {
+        state.environmentDatasetList.forEach((env) => {
           env.disabled = false
         })
       }
@@ -258,10 +282,11 @@ const actions = {
    * 查询所有请求头模板
    */
   queryHttpHeaderTemplateAll({ state }) {
-    HttpHeadersService.queryHttpHeaderTemplateAll({ workspaceNo: store.state.workspace.workspaceNo })
-      .then(response => {
+    HttpHeadersService.queryHttpHeaderTemplateAll({ workspaceNo: store.state.workspace.workspaceNo }).then(
+      (response) => {
         state.httpHeaderTemplateList = response.result
-      })
+      }
+    )
   }
 }
 

@@ -60,9 +60,9 @@ const toHideLoading = _.debounce(() => {
 
 // 请求拦截器
 service.interceptors.request.use(
-  config => {
+  (config) => {
     if (store.getters.token) {
-      config.headers['Authorization'] = 'Bearer ' + getToken()
+      config.headers['Authorization'] = `Bearer ${  getToken()}`
     }
     // 判断当前请求是否设置了不显示Loading
     if (config.method !== 'get') {
@@ -70,7 +70,7 @@ service.interceptors.request.use(
     }
     return config
   },
-  error => {
+  (error) => {
     // 判断当前请求是否设置了不显示Loading
     if (error.config.method !== 'get') {
       hideLoading()
@@ -82,7 +82,7 @@ service.interceptors.request.use(
 
 // 响应拦截器
 service.interceptors.response.use(
-  response => {
+  (response) => {
     const { data } = response
     // 判断当前请求是否设置了不显示 Loading（不显示自然无需隐藏）
     if (response.config.method !== 'get') {
@@ -112,7 +112,7 @@ service.interceptors.response.use(
       return data
     }
   },
-  error => {
+  (error) => {
     // 判断当前请求是否设置了不显示 Loading（不显示自然无需隐藏）
     if (error.config.method !== 'get') {
       hideLoading()

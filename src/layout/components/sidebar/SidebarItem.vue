@@ -1,12 +1,12 @@
 <template>
   <template v-if="!item.hidden">
     <template v-if="showSidebarItem(item.children, item)">
-      <sidebar-item-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
+      <SidebarItemLink v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
         <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{ 'submenu-title-noDropdown': !isNest }">
           <svg-icon :icon-name="onlyOneChild.meta?.icon || item.meta?.icon" class-name="nav-icon" />
           <template #title>{{ onlyOneChild.meta?.title }}</template>
         </el-menu-item>
-      </sidebar-item-link>
+      </SidebarItemLink>
     </template>
 
     <el-sub-menu v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
@@ -14,8 +14,9 @@
         <svg-icon :icon-name="item.meta?.icon" class-name="nav-icon" />
         <span>{{ item.meta.title }}</span>
       </template>
-      <sidebar-item
+      <SidebarItem
         v-for="child in item.children"
+        v-bind="$attrs"
         :key="child.path"
         :is-nest="true"
         :item="child"
@@ -36,6 +37,7 @@ import { isExternal } from '@/utils/validate'
 
 export default {
   name: 'SidebarItem',
+  inheritAttrs: false,
   props: {
     item: { type: Object, required: true },
     isNest: { type: Boolean, default: false },
