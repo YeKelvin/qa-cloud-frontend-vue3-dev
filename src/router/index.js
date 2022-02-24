@@ -20,19 +20,19 @@ export const constantRoutes = [
 
   {
     path: '/login',
-    component: () => import('@/views/login/index'),
+    component: () => import('@/views/login/Login.vue'),
     hidden: true
   },
 
   {
     path: '/401',
-    component: () => import('@/views/error-page/401'),
+    component: () => import('@/views/error-page/401.vue'),
     hidden: true
   },
 
   {
     path: '/404',
-    component: () => import('@/views/error-page/404'),
+    component: () => import('@/views/error-page/404.vue'),
     hidden: true
   },
 
@@ -45,7 +45,7 @@ export const constantRoutes = [
       {
         path: 'dashboard',
         name: 'Dashboard',
-        component: () => import('@/views/dashboard/index'),
+        component: () => import('@/views/dashboard'),
         meta: { title: '首页', icon: 'sidebar-home' }
       }
     ]
@@ -155,15 +155,18 @@ export const asyncRoutes = [
   { path: '/:pathMatch(.*)', redirect: '/404', hidden: true }
 ]
 
-const router = createRouter({
-  history: createWebHashHistory(),
-  scrollBehavior: () => ({ top: 0 }),
-  routes: constantRoutes
-})
+const createVueRouter = () =>
+  createRouter({
+    history: createWebHashHistory(),
+    scrollBehavior: () => ({ top: 0 }),
+    routes: constantRoutes
+  })
 
 export function resetRouter() {
-  const newRouter = createRouter()
+  const newRouter = createVueRouter()
   router.matcher = newRouter.matcher // reset router
 }
+
+const router = createVueRouter()
 
 export default router

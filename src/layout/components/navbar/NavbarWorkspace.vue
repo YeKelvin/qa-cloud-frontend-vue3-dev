@@ -27,24 +27,24 @@
         <!-- 标签 -->
         <el-tag
           v-if="data.workspaceScope == 'PRIVATE'"
-          size="mini"
+          size="small"
           type="danger"
           style="margin-left:5px;"
-          Private
+          private
         </el-tag>
         <el-tag
           v-if="data.workspaceScope == 'PROTECTED'"
-          size="mini"
+          size="small"
           type="warning"
           style="margin-left:5px;"
-          Protected
+          protected
         </el-tag>
         <el-tag
           v-if="data.workspaceScope == 'PUBLIC'"
-          size="mini"
+          size="small"
           type="success"
           style="margin-left:5px;"
-          Public
+          public
         </el-tag>
       </span>
     </el-tree>

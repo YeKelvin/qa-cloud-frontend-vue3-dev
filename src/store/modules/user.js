@@ -1,4 +1,4 @@
-import * as UsercenterService from '@/api/usercenter'
+import * as UsercenterService from '@/api/usercenter/usercenter'
 import { getToken, removeToken, setToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 import userDefaultAvatar from '@/assets/images/layout/user_avatar.gif'

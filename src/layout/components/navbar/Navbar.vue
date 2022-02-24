@@ -1,7 +1,7 @@
 <template>
   <div class="navbar">
     <div style="display: flex; flex: 1 1 33.33%; align-items: center">
-      <Hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
+      <Hamburger :is-active="sidebar.opened" class="hamburger-container" @toggle-click="toggleSideBar" />
       <Breadcrumb />
     </div>
 
@@ -11,6 +11,7 @@
 
     <div style="display: flex; flex: 1 1 33.33%; align-items: center; justify-content: flex-end" class="right-menu">
       <template v-if="device !== 'mobile'">
+        <Search id="header-search" class="right-menu-item" />
         <Screenfull id="screenfull" class="right-menu-item hover-effect" />
       </template>
 
@@ -36,6 +37,7 @@ import { CaretBottom } from '@element-plus/icons-vue'
 import Breadcrumb from './NavbarBreadcrumb.vue'
 import Hamburger from './NavbarHamburger.vue'
 import Screenfull from './NavbarScreenfull.vue'
+import Search from './NavbarSearch.vue'
 // import WorkspaceSelect from './NavbarWorkspace.vue'
 </script>
 
@@ -71,9 +73,9 @@ export default {
 }
 
 .hamburger-container {
+  cursor: pointer;
   line-height: 46px;
   height: 100%;
-  cursor: pointer;
   transition: background 0.3s;
   -webkit-tap-highlight-color: transparent;
 
@@ -110,14 +112,15 @@ export default {
 }
 
 .avatar-container {
-  margin-right: 30px;
+  margin-right: 20px;
   .avatar-wrapper {
+    cursor: pointer;
     display: flex;
+    align-items: flex-end;
   }
 }
 
 .user-avatar {
-  cursor: pointer;
   width: 40px;
   height: 40px;
   border-radius: 10px;

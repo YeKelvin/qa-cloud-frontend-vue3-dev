@@ -3,7 +3,7 @@
     <template v-if="showSidebarItem(item.children, item)">
       <SidebarItemLink v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">
         <el-menu-item :index="resolvePath(onlyOneChild.path)" :class="{ 'submenu-title-noDropdown': !isNest }">
-          <svg-icon :icon-name="onlyOneChild.meta?.icon || item.meta?.icon" class-name="nav-icon" />
+          <SvgIcon :icon-name="onlyOneChild.meta?.icon || item.meta?.icon" class-name="nav-icon" />
           <template #title>{{ onlyOneChild.meta?.title }}</template>
         </el-menu-item>
       </SidebarItemLink>
@@ -11,7 +11,7 @@
 
     <el-sub-menu v-else ref="subMenu" :index="resolvePath(item.path)" popper-append-to-body>
       <template v-if="item.meta" #title>
-        <svg-icon :icon-name="item.meta?.icon" class-name="nav-icon" />
+        <SvgIcon :icon-name="item.meta?.icon" class-name="nav-icon" />
         <span>{{ item.meta.title }}</span>
       </template>
       <SidebarItem
@@ -80,3 +80,10 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.nav-icon {
+  display: inline-block;
+  font-size: 16px;
+}
+</style>

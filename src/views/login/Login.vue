@@ -33,10 +33,10 @@
           :key="passwordType"
           v-model="loginForm.password"
           placeholder="密码"
-          :type="passwordType"
           name="password"
           tabindex="2"
           auto-complete="on"
+          :type="passwordType"
           @keyup.enter="handleLogin"
         />
         <span class="show-pwd" @click="showPwd">
