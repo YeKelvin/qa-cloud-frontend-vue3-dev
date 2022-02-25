@@ -16,7 +16,7 @@
           <el-button type="primary" @click="query">查 询</el-button>
           <el-button @click="resetQueryConditions">重 置</el-button>
         </div>
-        <el-button type="primary" @click="showRegisterDialog = true">新 增</el-button>
+        <el-button type="primary" @click="showCreateDialog = true">新 增</el-button>
       </div>
     </el-card>
 
@@ -53,6 +53,7 @@
       </el-table>
     </el-card>
 
+    <!-- 分页组件 -->
     <div class="pagination-container">
       <el-pagination
         v-model:current-page="page"
@@ -66,36 +67,28 @@
     </div>
 
     <!-- 注册用户表单 -->
-    <!-- <register-form v-if="showRegisterDialog" key="create" v-model:visible="showRegisterDialog" @re-query="query" /> -->
-
+    <CreateDialog v-model="showCreateDialog" destroy-on-close @re-query="query" />
     <!-- 编辑用户表单 -->
-    <!-- <modify-form
-      v-if="showModifyDialog"
-      key="modify"
-      v-model:visible="showModifyDialog"
-      :row="currentRowData"
-      @re-query="query"
-    /> -->
+    <ModifyDialog v-model="showModifyDialog" destroy-on-close :row="currentRow" @re-query="query" />
   </div>
 </template>
 
 <script setup>
 import ConditionInput from '@/components/query-condition/ConditionInput.vue'
 import ConditionSelect from '@/components/query-condition/ConditionSelect.vue'
-// import RegisterForm from './components/register-form'
-// import ModifyForm from './components/modify-form'
+import CreateDialog from './UserCreateDialog.vue'
+import ModifyDialog from './UserModifyDialog.vue'
+import { UserState } from '@/api/enum'
 </script>
 
 <script>
 import * as UserService from '@/api/usercenter/user'
-import { UserState } from '@/api/enum'
 
 export default {
   name: 'User',
   data() {
     return {
       // 查询条件
-      UserState: UserState,
       queryConditions: {
         userNo: '',
         userName: '',
@@ -111,8 +104,8 @@ export default {
       page: 1,
       pageSize: 10,
       total: 0,
-      currentRowData: {},
-      showRegisterDialog: false,
+      currentRow: {},
+      showCreateDialog: false,
       showModifyDialog: false
     }
   },
@@ -141,50 +134,62 @@ export default {
       this.page = val
       this.query()
     },
-    modifyUserState(row, state) {
+
+    /**
+     * 修改用户状态
+     */
+    async modifyUserState(row, state) {
       const message = state === 'DISABLE' ? '禁用' : '启用'
-      this.$confirm(`确定${message}吗？`, '警告', {
+      // 二次确认
+      await this.$confirm(`确定${message}吗？`, '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        UserService.modifyUserState({ userNo: row.userNo, state: state }).then(() => {
-          // 成功提示
-          this.$message({ message: `${message}成功`, type: 'info', duration: 2 * 1000 })
-          // 重新查询列表
-          this.query()
-        })
       })
+      // 修改用户状态
+      await UserService.modifyUserState({ userNo: row.userNo, state: state })
+      // 成功提示
+      this.$message({ message: `${message}成功`, type: 'info', duration: 2 * 1000 })
+      // 重新查询列表
+      this.query()
     },
-    resetPassword(row) {
-      this.$confirm('确定重置密码吗？', '提示', {
+
+    /**
+     * 重置用户密码
+     */
+    async resetPassword(row) {
+      // 二次确认
+      await this.$confirm('确定重置密码吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        UserService.resetPassword({ userNo: row.userNo }).then(() => {
-          // 成功提示
-          this.$message({ message: '重置用户密码成功', type: 'info', duration: 2 * 1000 })
-        })
       })
+      // 重置用户密码
+      await UserService.resetPassword({ userNo: row.userNo })
+      // 成功提示
+      this.$message({ message: '重置用户密码成功', type: 'info', duration: 2 * 1000 })
     },
-    deleteUser(row) {
-      this.$confirm('确定删除吗？', '警告', {
+
+    /**
+     * 删除用户
+     */
+    async deleteUser(row) {
+      // 二次确认
+      await this.$confirm('确定删除吗？', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        UserService.deleteUser({ userNo: row.userNo }).then(() => {
-          // 成功提示
-          this.$message({ message: '删除用户成功', type: 'info', duration: 2 * 1000 })
-          // 重新查询列表
-          this.query()
-        })
       })
+      // 删除用户
+      UserService.deleteUser({ userNo: row.userNo })
+      // 成功提示
+      this.$message({ message: '删除用户成功', type: 'info', duration: 2 * 1000 })
+      // 重新查询列表
+      this.query()
     },
     openModifyDialog(row) {
       this.showModifyDialog = true
-      this.currentRowData = { ...row }
+      this.currentRow = { ...row }
     }
   }
 }
