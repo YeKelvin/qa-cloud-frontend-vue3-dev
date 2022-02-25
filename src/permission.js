@@ -8,7 +8,7 @@ import getPageTitle from '@/utils/get-page-title'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
-const whiteList = ['/login', '/404', '/401'] // no redirect whitelist
+const WHITE_LIST = ['/login', '/404', '/401'] // no redirect whitelist
 
 // 全局前置导航守卫
 router.beforeEach(async (to, from, next) => {
@@ -27,7 +27,7 @@ router.beforeEach(async (to, from, next) => {
       next({ path: '/' })
       NProgress.done()
     } else {
-      // 确定用户是否已通过getInfo获得其权限角色
+      // 确定用户是否已获取其角色
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
       if (hasRoles) {
         next()
@@ -47,20 +47,19 @@ router.beforeEach(async (to, from, next) => {
           })
 
           // hack method to ensure that addRoutes is complete
-          next({ ...to, replace: true }) // replace:true的作用是不留下历史记录
+          next({ ...to, replace: true }) // replace: true 的作用是不留下历史记录
         } catch (error) {
           // 移除 token并重定向到登录页
-          await store.dispatch('user/resetToken')
           ElMessage.error(error.toString() || 'Has Error')
+          await store.dispatch('user/resetToken')
           next({ path: '/login', query: { redirect: to.path, ...to.query } })
           NProgress.done()
         }
       }
     }
   } else {
-    /* has no token*/
-
-    if (whiteList.indexOf(to.path) !== -1) {
+    /* has no token */
+    if (WHITE_LIST.indexOf(to.path) !== -1) {
       // in the free login whitelist, go directly
       next()
     } else {

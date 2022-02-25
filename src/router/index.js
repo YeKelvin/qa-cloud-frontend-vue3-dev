@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import Layout from '@/layout'
 
 /**
@@ -112,9 +112,9 @@ export const asyncRoutes = [
     meta: { title: '系统管理', icon: 'sidebar-setting', roles: ['ADMIN'] },
     children: [
       {
-        path: '/user',
-        name: 'User',
-        component: () => import('@/views/system/user/index'),
+        path: 'user',
+        // name: 'User',
+        component: () => import('@/views/system/user/User.vue'),
         meta: { title: '用户管理', icon: 'sidebar-user' }
       },
       {
@@ -157,15 +157,10 @@ export const asyncRoutes = [
 
 const createVueRouter = () =>
   createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     scrollBehavior: () => ({ top: 0 }),
     routes: constantRoutes
   })
-
-export function resetRouter() {
-  const newRouter = createVueRouter()
-  router.matcher = newRouter.matcher // reset router
-}
 
 const router = createVueRouter()
 

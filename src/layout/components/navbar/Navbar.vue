@@ -54,8 +54,10 @@ export default {
       this.$store.dispatch('app/toggleSideBar')
     },
     async logout() {
-      await this.$store.dispatch('user/logout')
-      this.$router.push({ path: '/login', query: { redirect: this.$route.path, ...this.$route.query } })
+      await this.$store.dispatch('user/logout').then(() => {
+        // 刷新页面
+        location.reload()
+      })
     }
   }
 }

@@ -62,7 +62,7 @@ const toHideLoading = _.debounce(() => {
 service.interceptors.request.use(
   (config) => {
     if (store.getters.token) {
-      config.headers['Authorization'] = `Bearer ${  getToken()}`
+      config.headers['Authorization'] = `Bearer ${getToken()}`
     }
     // 判断当前请求是否设置了不显示Loading
     if (config.method !== 'get') {
@@ -100,6 +100,7 @@ service.interceptors.response.use(
           type: 'warning'
         }).then(() => {
           store.dispatch('user/resetToken').then(() => {
+            // 刷新页面
             location.reload()
           })
         })

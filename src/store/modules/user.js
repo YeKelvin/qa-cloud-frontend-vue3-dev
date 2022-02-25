@@ -1,8 +1,8 @@
-import * as UsercenterService from '@/api/usercenter/usercenter'
+import * as UserService from '@/api/usercenter/user'
+import * as AuthService from '@/api/usercenter/auth'
 import { getToken, removeToken, setToken } from '@/utils/auth'
-import { resetRouter } from '@/router'
-import userDefaultAvatar from '@/assets/images/layout/user_avatar.gif'
 import { JSEncrypt } from 'jsencrypt'
+import userDefaultAvatar from '@/assets/images/layout/user_avatar.gif'
 
 const getDefaultState = () => {
   return {
@@ -42,13 +42,13 @@ const actions = {
     const { loginName, password } = userInfo
     return new Promise((resolve, reject) => {
       // 获取加密公钥
-      UsercenterService.encryptionFactor({ loginName: loginName.trim() })
+      AuthService.encryptionFactor({ loginName: loginName.trim() })
         .then((response) => {
           const { result } = response
           const rsaPublicKey = result['publicKey']
           const jse = new JSEncrypt()
           jse.setPublicKey(rsaPublicKey)
-          return UsercenterService.login({ loginName: loginName.trim(), password: jse.encrypt(password) })
+          return UserService.login({ loginName: loginName.trim(), password: jse.encrypt(password) })
         })
         .then((response) => {
           const { result } = response
@@ -62,9 +62,9 @@ const actions = {
     })
   },
 
-  queryInfo({ commit, state }) {
+  queryInfo({ commit }) {
     return new Promise((resolve, reject) => {
-      UsercenterService.queryInfo()
+      UserService.queryInfo()
         .then((response) => {
           if (!response) {
             reject('身份认证失败或过期，请重新登录')
@@ -86,10 +86,9 @@ const actions = {
 
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
-      UsercenterService.logout(state.token)
+      UserService.logout(state.token)
         .then(() => {
           removeToken() // must remove  token  first
-          resetRouter()
           commit('RESET_STATE')
           resolve()
         })

@@ -60,14 +60,14 @@
 export default {
   name: 'Login',
   data() {
-    const validateLoginName = (rule, value, callback) => {
+    const validateLoginName = (_, value, callback) => {
       if (this.$_.isEmpty(value)) {
         callback(new Error('登录账号不能为空'))
       } else {
         callback()
       }
     }
-    const validatePassword = (rule, value, callback) => {
+    const validatePassword = (_, value, callback) => {
       if (this.$_.isEmpty(value)) {
         callback(new Error('登录密码不能为空'))
       } else {

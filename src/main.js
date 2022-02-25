@@ -29,7 +29,7 @@ import './permission'
 
 const app = createApp(App)
 app.use(store)
-app.use(ElementPlus, { size: 'mini', locale: zhCn })
+app.use(ElementPlus, { size: 'default', locale: zhCn })
 app.component('SvgIcon', SvgIcon)
 directive(app)
 app.config.globalProperties.$dayjs = DayJs
