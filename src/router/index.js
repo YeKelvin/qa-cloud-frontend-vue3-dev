@@ -120,32 +120,32 @@ export const asyncRoutes = [
       {
         path: 'role',
         name: 'Role',
-        component: () => import('@/views/system/role/index'),
+        component: () => import('@/views/system/role/Role.vue'),
         meta: { title: '角色管理', icon: 'sidebar-role' }
       },
       {
         path: 'permission',
         name: 'Permission',
-        component: () => import('@/views/system/permission/index'),
+        component: () => import('@/views/system/permission/Permission.vue'),
         meta: { title: '权限管理', icon: 'sidebar-permission' }
       },
       {
         path: 'role/permissions',
         name: 'RolePermissions',
         hidden: true,
-        component: () => import('@/views/system/role-permissions/index'),
+        component: () => import('@/views/system/role/RolePermissions.vue'),
         meta: { title: '角色权限', activeMenu: '/system/role' }
       },
       {
         path: 'workspace',
         name: 'Workspace',
-        component: () => import('@/views/system/workspace/index'),
+        component: () => import('@/views/system/workspace/Workspace.vue'),
         meta: { title: '空间管理', icon: 'sidebar-workspace' }
       },
       {
         path: 'action/log',
         name: 'ActionLog',
-        component: () => import('@/views/system/action-log/index'),
+        component: () => import('@/views/system/action-log/ActionLog'),
         meta: { title: '操作日志', icon: 'sidebar-log' }
       }
     ]
