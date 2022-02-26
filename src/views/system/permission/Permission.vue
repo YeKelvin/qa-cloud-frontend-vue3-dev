@@ -3,12 +3,12 @@
     <el-card shadow="hover" style="margin-bottom: 10px">
       <template #header><span>查询条件</span></template>
       <div class="conditions-container">
-        <ConditionInput v-model="queryConditions.userNo" label="用户编号" />
-        <ConditionInput v-model="queryConditions.userName" label="用户名称" />
-        <ConditionInput v-model="queryConditions.loginName" label="登录账号" />
-        <ConditionInput v-model="queryConditions.mobileNo" label="手机号" />
-        <ConditionInput v-model="queryConditions.email" label="邮箱地址" />
-        <ConditionSelect v-model="queryConditions.state" :options="UserState" label="用户状态" />
+        <ConditionInput v-model="queryConditions.permissionNo" label="权限编号" />
+        <ConditionInput v-model="queryConditions.permissionName" label="权限名称" />
+        <ConditionInput v-model="queryConditions.permissionDesc" label="权限描述" />
+        <ConditionInput v-model="queryConditions.endpoint" label="请求路由" />
+        <ConditionSelect v-model="queryConditions.method" :options="HttpMethods" label="请求方法" />
+        <ConditionSelect v-model="queryConditions.state" :options="PermissionState" label="权限状态" />
       </div>
       <div style="display: flex; justify-content: space-between">
         <div />
@@ -26,36 +26,27 @@
         <!-- 空数据提示 -->
         <template #empty><el-empty /></template>
         <!-- 列定义 -->
-        <el-table-column prop="userNo" label="用户编号" min-width="150" />
-        <el-table-column prop="userName" label="用户名称" min-width="150" />
-        <el-table-column prop="loginName" label="登录账号" min-width="150" />
-        <el-table-column prop="mobileNo" label="手机号" min-width="150" />
-        <el-table-column prop="email" label="邮箱" min-width="150" />
+        <el-table-column prop="permissionNo" label="权限编号" min-width="150" />
+        <el-table-column prop="permissionName" label="权限名称" min-width="150" />
+        <el-table-column prop="permissionDesc" label="权限描述" min-width="150" />
+        <el-table-column prop="endpoint" label="请求路由" min-width="150" />
+        <el-table-column prop="method" label="请求方法" min-width="150" />
         <el-table-column prop="state" label="状态" min-width="150">
-          <template #default="{ row }">{{ UserState[row.state] }}</template>
-        </el-table-column>
-        <el-table-column prop="roles" label="角色" min-width="150">
-          <template #default="{ row }">
-            <el-tag v-for="role in row.roles" :key="role.roleNo">{{ role.roleName }}</el-tag>
-          </template>
+          <template #default="{ row }">{{ PermissionState[row.state] }}</template>
         </el-table-column>
         <el-table-column fixed="right" label="操作" min-width="150">
           <template #default="{ row }">
             <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
-            <el-button type="text" @click="resetPassword(row)">重置密码</el-button>
-            <template v-if="row.state === 'ENABLE'">
-              <el-button type="text" @click="modifyUserState(row, 'DISABLE')">禁用</el-button>
-            </template>
-            <template v-else>
-              <el-button type="text" @click="modifyUserState(row, 'ENABLE')">启用</el-button>
-            </template>
-            <el-button type="text" @click="deleteUser(row)">删除</el-button>
+            <el-button v-if="row.state === 'ENABLE'" type="text" @click="modifyPermissionState(row, 'DISABLE')">
+              禁用
+            </el-button>
+            <el-button v-else type="text" @click="modifyPermissionState(row, 'ENABLE')">启用</el-button>
+            <el-button type="text" @click="disablePermission(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
 
-    <!-- 分页组件 -->
     <div class="pagination-container">
       <el-pagination
         v-model:current-page="page"
@@ -68,37 +59,36 @@
       />
     </div>
 
-    <!-- 创建用户表单 -->
+    <!-- 创建权限表单 -->
     <CreateDialog v-model="showCreateDialog" destroy-on-close @re-query="query" />
-    <!-- 编辑用户表单 -->
+    <!-- 编辑权限表单 -->
     <ModifyDialog v-model="showModifyDialog" destroy-on-close :row="currentRow" @re-query="query" />
   </div>
 </template>
 
 <script setup>
-import { UserState } from '@/api/enum'
-import * as UserService from '@/api/usercenter/user'
+import { PermissionState, HttpMethods } from '@/api/enum'
+import * as PermissionService from '@/api/usercenter/permission'
 import ConditionInput from '@/components/query-condition/ConditionInput.vue'
 import ConditionSelect from '@/components/query-condition/ConditionSelect.vue'
 import useQueryConditions from '@/composables/useQueryConditions'
-import CreateDialog from './UserCreateDialog.vue'
-import ModifyDialog from './UserModifyDialog.vue'
+import CreateDialog from './PermissionCreateDialog.vue'
+import ModifyDialog from './PermissionModifyDialog.vue'
 
 // 查询条件
 const { queryConditions, resetQueryConditions } = useQueryConditions({
-  userNo: '',
-  userName: '',
-  loginName: '',
-  mobileNo: '',
-  email: '',
-  state: '',
-  roles: []
+  permissionNo: '',
+  permissionName: '',
+  permissionDesc: '',
+  endpoint: '',
+  method: '',
+  state: ''
 })
 </script>
 
 <script>
 export default {
-  name: 'User',
+  name: 'Permission',
   data() {
     return {
       // 表格数据
@@ -122,7 +112,7 @@ export default {
      * 查询
      */
     query() {
-      UserService.queryUserList({ ...this.queryConditions, page: this.page, pageSize: this.pageSize }).then(
+      PermissionService.queryPermissionList({ ...this.queryConditions, page: this.page, pageSize: this.pageSize }).then(
         (response) => {
           this.tableData = response.result['data']
           this.total = response.result['total']
@@ -131,21 +121,21 @@ export default {
     },
 
     /**
-     * 修改用户状态
+     * 修改权限状态
      */
-    async modifyUserState(row, state) {
-      const message = state === 'DISABLE' ? '禁用' : '启用'
+    async modifyPermissionState(row, state) {
+      const stateMsg = state === 'DISABLE' ? '禁用' : '启用'
       try {
         // 二次确认
-        await this.$confirm(`确定${message}吗？`, '警告', {
+        await this.$confirm(`确定${stateMsg}吗？`, '警告', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         })
-        // 修改用户状态
-        await UserService.modifyUserState({ userNo: row.userNo, state: state })
+        // 修改权限状态
+        await PermissionService.modifyPermissionState({ permissionNo: row.permissionNo, state: state })
         // 成功提示
-        this.$message({ message: `${message}成功`, type: 'info', duration: 2 * 1000 })
+        this.$message({ message: `${stateMsg}权限成功`, type: 'info', duration: 2 * 1000 })
         // 重新查询列表
         this.query()
       } catch {
@@ -154,29 +144,9 @@ export default {
     },
 
     /**
-     * 重置用户密码
+     * 删除权限
      */
-    async resetPassword(row) {
-      try {
-        // 二次确认
-        await this.$confirm('确定重置密码吗？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-        // 重置用户密码
-        await UserService.resetPassword({ userNo: row.userNo })
-        // 成功提示
-        this.$message({ message: '重置用户密码成功', type: 'info', duration: 2 * 1000 })
-      } catch {
-        return
-      }
-    },
-
-    /**
-     * 删除用户
-     */
-    async deleteUser(row) {
+    async disablePermission(row) {
       try {
         // 二次确认
         await this.$confirm('确定删除吗？', '警告', {
@@ -184,10 +154,10 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         })
-        // 删除用户
-        UserService.deleteUser({ userNo: row.userNo })
+        // 删除权限
+        await PermissionService.deletePermission({ permissionNo: row.permissionNo })
         // 成功提示
-        this.$message({ message: '删除用户成功', type: 'info', duration: 2 * 1000 })
+        this.$message({ message: '删除权限成功', type: 'info', duration: 2 * 1000 })
         // 重新查询列表
         this.query()
       } catch {
