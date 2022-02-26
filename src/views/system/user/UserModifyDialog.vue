@@ -1,6 +1,6 @@
 <template>
   <el-dialog title="编辑用户" width="50%" center v-bind="$attrs">
-    <el-form ref="form" label-width="auto" style="width: 100%" inline-message :model="form" :rules="formRules">
+    <el-form ref="form" label-width="100px" style="width: 100%" inline-message :model="form" :rules="formRules">
       <el-form-item label="用户名称：" prop="userName">
         <el-input v-model="form.userName" clearable />
       </el-form-item>
@@ -50,12 +50,19 @@ export default {
       roleList: []
     }
   },
+  watch: {
+    row(val) {
+      if (!val) return
+      // 除 roles 属性外其余赋值给 form
+      this.form = this.$_.omit(val, ['roles'])
+      // 提取 roleNo
+      this.form.roleNumberList = this.row.roles.map((item) => item.roleNo)
+    }
+  },
   mounted() {
-    this.form = this.$_.omit(this.row, ['roles'])
     // 查询所有角色
     RoleService.queryRoleAll().then((response) => {
       this.roleList = response.result
-      this.form.roleNumberList = this.row.roles.map((item) => item.roleNo)
     })
   },
   methods: {
@@ -63,24 +70,26 @@ export default {
      * 提交表单
      */
     async submitForm() {
-      // 表单校验
-      await this.$refs.form.validate().catch(() => {
+      try {
+        // 表单校验
+        await this.$refs.form.validate()
+        // 二次确认
+        await this.$confirm('确定修改吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        // 修改用户
+        await UserService.modifyUser(this.form)
+        // 成功提示
+        this.$message({ message: '编辑成功', type: 'info', duration: 2 * 1000 })
+        // 关闭dialog
+        this.$emit('update:model-value', false)
+        // 重新查询列表
+        this.$emit('re-query')
+      } catch {
         this.$message({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
-      })
-      // 二次确认
-      await this.$confirm('确定修改吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-      // 修改用户
-      await UserService.modifyUser(this.form)
-      // 成功提示
-      this.$message({ message: '编辑成功', type: 'info', duration: 2 * 1000 })
-      // 关闭dialog
-      this.$emit('update:model-value', false)
-      // 重新查询列表
-      this.$emit('re-query')
+      }
     }
   }
 }

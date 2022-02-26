@@ -34,5 +34,9 @@ app.component('SvgIcon', SvgIcon)
 directive(app)
 app.config.globalProperties.$dayjs = DayJs
 app.config.globalProperties.$_ = Lodash
+app.config.errorHandler = (err, vm, info) => {
+  console.error(err)
+  ElementPlus.ElMessage.error(err.toString() || '服务开小差')
+}
 
 app.use(router).mount('#app')

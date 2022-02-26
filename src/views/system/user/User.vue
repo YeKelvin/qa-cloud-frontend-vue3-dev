@@ -43,10 +43,12 @@
           <template #default="{ row }">
             <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
             <el-button type="text" @click="resetPassword(row)">重置密码</el-button>
-            <el-button v-if="row.state === 'ENABLE'" type="text" @click="modifyUserState(row, 'DISABLE')">
-              禁用
-            </el-button>
-            <el-button v-else type="text" @click="modifyUserState(row, 'ENABLE')">启用</el-button>
+            <template v-if="row.state === 'ENABLE'">
+              <el-button type="text" @click="modifyUserState(row, 'DISABLE')">禁用</el-button>
+            </template>
+            <template v-else>
+              <el-button type="text" @click="modifyUserState(row, 'ENABLE')">启用</el-button>
+            </template>
             <el-button type="text" @click="deleteUser(row)">删除</el-button>
           </template>
         </el-table-column>
@@ -66,7 +68,7 @@
       />
     </div>
 
-    <!-- 注册用户表单 -->
+    <!-- 创建用户表单 -->
     <CreateDialog v-model="showCreateDialog" destroy-on-close @re-query="query" />
     <!-- 编辑用户表单 -->
     <ModifyDialog v-model="showModifyDialog" destroy-on-close :row="currentRow" @re-query="query" />
@@ -74,37 +76,40 @@
 </template>
 
 <script setup>
+import { UserState } from '@/api/enum'
+import * as UserService from '@/api/usercenter/user'
 import ConditionInput from '@/components/query-condition/ConditionInput.vue'
 import ConditionSelect from '@/components/query-condition/ConditionSelect.vue'
+import useQueryConditions from '@/composables/useQueryConditions'
 import CreateDialog from './UserCreateDialog.vue'
 import ModifyDialog from './UserModifyDialog.vue'
-import { UserState } from '@/api/enum'
+
+// 查询条件
+const { queryConditions, resetQueryConditions } = useQueryConditions({
+  userNo: '',
+  userName: '',
+  loginName: '',
+  mobileNo: '',
+  email: '',
+  state: '',
+  roles: []
+})
 </script>
 
 <script>
-import * as UserService from '@/api/usercenter/user'
-
 export default {
   name: 'User',
   data() {
     return {
-      // 查询条件
-      queryConditions: {
-        userNo: '',
-        userName: '',
-        loginName: '',
-        mobileNo: '',
-        email: '',
-        state: '',
-        roles: []
-      },
       // 表格数据
       tableData: [],
       // 分页信息
       page: 1,
       pageSize: 10,
       total: 0,
+      // 当前操作的行数据
       currentRow: {},
+      // 对话框打开关闭标识
       showCreateDialog: false,
       showModifyDialog: false
     }
@@ -113,6 +118,9 @@ export default {
     this.query()
   },
   methods: {
+    /**
+     * 查询
+     */
     query() {
       UserService.queryUserList({ ...this.queryConditions, page: this.page, pageSize: this.pageSize }).then(
         (response) => {
@@ -121,10 +129,78 @@ export default {
         }
       )
     },
-    resetQueryConditions() {
-      Object.keys(this.queryConditions).forEach((key) => {
-        this.queryConditions[key] = ''
-      })
+
+    /**
+     * 修改用户状态
+     */
+    async modifyUserState(row, state) {
+      try {
+        const message = state === 'DISABLE' ? '禁用' : '启用'
+        // 二次确认
+        await this.$confirm(`确定${message}吗？`, '警告', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        // 修改用户状态
+        await UserService.modifyUserState({ userNo: row.userNo, state: state })
+        // 成功提示
+        this.$message({ message: `${message}成功`, type: 'info', duration: 2 * 1000 })
+        // 重新查询列表
+        this.query()
+      } catch {
+        return
+      }
+    },
+
+    /**
+     * 重置用户密码
+     */
+    async resetPassword(row) {
+      try {
+        // 二次确认
+        await this.$confirm('确定重置密码吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        // 重置用户密码
+        await UserService.resetPassword({ userNo: row.userNo })
+        // 成功提示
+        this.$message({ message: '重置用户密码成功', type: 'info', duration: 2 * 1000 })
+      } catch {
+        return
+      }
+    },
+
+    /**
+     * 删除用户
+     */
+    async deleteUser(row) {
+      try {
+        // 二次确认
+        await this.$confirm('确定删除吗？', '警告', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        // 删除用户
+        UserService.deleteUser({ userNo: row.userNo })
+        // 成功提示
+        this.$message({ message: '删除用户成功', type: 'info', duration: 2 * 1000 })
+        // 重新查询列表
+        this.query()
+      } catch {
+        return
+      }
+    },
+
+    /**
+     * 打开编辑对话框
+     */
+    openModifyDialog(row) {
+      this.showModifyDialog = true
+      this.currentRow = row
     },
     handleSizeChange(val) {
       this.pageSize = val
@@ -133,63 +209,6 @@ export default {
     handleCurrentChange(val) {
       this.page = val
       this.query()
-    },
-
-    /**
-     * 修改用户状态
-     */
-    async modifyUserState(row, state) {
-      const message = state === 'DISABLE' ? '禁用' : '启用'
-      // 二次确认
-      await this.$confirm(`确定${message}吗？`, '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-      // 修改用户状态
-      await UserService.modifyUserState({ userNo: row.userNo, state: state })
-      // 成功提示
-      this.$message({ message: `${message}成功`, type: 'info', duration: 2 * 1000 })
-      // 重新查询列表
-      this.query()
-    },
-
-    /**
-     * 重置用户密码
-     */
-    async resetPassword(row) {
-      // 二次确认
-      await this.$confirm('确定重置密码吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-      // 重置用户密码
-      await UserService.resetPassword({ userNo: row.userNo })
-      // 成功提示
-      this.$message({ message: '重置用户密码成功', type: 'info', duration: 2 * 1000 })
-    },
-
-    /**
-     * 删除用户
-     */
-    async deleteUser(row) {
-      // 二次确认
-      await this.$confirm('确定删除吗？', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-      // 删除用户
-      UserService.deleteUser({ userNo: row.userNo })
-      // 成功提示
-      this.$message({ message: '删除用户成功', type: 'info', duration: 2 * 1000 })
-      // 重新查询列表
-      this.query()
-    },
-    openModifyDialog(row) {
-      this.showModifyDialog = true
-      this.currentRow = { ...row }
     }
   }
 }
