@@ -1,15 +1,15 @@
 <template>
   <div class="navbar">
-    <div style="display: flex; flex: 1 1 33.33%; align-items: center">
+    <div class="three-column-flexbox">
       <Hamburger :is-active="sidebar.opened" class="hamburger-container" @toggle-click="toggleSideBar" />
       <Breadcrumb />
     </div>
 
-    <!-- <div style="display:flex; flex:1 1 33.33%; align-items:center; justify-content:center;">
-      <workspace-selector />
-    </div> -->
+    <div class="three-column-flexbox" style="justify-content: center">
+      <WorkspaceSelect />
+    </div>
 
-    <div style="display: flex; flex: 1 1 33.33%; align-items: center; justify-content: flex-end" class="right-menu">
+    <div class="three-column-flexbox right-menu" style="justify-content: flex-end">
       <template v-if="device !== 'mobile'">
         <Search id="header-search" class="right-menu-item" />
         <Screenfull id="screenfull" class="right-menu-item hover-effect" />
@@ -38,7 +38,7 @@ import Breadcrumb from './NavbarBreadcrumb.vue'
 import Hamburger from './NavbarHamburger.vue'
 import Screenfull from './NavbarScreenfull.vue'
 import Search from './NavbarSearch.vue'
-// import WorkspaceSelect from './NavbarWorkspace.vue'
+import WorkspaceSelect from './NavbarWorkspace.vue'
 </script>
 
 <script>
@@ -126,5 +126,11 @@ export default {
   width: 40px;
   height: 40px;
   border-radius: 10px;
+}
+
+.three-column-flexbox {
+  display: flex;
+  flex: 1 1 33.33%;
+  align-items: center;
 }
 </style>

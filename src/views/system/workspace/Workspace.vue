@@ -14,7 +14,7 @@
           <el-button type="primary" @click="query()">查 询</el-button>
           <el-button @click="resetQueryConditions()">重 置</el-button>
         </div>
-        <el-button type="primary" @click="showCreateView = true">新 增</el-button>
+        <el-button type="primary" @click="showCreateDialog = true">新 增</el-button>
       </div>
     </el-card>
 
@@ -140,16 +140,16 @@ export default {
      * 打开编辑对话框
      */
     openModifyDialog(row) {
-      this.showModifyView = true
-      this.currentRowData = row
+      this.showModifyDialog = true
+      this.currentRow = row
     },
 
     /**
      * 打开成员管理对话框
      */
     openMemberDialog(row) {
-      this.showMemberView = true
-      this.currentRowData = row
+      this.showMemberDialog = true
+      this.currentRow = row
     },
 
     /**
