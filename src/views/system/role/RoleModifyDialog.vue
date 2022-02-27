@@ -57,25 +57,33 @@ export default {
      * 提交表单
      */
     async submitForm() {
-      try {
-        // 表单校验
-        await this.$refs.form.validate()
-        // 二次确认
-        await this.$confirm('确定修改吗？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-        await RoleService.modifyRole(this.form)
-        // 成功提示
-        this.$message({ message: '编辑成功', type: 'info', duration: 2 * 1000 })
-        // 关闭dialog
-        this.$emit('update:model-value', false)
-        // 重新查询列表
-        this.$emit('re-query')
-      } catch {
+      let error = false
+      // 表单校验
+      error = await this.$refs.form
+        .validate()
+        .then(() => false)
+        .catch(() => true)
+      if (error) {
         this.$message({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+        return
       }
+      // 二次确认
+      error = await this.$confirm('确定修改吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 修改角色
+      await RoleService.modifyRole(this.form)
+      // 成功提示
+      this.$message({ message: '编辑成功', type: 'info', duration: 2 * 1000 })
+      // 关闭dialog
+      this.$emit('update:model-value', false)
+      // 重新查询列表
+      this.$emit('re-query')
     }
   }
 }

@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import * as UsercenterService from '@/api/usercenter'
+import * as PermissionService from '@/api/usercenter/permission'
 import { HttpMethods } from '@/api/enum'
 
 export default {
@@ -51,20 +51,23 @@ export default {
      * 提交表单
      */
     async submitForm() {
-      try {
-        // 表单校验
-        await this.$refs.form.validate()
-        // 创建权限
-        await UsercenterService.createPermission(this.form)
-        // 成功提示
-        this.$message({ message: '新增成功', type: 'info', duration: 2 * 1000 })
-        // 关闭dialog
-        this.$emit('update:model-value', false)
-        // 重新查询列表
-        this.$emit('re-query')
-      } catch {
+      // 表单校验
+      const error = await this.$refs.form
+        .validate()
+        .then(() => false)
+        .catch(() => false)
+      if (error) {
         this.$message({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+        return
       }
+      // 创建权限
+      await PermissionService.createPermission(this.form)
+      // 成功提示
+      this.$message({ message: '新增成功', type: 'info', duration: 2 * 1000 })
+      // 关闭dialog
+      this.$emit('update:model-value', false)
+      // 重新查询列表
+      this.$emit('re-query')
     }
   }
 }

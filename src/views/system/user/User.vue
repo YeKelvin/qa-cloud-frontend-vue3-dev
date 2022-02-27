@@ -135,64 +135,61 @@ export default {
      */
     async modifyUserState(row, state) {
       const message = state === 'DISABLE' ? '禁用' : '启用'
-      try {
-        // 二次确认
-        await this.$confirm(`确定${message}吗？`, '警告', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-        // 修改用户状态
-        await UserService.modifyUserState({ userNo: row.userNo, state: state })
-        // 成功提示
-        this.$message({ message: `${message}成功`, type: 'info', duration: 2 * 1000 })
-        // 重新查询列表
-        this.query()
-      } catch {
-        return
-      }
+      // 二次确认
+      const error = await this.$confirm(`确定${message}吗？`, '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 修改用户状态
+      await UserService.modifyUserState({ userNo: row.userNo, state: state })
+      // 成功提示
+      this.$message({ message: `${message}成功`, type: 'info', duration: 2 * 1000 })
+      // 重新查询列表
+      this.query()
     },
 
     /**
      * 重置用户密码
      */
     async resetPassword(row) {
-      try {
-        // 二次确认
-        await this.$confirm('确定重置密码吗？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-        // 重置用户密码
-        await UserService.resetPassword({ userNo: row.userNo })
-        // 成功提示
-        this.$message({ message: '重置用户密码成功', type: 'info', duration: 2 * 1000 })
-      } catch {
-        return
-      }
+      // 二次确认
+      const error = await this.$confirm('确定重置密码吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 重置用户密码
+      await UserService.resetPassword({ userNo: row.userNo })
+      // 成功提示
+      this.$message({ message: '重置用户密码成功', type: 'info', duration: 2 * 1000 })
     },
 
     /**
      * 删除用户
      */
     async deleteUser(row) {
-      try {
-        // 二次确认
-        await this.$confirm('确定删除吗？', '警告', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-        // 删除用户
-        UserService.deleteUser({ userNo: row.userNo })
-        // 成功提示
-        this.$message({ message: '删除用户成功', type: 'info', duration: 2 * 1000 })
-        // 重新查询列表
-        this.query()
-      } catch {
-        return
-      }
+      // 二次确认
+      const error = await this.$confirm('确定删除吗？', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 删除用户
+      await UserService.deleteUser({ userNo: row.userNo })
+      // 成功提示
+      this.$message({ message: '删除用户成功', type: 'info', duration: 2 * 1000 })
+      // 重新查询列表
+      this.query()
     },
 
     /**

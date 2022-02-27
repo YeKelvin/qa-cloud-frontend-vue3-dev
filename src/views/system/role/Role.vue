@@ -131,44 +131,42 @@ export default {
      */
     async modifyRoleState(row, state) {
       const stateMsg = state === 'DISABLE' ? '禁用' : '启用'
-      try {
-        // 二次确认
-        await this.$confirm(`确定${stateMsg}吗？`, '警告', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-        // 修改角色状态
-        await RoleService.modifyRoleState({ roleNo: row.roleNo, state: state })
-        // 成功提示
-        this.$message({ message: `${stateMsg}角色成功`, type: 'info', duration: 2 * 1000 })
-        // 重新查询列表
-        this.query()
-      } catch {
-        return
-      }
+      // 二次确认
+      const error = await this.$confirm(`确定${stateMsg}吗？`, '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 修改角色状态
+      await RoleService.modifyRoleState({ roleNo: row.roleNo, state: state })
+      // 成功提示
+      this.$message({ message: `${stateMsg}角色成功`, type: 'info', duration: 2 * 1000 })
+      // 重新查询列表
+      this.query()
     },
 
     /**
      * 删除角色
      */
     async deleteRole(row) {
-      try {
-        // 二次确认
-        await this.$confirm('确定删除吗？', '警告', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-        // 删除角色
-        await RoleService.deleteRole({ roleNo: row.roleNo })
-        // 成功提示
-        this.$message({ message: '删除角色成功', type: 'info', duration: 2 * 1000 })
-        // 重新查询列表
-        this.query()
-      } catch {
-        return
-      }
+      // 二次确认
+      const error = await this.$confirm('确定删除吗？', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 删除角色
+      await RoleService.deleteRole({ roleNo: row.roleNo })
+      // 成功提示
+      this.$message({ message: '删除角色成功', type: 'info', duration: 2 * 1000 })
+      // 重新查询列表
+      this.query()
     },
 
     /**
