@@ -1,6 +1,6 @@
 import { reactive } from 'vue'
 
-export default function userTablePagination(conditions) {
+export default function useTablePagination(conditions) {
   const queryConditions = reactive(conditions)
 
   const resetQueryConditions = () => {
