@@ -86,7 +86,7 @@
       <el-divider />
       <!-- 脚本内容 -->
       <el-scrollbar style="width: 100%; height: 100%" wrap-style="overflow-x:auto;" view-style="padding:10px;">
-        <element-tree ref="elementTree" :collection-number-list="selectedCollectionNumberList" />
+        <ElementTree ref="elementTree" :collection-number-list="selectedCollectionNumberList" />
       </el-scrollbar>
     </template>
 
