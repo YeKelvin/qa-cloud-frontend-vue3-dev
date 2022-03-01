@@ -64,7 +64,7 @@ const { datasetList } = usePyMeterState()
 const { workspaceList } = useWorkspaceState()
 </script>
 
-<script>
+<script lang="jsx">
 export default {
   name: 'DatasetTree',
   // props: {

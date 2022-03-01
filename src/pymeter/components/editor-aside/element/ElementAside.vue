@@ -29,7 +29,7 @@
 
             <!-- 脚本禁用标识 -->
             <span style="float: right">
-              <el-tag v-if="!collection.enabled" type="danger" size="mini" style="margin-left: 10px">已禁用</el-tag>
+              <el-tag v-if="!collection.enabled" type="danger" size="small" style="margin-left: 10px">已禁用</el-tag>
             </span>
           </el-option>
         </el-option-group>
@@ -50,12 +50,12 @@
         <!-- 下拉框底部的新增脚本按钮 -->
         <el-option-group key="new-operation" label="新增">
           <el-option value="NEW_COLLECTION">
-            <el-button type="text" icon="el-icon-plus" style="width: 100%" @click.native.stop="openNewCollectionTab">
+            <el-button type="text" icon="el-icon-plus" style="width: 100%" @click.stop="openNewCollectionTab">
               新增集合
             </el-button>
           </el-option>
           <el-option value="NEW_SNIPPET">
-            <el-button type="text" icon="el-icon-plus" style="width: 100%" @click.native.stop="openNewSnippetTab">
+            <el-button type="text" icon="el-icon-plus" style="width: 100%" @click.stop="openNewSnippetTab">
               新增片段
             </el-button>
           </el-option>
@@ -95,16 +95,15 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { mapState } from 'vuex'
 import * as ElementService from '@/api/script/element'
-import ElementTree from './element-tree'
+import ElementTree from './ElementTree'
+</script>
 
+<script>
 export default {
   name: 'ElementAside',
-
-  components: { ElementTree },
-
   data() {
     return {
       loading: false,
@@ -157,19 +156,17 @@ export default {
       // 加载中
       this.loading = true
       // 查询 TestCollection
-      const collectionResponse = await ElementService.queryElementAll({
+      this.collections = await ElementService.queryElementAll({
         workspaceNo: this.workspaceNo,
         elementType: 'COLLECTION',
         elementClass: 'TestCollection'
-      })
+      }).result
       // 查询 TestSnippets
-      const snippetResponse = await ElementService.queryElementAll({
+      this.snippets = await ElementService.queryElementAll({
         workspaceNo: this.workspaceNo,
         elementType: 'COLLECTION',
         elementClass: 'TestSnippets'
-      })
-      this.collections = collectionResponse.result
-      this.snippets = snippetResponse.result
+      }).result
       // 加载完成
       this.loading = false
       // 提取集合编号
@@ -252,7 +249,7 @@ export default {
   }
 }
 
-::v-deep .el-select-dropdown__wrap {
+:deep(.el-select-dropdown__wrap) {
   max-height: 400px;
 }
 </style>

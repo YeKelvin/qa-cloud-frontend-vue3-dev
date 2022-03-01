@@ -23,121 +23,139 @@
     @keyup.meta.c="handleMetaKeyC"
     @keyup.meta.v="handleMetaKeyV"
   >
-    <span
-      slot-scope="{ node, data }"
-      style="display: flex; align-items: center; justify-content: space-between; flex: 1; padding-right: 8px"
-      @mouseenter="mouseenter(node)"
-      @mouseleave="mouseleave()"
-    >
-      <!-- 元素名称 -->
-      <element-name :data="data" @dblclick="handleNodeDoubleClick(node)" />
+    <template #default="{ node, data }">
+      <span class="tree-item" @mouseenter="mouseenter(node)" @mouseleave="mouseleave()">
+        <!-- 元素名称 -->
+        <ElementTreeItemName :data="data" @dblclick="handleNodeDoubleClick(node)" />
 
-      <!-- 元素操作菜单 -->
-      <span v-show="hoveredNode === node" @click.stop>
-        <el-dropdown
-          trigger="click"
-          placement="bottom"
-          :show-timeout="50"
-          :hide-timeout="50"
-          @visible-change="visibleChange"
-        >
-          <!-- 菜单弹出按钮 -->
-          <el-button type="text" icon="el-icon-more" />
-          <!-- 菜单 -->
-          <el-dropdown-menu slot="dropdown">
-            <!-- Group -->
-            <template v-if="data.elementClass == 'TestCollection'">
-              <el-dropdown-item @click.native="openNewGroupTab(node)">新增测试分组</el-dropdown-item>
-              <el-dropdown-item @click.native="openNewSetupGroupTab(node)">新增前置分组</el-dropdown-item>
-              <el-dropdown-item @click.native="openNewTeardownGroupTab(node)">新增后置分组</el-dropdown-item>
+        <!-- 元素操作菜单 -->
+        <span v-show="hoveredNode === node" @click.stop>
+          <el-dropdown
+            trigger="click"
+            placement="bottom"
+            :show-timeout="50"
+            :hide-timeout="50"
+            @visible-change="visibleChange"
+          >
+            <!-- 菜单弹出按钮 -->
+            <el-button type="text" icon="el-icon-more" />
+            <!-- 菜单 -->
+            <template #dropdown>
+              <el-dropdown-menu>
+                <!-- Group -->
+                <template v-if="data.elementClass == 'TestCollection'">
+                  <el-dropdown-item @click="openNewGroupTab(node)">新增测试分组</el-dropdown-item>
+                  <el-dropdown-item @click="openNewSetupGroupTab(node)">新增前置分组</el-dropdown-item>
+                  <el-dropdown-item @click="openNewTeardownGroupTab(node)">新增后置分组</el-dropdown-item>
+                </template>
+
+                <template v-if="data.elementClass == 'TestSnippets'">
+                  <el-dropdown-item @click="openNewSetupGroupDebugerTab(node)">新增前置分组调试器</el-dropdown-item>
+                  <el-dropdown-item @click="openNewTeardownGroupDebugerTab(node)">新增后置分组调试器</el-dropdown-item>
+                </template>
+
+                <!-- Sampler -->
+                <template
+                  v-if="
+                    data.elementType == 'GROUP' ||
+                    data.elementType == 'CONTROLLER' ||
+                    data.elementClass == 'TestSnippets'
+                  "
+                >
+                  <el-dropdown-item :divided="data.elementClass == 'TestSnippets'" @click="openNewHttpSamplerTab(node)">
+                    新增HTTP请求
+                  </el-dropdown-item>
+                  <el-dropdown-item @click="openNewPythonSamplerTab(node)">新增Python请求</el-dropdown-item>
+                  <el-dropdown-item @click="openNewSnippetSamplerTab(node)">新增Snippet请求</el-dropdown-item>
+                </template>
+
+                <!-- PreProcessor -->
+                <template v-if="data.elementType == 'SAMPLER'">
+                  <el-dropdown-item @click="openNewPythonPreProcessorTab(node)">新增Python前置脚本</el-dropdown-item>
+                </template>
+
+                <!-- PostProcessor -->
+                <template v-if="data.elementType == 'SAMPLER'">
+                  <el-dropdown-item divided @click="openNewPythonPostProcessorTab(node)">
+                    新增Python后置脚本
+                  </el-dropdown-item>
+                </template>
+
+                <!-- Assertion -->
+                <template v-if="data.elementType == 'SAMPLER'">
+                  <el-dropdown-item divided @click="openNewPythonAssertionTab(node)">新增Python断言</el-dropdown-item>
+                </template>
+
+                <!-- Controller -->
+                <template
+                  v-if="
+                    data.elementType == 'GROUP' ||
+                    data.elementType == 'CONTROLLER' ||
+                    data.elementClass == 'TestSnippets'
+                  "
+                >
+                  <el-dropdown-item divided @click="openNewIfControllerTab(node)">新增if控制器</el-dropdown-item>
+                  <el-dropdown-item @click="openNewWhileControllerTab(node)">新增while控制器</el-dropdown-item>
+                  <el-dropdown-item @click="openNewForInControllerTab(node)">新增遍历控制器</el-dropdown-item>
+                  <el-dropdown-item @click="openNewLoopControllerTab(node)">新增循环控制器</el-dropdown-item>
+                  <el-dropdown-item @click="openNewRetryControllerTab(node)">新增重试控制器</el-dropdown-item>
+                  <el-dropdown-item @click="openNewTransactionControllerTab(node)">新增事务控制器</el-dropdown-item>
+                </template>
+
+                <!-- 复制元素按钮 -->
+                <template v-if="data.elementType == 'COLLECTION'">
+                  <el-dropdown-item divided @click="copyElementToWorkspace(data)">复制到空间</el-dropdown-item>
+                  <el-dropdown-item @click="moveElementToWorkspace(data)">移动到空间</el-dropdown-item>
+                </template>
+                <template v-else>
+                  <el-dropdown-item divided @click="duplicateElement(data)">复制</el-dropdown-item>
+                </template>
+
+                <!-- 状态变更按钮 -->
+                <el-dropdown-item v-if="!data.enabled" divided @click="enableElement(data)">启用</el-dropdown-item>
+                <el-dropdown-item v-else divided @click="disableElement(data)">禁用</el-dropdown-item>
+
+                <!-- 删除按钮 -->
+                <el-dropdown-item divided @click="removeElement(data)">删除</el-dropdown-item>
+              </el-dropdown-menu>
             </template>
-
-            <template v-if="data.elementClass == 'TestSnippets'">
-              <el-dropdown-item @click.native="openNewSetupGroupDebugerTab(node)">新增前置分组调试器</el-dropdown-item>
-              <el-dropdown-item @click.native="openNewTeardownGroupDebugerTab(node)">
-                新增后置分组调试器
-              </el-dropdown-item>
-            </template>
-
-            <!-- Sampler -->
-            <template
-              v-if="
-                data.elementType == 'GROUP' || data.elementType == 'CONTROLLER' || data.elementClass == 'TestSnippets'
-              "
-            >
-              <el-dropdown-item :divided="data.elementClass == 'TestSnippets'" @click="openNewHttpSamplerTab(node)">
-                新增HTTP请求
-              </el-dropdown-item>
-              <el-dropdown-item @click="openNewPythonSamplerTab(node)">新增Python请求</el-dropdown-item>
-              <el-dropdown-item @click="openNewSnippetSamplerTab(node)">新增Snippet请求</el-dropdown-item>
-            </template>
-
-            <!-- PreProcessor -->
-            <template v-if="data.elementType == 'SAMPLER'">
-              <el-dropdown-item @click="openNewPythonPreProcessorTab(node)">新增Python前置脚本</el-dropdown-item>
-            </template>
-
-            <!-- PostProcessor -->
-            <template v-if="data.elementType == 'SAMPLER'">
-              <el-dropdown-item divided @click="openNewPythonPostProcessorTab(node)">
-                新增Python后置脚本
-              </el-dropdown-item>
-            </template>
-
-            <!-- Assertion -->
-            <template v-if="data.elementType == 'SAMPLER'">
-              <el-dropdown-item divided @click="openNewPythonAssertionTab(node)">新增Python断言</el-dropdown-item>
-            </template>
-
-            <!-- Controller -->
-            <template
-              v-if="
-                data.elementType == 'GROUP' || data.elementType == 'CONTROLLER' || data.elementClass == 'TestSnippets'
-              "
-            >
-              <el-dropdown-item divided @click="openNewIfControllerTab(node)">新增if控制器</el-dropdown-item>
-              <el-dropdown-item @click="openNewWhileControllerTab(node)">新增while控制器</el-dropdown-item>
-              <el-dropdown-item @click="openNewForInControllerTab(node)">新增遍历控制器</el-dropdown-item>
-              <el-dropdown-item @click="openNewLoopControllerTab(node)">新增循环控制器</el-dropdown-item>
-              <el-dropdown-item @click="openNewRetryControllerTab(node)">新增重试控制器</el-dropdown-item>
-              <el-dropdown-item @click="openNewTransactionControllerTab(node)">新增事务控制器</el-dropdown-item>
-            </template>
-
-            <!-- 复制元素按钮 -->
-            <template v-if="data.elementType == 'COLLECTION'">
-              <el-dropdown-item divided @click="copyElementToWorkspace(data)">复制到空间</el-dropdown-item>
-              <el-dropdown-item @click="moveElementToWorkspace(data)">移动到空间</el-dropdown-item>
-            </template>
-            <template v-else>
-              <el-dropdown-item divided @click="duplicateElement(data)">复制</el-dropdown-item>
-            </template>
-
-            <!-- 状态变更按钮 -->
-            <el-dropdown-item v-if="!data.enabled" divided @click="enableElement(data)">启用</el-dropdown-item>
-            <el-dropdown-item v-else divided @click="disableElement(data)">禁用</el-dropdown-item>
-
-            <!-- 删除按钮 -->
-            <el-dropdown-item divided @click="removeElement(data)">删除</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
+          </el-dropdown>
+        </span>
       </span>
-    </span>
+    </template>
   </el-tree>
 </template>
 
-<script>
+<script setup>
 import { mapState } from 'vuex'
-import ElTreeMixin from '@/mixins/el-tree-mixin'
-import ElementName from './element-name'
-import WorkspaceList from './workspace-list'
 import * as ElementService from '@/api/script/element'
+import useTree from '@/composables/useTree'
+// import useWorkspaceState from '@/composables/useWorkspaceState'
+// import usePyMeterState from '@/pymeter/composables/usePyMeterState'
+import ElementTreeItemName from './ElementTreeItemName.vue'
+import WorkspaceList from './common/WorkspaceListDialog.vue'
 
+const {
+  hoveredNode,
+  menuOpened,
+  expandedList,
+  mouseenter,
+  mouseleave,
+  visibleChange,
+  getRootNode,
+  handleNodeDoubleClick,
+  handleNodeExpand,
+  handleNodeCollapse,
+  expandAll,
+  expandNode
+} = useTree()
+// const { workspaceNo, workspaceList } = useWorkspaceState()
+// const { refreshElementTree } = usePyMeterState()
+</script>
+
+<script lang="jsx">
 export default {
   name: 'ElementTree',
-  // eslint-disable-next-line
-  components: { ElementName, WorkspaceList },
-  mixins: [ElTreeMixin],
-
   props: {
     collectionNumberList: { type: Array, default: () => [] }
   },
@@ -467,7 +485,7 @@ export default {
     /**
      * el-tree点击节点的回调
      */
-    handleNodeClick(data, node) {
+    handleNodeClick(data) {
       this.$store.commit({
         type: 'pymeter/addTab',
         editorNo: data.elementNo,
@@ -632,7 +650,7 @@ export default {
     /**
      * 拖拽成功完成时触发的事件
      */
-    handleNodeDrop(draggingNode, dropNode, dropType, dragEvent) {
+    handleNodeDrop(draggingNode, dropNode, dropType) {
       let targetParentNo = 0
       let targetSortNo = 0
 
@@ -826,9 +844,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep .el-tree-node__content {
-  height: 100%;
-  min-height: 26px;
+.tree-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  padding-right: 8px;
 }
 
 .el-dropdown {
@@ -836,5 +857,10 @@ export default {
     -webkit-appearance: button;
     padding: 5px;
   }
+}
+
+:deep(.el-tree-node__content) {
+  height: 100%;
+  min-height: 26px;
 }
 </style>
