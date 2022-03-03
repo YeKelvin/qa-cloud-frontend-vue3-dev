@@ -6,7 +6,7 @@
     </el-tabs>
 
     <!-- 中间栏 -->
-    <middle-bar :component="activeTab.editorComponent" />
+    <!-- <middle-bar :component="activeTab.editorComponent" /> -->
 
     <!-- pymeter 组件 -->
     <el-scrollbar id="editor-main-scrollbar" style="width: 100%; height: 100%" wrap-style="overflow-x:auto;">
@@ -28,31 +28,31 @@
 
 <script setup>
 // ** PyMeter Components ******************************************************************************************** /
-import CollectionEditor from './collections/collection-editor'
-import SnippetsEditor from './collections/snippets-editor'
-import GroupEditor from './groups/group-editor'
-import SetupGroupEditor from './groups/setup-group-editor'
-import TeardownGroupEditor from './groups/teardown-group-editor'
-import SetupGroupDebugerEditor from './groups/setup-group-debuger-editor'
-import TeardownGroupDebugerEditor from './groups/teardown-group-debuger-editor'
-import HTTPSamplerEditor from './samplers/http-sampler-editor'
-import PythonSamplerEditor from './samplers/python-sampler-editor'
-import SnippetSamplerEditor from './samplers/snippet-sampler-editor'
-import PythonPreProcessorEditor from './pre-processors/python-pre-processor-editor'
-import PythonPostProcessorEditor from './post-processors/python-post-processor-editor'
-import PythonAssertionEditor from './assertions/python-assertion-editor'
-import IfControllerEditor from './controllers/if-controller-editor'
-import ForInControllerEditor from './controllers/for-in-controller-editor'
-import LoopControllerEditor from './controllers/loop-controller-editor'
-import RetryControllerEditor from './controllers/retry-controller-editor'
-import TransactionControllerEditor from './controllers/transaction-controller-editor'
-import WhileControllerEditor from './controllers/while-controller-editor'
-import VariableDatasetEditor from './configs/variable-dataset-editor'
-import HttpHeadersTemplateEditor from './configs/http-headers-template-editor'
-import ConstantTimerEditor from './timers/constant-timer-editor'
+// import CollectionEditor from './collections/collection-editor'
+// import SnippetsEditor from './collections/snippets-editor'
+// import GroupEditor from './groups/group-editor'
+// import SetupGroupEditor from './groups/setup-group-editor'
+// import TeardownGroupEditor from './groups/teardown-group-editor'
+// import SetupGroupDebugerEditor from './groups/setup-group-debuger-editor'
+// import TeardownGroupDebugerEditor from './groups/teardown-group-debuger-editor'
+// import HTTPSamplerEditor from './samplers/http-sampler-editor'
+// import PythonSamplerEditor from './samplers/python-sampler-editor'
+// import SnippetSamplerEditor from './samplers/snippet-sampler-editor'
+// import PythonPreProcessorEditor from './pre-processors/python-pre-processor-editor'
+// import PythonPostProcessorEditor from './post-processors/python-post-processor-editor'
+// import PythonAssertionEditor from './assertions/python-assertion-editor'
+// import IfControllerEditor from './controllers/if-controller-editor'
+// import ForInControllerEditor from './controllers/for-in-controller-editor'
+// import LoopControllerEditor from './controllers/loop-controller-editor'
+// import RetryControllerEditor from './controllers/retry-controller-editor'
+// import TransactionControllerEditor from './controllers/transaction-controller-editor'
+// import WhileControllerEditor from './controllers/while-controller-editor'
+// import VariableDatasetEditor from './configs/variable-dataset-editor'
+// import HttpHeadersTemplateEditor from './configs/http-headers-template-editor'
+// import ConstantTimerEditor from './timers/constant-timer-editor'
 // ** PyMeter Components ******************************************************************************************** /
 import { mapState } from 'vuex'
-import middleBar from './middle-bar'
+// import middleBar from './middle-bar'
 </script>
 
 <script>
@@ -61,28 +61,28 @@ export default {
   data() {
     return {
       editors: {
-        TestCollection: CollectionEditor,
-        TestSnippets: SnippetsEditor,
-        TestGroup: GroupEditor,
-        SetupGroup: SetupGroupEditor,
-        TeardownGroup: TeardownGroupEditor,
-        SetupGroupDebuger: SetupGroupDebugerEditor,
-        TeardownGroupDebuger: TeardownGroupDebugerEditor,
-        HTTPSampler: HTTPSamplerEditor,
-        PythonSampler: PythonSamplerEditor,
-        SnippetSampler: SnippetSamplerEditor,
-        PythonPreProcessor: PythonPreProcessorEditor,
-        PythonPostProcessor: PythonPostProcessorEditor,
-        PythonAssertion: PythonAssertionEditor,
-        IfController: IfControllerEditor,
-        ForInController: ForInControllerEditor,
-        LoopController: LoopControllerEditor,
-        RetryController: RetryControllerEditor,
-        TransactionController: TransactionControllerEditor,
-        WhileController: WhileControllerEditor,
-        VariableDataset: VariableDatasetEditor,
-        HttpHeadersTemplate: HttpHeadersTemplateEditor,
-        ConstantTimer: ConstantTimerEditor
+        // TestCollection: CollectionEditor,
+        // TestSnippets: SnippetsEditor,
+        // TestGroup: GroupEditor,
+        // SetupGroup: SetupGroupEditor,
+        // TeardownGroup: TeardownGroupEditor,
+        // SetupGroupDebuger: SetupGroupDebugerEditor,
+        // TeardownGroupDebuger: TeardownGroupDebugerEditor,
+        // HTTPSampler: HTTPSamplerEditor,
+        // PythonSampler: PythonSamplerEditor,
+        // SnippetSampler: SnippetSamplerEditor,
+        // PythonPreProcessor: PythonPreProcessorEditor,
+        // PythonPostProcessor: PythonPostProcessorEditor,
+        // PythonAssertion: PythonAssertionEditor,
+        // IfController: IfControllerEditor,
+        // ForInController: ForInControllerEditor,
+        // LoopController: LoopControllerEditor,
+        // RetryController: RetryControllerEditor,
+        // TransactionController: TransactionControllerEditor,
+        // WhileController: WhileControllerEditor,
+        // VariableDataset: VariableDatasetEditor,
+        // HttpHeadersTemplate: HttpHeadersTemplateEditor,
+        // ConstantTimer: ConstantTimerEditor
       }
     }
   },

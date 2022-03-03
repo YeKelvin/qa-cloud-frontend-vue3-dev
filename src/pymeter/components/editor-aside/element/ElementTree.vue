@@ -126,29 +126,29 @@
   </el-tree>
 </template>
 
-<script setup>
+<script lang="jsx" setup>
 import { mapState } from 'vuex'
 import * as ElementService from '@/api/script/element'
 import useTree from '@/composables/useTree'
 // import useWorkspaceState from '@/composables/useWorkspaceState'
 // import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 import ElementTreeItemName from './ElementTreeItemName.vue'
-import WorkspaceList from './common/WorkspaceListDialog.vue'
+import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceListDialog.vue'
 
-const {
-  hoveredNode,
-  menuOpened,
-  expandedList,
-  mouseenter,
-  mouseleave,
-  visibleChange,
-  getRootNode,
-  handleNodeDoubleClick,
-  handleNodeExpand,
-  handleNodeCollapse,
-  expandAll,
-  expandNode
-} = useTree()
+// const {
+//   hoveredNode,
+//   menuOpened,
+//   expandedList,
+//   mouseenter,
+//   mouseleave,
+//   visibleChange,
+//   getRootNode,
+//   handleNodeDoubleClick,
+//   handleNodeExpand,
+//   handleNodeCollapse,
+//   expandAll,
+//   expandNode
+// } = useTree()
 // const { workspaceNo, workspaceList } = useWorkspaceState()
 // const { refreshElementTree } = usePyMeterState()
 </script>
@@ -853,7 +853,7 @@ export default {
 }
 
 .el-dropdown {
-  ::v-deep .el-button {
+  :deep(.el-button) {
     -webkit-appearance: button;
     padding: 5px;
   }

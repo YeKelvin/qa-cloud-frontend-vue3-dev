@@ -10,7 +10,7 @@
     >
       <el-select
         v-model="selectedCollectionNumberList"
-        :popper-append-to-body="false"
+        :teleported="false"
         style="flex-grow: 1"
         placeholder="脚本集合"
         filterable
@@ -86,7 +86,7 @@
       <el-divider />
       <!-- 脚本内容 -->
       <el-scrollbar style="width: 100%; height: 100%" wrap-style="overflow-x:auto;" view-style="padding:10px;">
-        <ElementTree ref="elementTree" :collection-number-list="selectedCollectionNumberList" />
+        <ElementTree ref="tree" :collection-number-list="selectedCollectionNumberList" />
       </el-scrollbar>
     </template>
 
@@ -156,17 +156,21 @@ export default {
       // 加载中
       this.loading = true
       // 查询 TestCollection
-      this.collections = await ElementService.queryElementAll({
-        workspaceNo: this.workspaceNo,
-        elementType: 'COLLECTION',
-        elementClass: 'TestCollection'
-      }).result
+      this.collections = (
+        await ElementService.queryElementAll({
+          workspaceNo: this.workspaceNo,
+          elementType: 'COLLECTION',
+          elementClass: 'TestCollection'
+        })
+      ).result
       // 查询 TestSnippets
-      this.snippets = await ElementService.queryElementAll({
-        workspaceNo: this.workspaceNo,
-        elementType: 'COLLECTION',
-        elementClass: 'TestSnippets'
-      }).result
+      this.snippets = (
+        await ElementService.queryElementAll({
+          workspaceNo: this.workspaceNo,
+          elementType: 'COLLECTION',
+          elementClass: 'TestSnippets'
+        })
+      ).result
       // 加载完成
       this.loading = false
       // 提取集合编号
@@ -183,7 +187,7 @@ export default {
      * 根据集合编号查询测试案例
      */
     queryElementsTree() {
-      this.$refs.elementTree.queryElementsTree()
+      this.$refs.tree.queryElementsTree()
     },
 
     /**
@@ -216,7 +220,7 @@ export default {
      * 展开或收起所有节点
      */
     expandAll(expand) {
-      this.$refs.elementTree.expandAll(expand)
+      this.$refs.tree.expandAll(expand)
     }
   }
 }

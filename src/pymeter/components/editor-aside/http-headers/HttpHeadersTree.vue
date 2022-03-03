@@ -45,17 +45,17 @@
   </el-tree>
 </template>
 
-<script>
+<script lang="jsx">
 import { mapState } from 'vuex'
-import ElTreeMixin from '@/mixins/el-tree-mixin'
-import WorkspaceList from './workspace-list'
+// import ElTreeMixin from '@/mixins/el-tree-mixin'
+import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceListDialog.vue'
 import * as HeadersService from '@/api/script/headers'
 
 export default {
   name: 'HttpHeadersTree',
   // eslint-disable-next-line
   components: { WorkspaceList },
-  mixins: [ElTreeMixin],
+  // mixins: [ElTreeMixin],
 
   props: {
     filterText: { type: String, default: '' }

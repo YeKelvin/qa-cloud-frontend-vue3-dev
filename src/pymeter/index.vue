@@ -14,14 +14,14 @@
       <EditorMain class="resize-box-right r-container" />
     </div>
     <!-- 编辑器底部 -->
-    <EditorFooter class="editor-footer" />
+    <!-- <EditorFooter class="editor-footer" /> -->
   </div>
 </template>
 
 <script setup>
 import EditorAside from './components/editor-aside/EditorAside.vue'
 import EditorMain from './components/editor-main/EditorMain.vue'
-import EditorFooter from './components/editor-footer/EditorFooter.vue'
+// import EditorFooter from './components/editor-footer/EditorFooter.vue'
 </script>
 
 <script>

@@ -13,9 +13,7 @@
 </template>
 
 <script setup>
-import ElementAside from './ElementAside.vue'
-import DatasetAside from './DatasetAside.vue'
-import HttpHeadersAside from './HttpHeadersAside.vue'
+import { markRaw, defineAsyncComponent } from 'vue'
 </script>
 
 <script>
@@ -25,9 +23,12 @@ export default {
     return {
       asideName: 'ELEMENT',
       asideComponents: {
-        ELEMENT: ElementAside,
-        DATASET: DatasetAside,
-        HTTP_HEADERS: HttpHeadersAside
+        // ELEMENT: ElementAside,
+        ELEMENT: markRaw(defineAsyncComponent(() => import('./element/ElementAside.vue'))),
+        // DATASET: DatasetAside,
+        DATASET: markRaw(defineAsyncComponent(() => import('./dataset/DatasetAside.vue'))),
+        // HTTP_HEADERS: HttpHeadersAside
+        HTTP_HEADERS: markRaw(defineAsyncComponent(() => import('./http-headers/HttpHeadersAside.vue')))
       }
     }
   }

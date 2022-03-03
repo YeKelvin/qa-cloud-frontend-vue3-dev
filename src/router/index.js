@@ -65,33 +65,33 @@ export const constantRoutes = [
         component: () => import('@/pymeter/index.vue'),
         meta: { title: '脚本编辑', icon: 'sidebar-editor' }
       },
-      {
-        path: 'testplan',
-        name: 'TestplanManager',
-        component: () => import('@/views/script/testplan/manager.vue'),
-        meta: { title: '计划管理', icon: 'sidebar-testplan' }
-      },
-      {
-        path: 'testplan/editor',
-        name: 'TestplanEditor',
-        hidden: true,
-        component: () => import('@/views/script/testplan/editor.vue'),
-        meta: { title: '测试计划', activeMenu: '/script/testplan' }
-      },
-      {
-        path: 'testplan/execution/details',
-        name: 'ExecutionDetails',
-        hidden: true,
-        component: () => import('@/views/script/testplan/execution-details.vue'),
-        meta: { title: '计划详情', activeMenu: '/script/testplan' }
-      },
-      {
-        path: 'report',
-        name: 'TestReport',
-        hidden: true,
-        component: () => import('@/views/script/report/index.vue'),
-        meta: { title: '测试报告', activeMenu: '/script/testplan' }
-      }
+      // {
+      //   path: 'testplan',
+      //   name: 'TestplanManager',
+      //   component: () => import('@/views/script/testplan/manager.vue'),
+      //   meta: { title: '计划管理', icon: 'sidebar-testplan' }
+      // },
+      // {
+      //   path: 'testplan/editor',
+      //   name: 'TestplanEditor',
+      //   hidden: true,
+      //   component: () => import('@/views/script/testplan/editor.vue'),
+      //   meta: { title: '测试计划', activeMenu: '/script/testplan' }
+      // },
+      // {
+      //   path: 'testplan/execution/details',
+      //   name: 'ExecutionDetails',
+      //   hidden: true,
+      //   component: () => import('@/views/script/testplan/execution-details.vue'),
+      //   meta: { title: '计划详情', activeMenu: '/script/testplan' }
+      // },
+      // {
+      //   path: 'report',
+      //   name: 'TestReport',
+      //   hidden: true,
+      //   component: () => import('@/views/script/report/index.vue'),
+      //   meta: { title: '测试报告', activeMenu: '/script/testplan' }
+      // }
     ]
   }
 
