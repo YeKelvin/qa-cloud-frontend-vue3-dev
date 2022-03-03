@@ -38,7 +38,7 @@
             @visible-change="visibleChange"
           >
             <!-- 菜单弹出按钮 -->
-            <el-button type="text" icon="el-icon-more" />
+            <el-button type="text" :icon="More" />
             <!-- 菜单 -->
             <template #dropdown>
               <el-dropdown-menu>
@@ -128,6 +128,7 @@
 
 <script lang="jsx" setup>
 import { mapState } from 'vuex'
+import { More } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
 import useTree from '@/composables/useTree'
 // import useWorkspaceState from '@/composables/useWorkspaceState'
@@ -135,20 +136,17 @@ import useTree from '@/composables/useTree'
 import ElementTreeItemName from './ElementTreeItemName.vue'
 import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceListDialog.vue'
 
-// const {
-//   hoveredNode,
-//   menuOpened,
-//   expandedList,
-//   mouseenter,
-//   mouseleave,
-//   visibleChange,
-//   getRootNode,
-//   handleNodeDoubleClick,
-//   handleNodeExpand,
-//   handleNodeCollapse,
-//   expandAll,
-//   expandNode
-// } = useTree()
+const {
+  hoveredNode,
+  expandedList,
+  mouseenter,
+  mouseleave,
+  visibleChange,
+  getRootNode,
+  handleNodeDoubleClick,
+  handleNodeExpand,
+  handleNodeCollapse
+} = useTree()
 // const { workspaceNo, workspaceList } = useWorkspaceState()
 // const { refreshElementTree } = usePyMeterState()
 </script>

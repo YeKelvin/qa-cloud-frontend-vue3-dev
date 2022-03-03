@@ -1,7 +1,7 @@
 <template>
   <el-card shadow="hover" style="width: 100%">
     <template #header>
-      <el-select v-model="asideName" style="flex-grow: 1; padding-right: 10px">
+      <el-select v-model="asideName" size="large" style="flex-grow: 1">
         <el-option label="脚本" value="ELEMENT" />
         <el-option label="环境 / 变量" value="DATASET" />
         <el-option label="HTTP请求头" value="HTTP_HEADERS" />
@@ -12,22 +12,17 @@
   </el-card>
 </template>
 
-<script setup>
-import { markRaw, defineAsyncComponent } from 'vue'
-</script>
-
 <script>
+import { markRaw, defineAsyncComponent } from 'vue'
+
 export default {
   name: 'EditorAside',
   data() {
     return {
       asideName: 'ELEMENT',
       asideComponents: {
-        // ELEMENT: ElementAside,
         ELEMENT: markRaw(defineAsyncComponent(() => import('./element/ElementAside.vue'))),
-        // DATASET: DatasetAside,
         DATASET: markRaw(defineAsyncComponent(() => import('./dataset/DatasetAside.vue'))),
-        // HTTP_HEADERS: HttpHeadersAside
         HTTP_HEADERS: markRaw(defineAsyncComponent(() => import('./http-headers/HttpHeadersAside.vue')))
       }
     }
@@ -38,10 +33,15 @@ export default {
 <style lang="scss" scoped>
 :deep(.el-card__header) {
   display: flex;
-  padding: 0;
+  padding: 0 10px;
+
+  .el-select {
+    --el-select-border-color-hover: none;
+    --el-select-input-focus-border-color: none;
+  }
 
   .el-input__inner {
-    border: 0;
+    box-shadow: none;
   }
 }
 

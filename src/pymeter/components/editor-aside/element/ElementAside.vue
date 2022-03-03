@@ -11,6 +11,7 @@
       <el-select
         v-model="selectedCollectionNumberList"
         :teleported="false"
+        size="large"
         style="flex-grow: 1"
         placeholder="脚本集合"
         filterable
@@ -68,19 +69,22 @@
       <!-- 元素操作按钮 -->
       <div class="operation-container" style="margin-top: 5px">
         <!-- 展开节点按钮 -->
-        <el-button type="text" size="medium" @click="expandAll(true)">
-          <SvgIcon icon-name="expand-all" style="margin-right: 5px" />
+        <el-button type="text" @click="expandAll(true)">
+          <SvgIcon icon-name="pymeter-expand-all" style="margin-right: 5px" />
           展开
         </el-button>
         <el-divider direction="vertical" />
         <!-- 收起节点按钮 -->
-        <el-button type="text" size="medium" @click="expandAll(false)">
-          <SvgIcon icon-name="collapse-all" style="margin-right: 5px" />
+        <el-button type="text" @click="expandAll(false)">
+          <SvgIcon icon-name="pymeter-collapse-all" style="margin-right: 5px" />
           收起
         </el-button>
         <el-divider direction="vertical" />
         <!-- 刷新脚本按钮 -->
-        <el-button type="text" icon="el-icon-refresh" @click="queryElementsTree">刷新</el-button>
+        <el-button type="text" @click="queryElementsTree">
+          <SvgIcon icon-name="pymeter-refresh" style="margin-right: 5px" />
+          刷新
+        </el-button>
       </div>
       <!-- 分割线 -->
       <el-divider />

@@ -1,24 +1,24 @@
 <template>
   <!-- 元素名称 -->
-  <span style="display: inline-flex; align-items: center; width: 100%; user-select: none" v-bind="$attrs">
+  <span class="element-name-wrapper">
     <!-- 图标 -->
     <span style="padding-right: 5px">
-      <svg-icon v-if="data.elementType == 'COLLECTION'" icon-class="collection" />
-      <svg-icon v-else-if="data.elementType == 'GROUP'" icon-class="group" />
-      <svg-icon v-else-if="data.elementClass == 'PythonSampler'" icon-class="python" />
-      <svg-icon v-else-if="data.elementClass == 'SnippetSampler'" icon-class="snippet" />
-      <svg-icon v-else-if="data.elementType == 'SAMPLER'" icon-class="sampler" />
-      <svg-icon v-else-if="data.elementType == 'PRE_PROCESSOR'" icon-class="pre-processor" />
-      <svg-icon v-else-if="data.elementType == 'POST_PROCESSOR'" icon-class="post-processor" />
-      <svg-icon v-else-if="data.elementClass == 'IfController'" icon-class="if-controller" />
-      <svg-icon v-else-if="data.elementClass == 'LoopController'" icon-class="loop-controller" />
-      <svg-icon v-else-if="data.elementClass == 'TransactionController'" icon-class="transaction-controller" />
-      <svg-icon v-else-if="data.elementClass == 'WhileController'" icon-class="loop-controller" />
-      <svg-icon v-else-if="data.elementType == 'CONTROLLER'" icon-class="controller" />
-      <svg-icon v-else-if="data.elementType == 'ASSERTION'" icon-class="assertion" />
+      <SvgIcon v-if="data.elementType == 'COLLECTION'" icon-name="pymeter-collection" />
+      <SvgIcon v-else-if="data.elementType == 'GROUP'" icon-name="pymeter-group" />
+      <SvgIcon v-else-if="data.elementClass == 'PythonSampler'" icon-name="pymeter-python" />
+      <SvgIcon v-else-if="data.elementClass == 'SnippetSampler'" icon-name="pymeter-snippet" />
+      <SvgIcon v-else-if="data.elementType == 'SAMPLER'" icon-name="pymeter-sampler" />
+      <SvgIcon v-else-if="data.elementType == 'PRE_PROCESSOR'" icon-name="pymeter-pre-processor" />
+      <SvgIcon v-else-if="data.elementType == 'POST_PROCESSOR'" icon-name="pymeter-post-processor" />
+      <SvgIcon v-else-if="data.elementClass == 'IfController'" icon-name="pymeter-if-controller" />
+      <SvgIcon v-else-if="data.elementClass == 'LoopController'" icon-name="pymeter-loop-controller" />
+      <SvgIcon v-else-if="data.elementClass == 'TransactionController'" icon-name="pymeter-transaction-controller" />
+      <SvgIcon v-else-if="data.elementClass == 'WhileController'" icon-name="pymeter-loop-controller" />
+      <SvgIcon v-else-if="data.elementType == 'CONTROLLER'" icon-name="pymeter-controller" />
+      <SvgIcon v-else-if="data.elementType == 'ASSERTION'" icon-name="pymeter-assertion" />
     </span>
     <!-- 名称 -->
-    <span style="white-space: normal; overflow: hidden; text-overflow: ellipsis">{{ data.elementName }}</span>
+    <span class="element-name">{{ data.elementName }}</span>
     <!-- 集合标识 -->
     <el-tag v-if="data.elementClass == 'TestCollection'" size="small" style="margin-left: 5px">集合</el-tag>
     <!-- 片段标识 -->
@@ -51,4 +51,17 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.element-name-wrapper {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  user-select: none;
+}
+
+.element-name {
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>
