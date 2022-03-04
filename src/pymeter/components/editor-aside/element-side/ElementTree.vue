@@ -1,6 +1,6 @@
 <template>
   <el-tree
-    ref="treeRef"
+    ref="eltreeVNode"
     node-key="elementNo"
     empty-text="请开始编辑脚本"
     highlight-current
@@ -137,7 +137,7 @@ import ElementTreeItemName from './ElementTreeItemName.vue'
 import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceList.vue'
 
 const {
-  treeRef,
+  eltreeVNode,
   hoveredNode,
   expandedList,
   mouseenter,

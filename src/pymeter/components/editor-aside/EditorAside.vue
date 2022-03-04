@@ -4,7 +4,7 @@
       <el-select v-model="asideName" effect="dark" size="large" style="flex-grow: 1">
         <el-option label="脚本" value="ELEMENT" />
         <el-option label="环境 / 变量" value="DATASET" />
-        <el-option label="HTTP请求头" value="HTTP_HEADERS" />
+        <el-option label="HTTP请求头" value="HTTP_HEADER_TEMPLATE" />
       </el-select>
     </template>
 
@@ -21,9 +21,11 @@ export default {
     return {
       asideName: 'ELEMENT',
       asideComponents: {
-        ELEMENT: markRaw(defineAsyncComponent(() => import('./element/ElementAside.vue'))),
-        DATASET: markRaw(defineAsyncComponent(() => import('./dataset/DatasetAside.vue'))),
-        HTTP_HEADERS: markRaw(defineAsyncComponent(() => import('./http-headers/HttpHeadersAside.vue')))
+        ELEMENT: markRaw(defineAsyncComponent(() => import('./element-side/ElementSide.vue'))),
+        DATASET: markRaw(defineAsyncComponent(() => import('./dataset-side/DatasetSide.vue'))),
+        HTTP_HEADER_TEMPLATE: markRaw(
+          defineAsyncComponent(() => import('./http-header-template-side/HttpHeaderTemplateSide.vue'))
+        )
       }
     }
   }

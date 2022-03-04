@@ -1,6 +1,6 @@
 <template>
   <el-tree
-    ref="tree"
+    ref="eltreeVNode"
     node-key="templateNo"
     :props="{ label: 'templateName' }"
     :data="httpHeaderTemplateList"
@@ -12,7 +12,7 @@
         <!-- 树节点 -->
         <span class="tree-item-name-wrapper">
           <!-- 图标 -->
-          <SvgIcon icon-name="header" class-name="tree-item-icon" />
+          <SvgIcon icon-name="pymeter-header" class-name="tree-item-icon" />
           <!-- 变量集名称 -->
           <span class="tree-item-name">{{ node.label }}</span>
         </span>
@@ -27,7 +27,7 @@
             @visible-change="visibleChange"
           >
             <!-- 菜单弹出按钮 -->
-            <el-button type="text" icon="el-icon-more" />
+            <el-button type="text" :icon="More" />
             <!-- 菜单 -->
             <template #dropdown>
               <el-dropdown-menu>
@@ -45,44 +45,33 @@
   </el-tree>
 </template>
 
-<script lang="jsx">
-import { mapState } from 'vuex'
-// import ElTreeMixin from '@/mixins/el-tree-mixin'
-import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceList.vue'
+<script lang="jsx" setup>
+import { More } from '@element-plus/icons-vue'
 import * as HeadersService from '@/api/script/headers'
+import useElTree from '@/composables/useElTree'
+import useWorkspaceState from '@/composables/useWorkspaceState'
+import usePyMeterState from '@/pymeter/composables/usePyMeterState'
+import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceList.vue'
 
+const { eltreeVNode, hoveredNode, mouseenter, mouseleave, visibleChange } = useElTree()
+const { httpHeaderTemplateList } = usePyMeterState()
+const { workspaceList } = useWorkspaceState()
+</script>
+
+<script lang="jsx">
 export default {
   name: 'HttpHeadersTree',
-  // eslint-disable-next-line
-  components: { WorkspaceList },
-  // mixins: [ElTreeMixin],
-
   props: {
     filterText: { type: String, default: '' }
   },
-
-  data() {
-    return {}
-  },
-
-  computed: {
-    ...mapState('workspace', {
-      workspaceList: (state) => state.workspaceList
-    }),
-    ...mapState('pymeter', {
-      httpHeaderTemplateList: (state) => state.httpHeaderTemplateList
-    })
-  },
-
   watch: {
     filterText(val) {
-      this.$refs.tree.filter(val)
+      this.$refs.eltreeVNode.filter(val)
     }
   },
-
   methods: {
     filter(val) {
-      this.$refs.tree.filter(val)
+      this.$refs.eltreeVNode.filter(val)
     },
     filterNode(value, data) {
       if (!value) return true
@@ -101,79 +90,103 @@ export default {
         }
       })
     },
-    duplicateTemplate({ templateNo }) {
-      this.$confirm('确定复制吗？', '警告', {
+
+    /**
+     * 复制请求头模板
+     */
+    async duplicateTemplate({ templateNo }) {
+      // 二次确认
+      const error = await this.$confirm('确定复制吗？', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        HeadersService.duplicateHttpHeaderTemplate({ templateNo: templateNo }).then(() => {
-          this.$store.dispatch('pymeter/queryHttpHeaderTemplateAll')
-          this.$message({ message: '复制成功', type: 'info', duration: 2 * 1000 })
-        })
       })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 复制请求头模板
+      await HeadersService.duplicateHttpHeaderTemplate({ templateNo: templateNo })
+      //  重新查询列表
+      this.$store.dispatch('pymeter/queryHttpHeaderTemplateAll')
+      // 成功提示
+      this.$message({ message: '复制成功', type: 'info', duration: 2 * 1000 })
     },
-    copyTemplateToWorkspace({ templateNo }) {
+
+    /**
+     * 复制请求头模板到指定空间
+     */
+    async copyTemplateToWorkspace({ templateNo }) {
       let workspaceNo = null
-      this.$confirm(null, {
+      // 弹出选择空间的对话框
+      const error = await this.$confirm(null, {
         title: '请选择工作空间',
         message: (
           <workspace-list
             key={templateNo}
             data={this.workspaceList}
-            on-node-click={(data) => {
-              workspaceNo = data.workspaceNo
-            }}
-          ></workspace-list>
+            onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
+          />
         ),
         confirmButtonText: '确定',
         cancelButtonText: '取消'
-      }).then(() => {
-        HeadersService.copyHttpHeaderTemplateToWorkspace({ templateNo: templateNo, workspaceNo: workspaceNo }).then(
-          () => {
-            this.$message({ message: '复制成功', type: 'info', duration: 1 * 1000 })
-          }
-        )
       })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 复制请求头模板到指定空间
+      await HeadersService.copyHttpHeaderTemplateToWorkspace({ templateNo: templateNo, workspaceNo: workspaceNo })
+      //  成功提示
+      this.$message({ message: '复制成功', type: 'info', duration: 1 * 1000 })
     },
-    moveTemplateToWorkspace({ templateNo }) {
+
+    /**
+     * 移动请求头模板到指定空间
+     */
+    async moveTemplateToWorkspace({ templateNo }) {
       let workspaceNo = null
-      this.$confirm(null, {
+      // 弹出选择空间的对话框
+      const error = await this.$confirm(null, {
         title: '请选择工作空间',
         message: (
           <workspace-list
             key={templateNo}
             data={this.workspaceList}
-            on-node-click={(data) => {
-              workspaceNo = data.workspaceNo
-            }}
-          ></workspace-list>
+            onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
+          />
         ),
         confirmButtonText: '确定',
         cancelButtonText: '取消'
-      }).then(() => {
-        HeadersService.moveHttpHeaderTemplateToWorkspace({ templateNo: templateNo, workspaceNo: workspaceNo }).then(
-          () => {
-            this.$store.dispatch('pymeter/queryHttpHeaderTemplateAll')
-            this.$message({ message: '移动成功', type: 'info', duration: 1 * 1000 })
-          }
-        )
       })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 移动请求头模板到指定空间
+      await HeadersService.moveHttpHeaderTemplateToWorkspace({ templateNo: templateNo, workspaceNo: workspaceNo })
+      // 重新查询列表
+      this.$store.dispatch('pymeter/queryHttpHeaderTemplateAll')
+      // 成功提示
+      this.$message({ message: '移动成功', type: 'info', duration: 1 * 1000 })
     },
 
     /**
      * 删除请求头模板
      */
-    deleteTemplate({ templateNo }) {
-      this.$confirm('确定删除吗？', '警告', {
+    async deleteTemplate({ templateNo }) {
+      // 二次确认
+      const error = await this.$confirm('确定删除吗？', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        HeadersService.deleteHttpHeaderTemplate({ templateNo: templateNo }).then(() => {
-          this.$store.dispatch('pymeter/queryHttpHeaderTemplateAll')
-        })
       })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 删除请求头模板
+      await HeadersService.deleteHttpHeaderTemplate({ templateNo: templateNo })
+      // 重新查询列表
+      this.$store.dispatch('pymeter/queryHttpHeaderTemplateAll')
+      // 成功提示
+      this.$message({ message: '删除成功', type: 'info', duration: 1 * 1000 })
     }
   }
 }

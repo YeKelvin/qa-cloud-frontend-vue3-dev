@@ -6,7 +6,7 @@ export default function useElTree() {
   const menuOpened = ref(false)
   const expandedList = ref([])
 
-  const treeRef = ref()
+  const eltreeVNode = ref()
 
   /**
    * el-tree-node 鼠标移入事件
@@ -80,7 +80,7 @@ export default function useElTree() {
    * 展开或收起所有节点
    */
   const expandAll = (expand) => {
-    expandNode(treeRef.value.store.root, expand)
+    expandNode(eltreeVNode.value.store.root, expand)
   }
 
   /**
@@ -107,7 +107,7 @@ export default function useElTree() {
   }
 
   return {
-    treeRef,
+    eltreeVNode,
     hoveredNode,
     menuOpened,
     expandedList,

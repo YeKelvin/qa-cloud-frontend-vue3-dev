@@ -91,7 +91,7 @@
       <el-divider />
       <!-- 脚本内容 -->
       <el-scrollbar style="width: 100%; height: 100%" wrap-style="overflow-x:auto;" view-style="padding:10px;">
-        <ElementTree ref="treeRef" :collection-number-list="selectedCollectionNumberList" />
+        <ElementTree ref="eltreeVNode" :collection-number-list="selectedCollectionNumberList" />
       </el-scrollbar>
     </template>
 
@@ -192,7 +192,7 @@ export default {
      * 根据集合编号查询测试案例
      */
     queryElementsTree() {
-      this.$refs.treeRef.queryElementsTree()
+      this.$refs.eltreeVNode.queryElementsTree()
     },
 
     /**
@@ -225,7 +225,7 @@ export default {
      * 展开或收起所有节点
      */
     expandAll(expand) {
-      this.$refs.treeRef.expandAll(expand)
+      this.$refs.eltreeVNode.expandAll(expand)
     }
   }
 }

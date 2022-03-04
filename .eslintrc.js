@@ -47,6 +47,7 @@ module.exports = {
     'no-plusplus': 'off',
     'no-param-reassign': ['off'],
     'no-useless-escape': 'off',
+    'no-unused-vars': ['error', { varsIgnorePattern: '.*', args: 'none' }],
     'no-constant-condition': ['error', { checkLoops: false }],
     'prefer-template': 'error',
     'prefer-const': ['warn', { destructuring: 'all', ignoreReadBeforeAssign: true }],

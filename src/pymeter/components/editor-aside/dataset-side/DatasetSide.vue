@@ -2,12 +2,12 @@
   <div class="manager-container">
     <!-- 过滤 -->
     <span style="padding: 10px">
-      <el-input v-model="filterText" size="small" placeholder="请输入搜索内容" clearable>
+      <el-input v-model="filterText" placeholder="请输入搜索内容" size="large" clearable>
         <!-- 新增菜单 -->
         <template #prepend>
           <el-dropdown trigger="click" placement="bottom-start">
             <!-- 菜单弹出按钮 -->
-            <el-button type="text" icon="el-icon-plus" style="padding: 6px 20px" />
+            <el-button type="text" :icon="Plus" style="padding: 6px 20px" />
             <!-- 菜单 -->
             <template #dropdown>
               <el-dropdown-menu>
@@ -29,12 +29,13 @@
 </template>
 
 <script setup>
+import { Plus } from '@element-plus/icons-vue'
 import DatasetTree from './DatasetTree'
 </script>
 
 <script>
 export default {
-  name: 'DatasetAside',
+  name: 'DatasetSide',
   data() {
     return {
       // 关键字

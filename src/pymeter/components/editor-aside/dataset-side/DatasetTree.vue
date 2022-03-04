@@ -1,6 +1,6 @@
 <template>
   <el-tree
-    ref="tree"
+    ref="eltreeVNode"
     node-key="datasetNo"
     :props="{ label: 'datasetName' }"
     :data="datasetList"
@@ -31,7 +31,7 @@
             @visible-change="visibleChange"
           >
             <!-- 菜单弹出按钮 -->
-            <el-button type="text" icon="el-icon-more" />
+            <el-button type="text" :icon="More" />
             <!-- 菜单 -->
             <template #dropdown>
               <el-dropdown-menu>
@@ -39,7 +39,7 @@
                 <el-dropdown-item @click="duplicateDataset(data)">复制</el-dropdown-item>
                 <el-dropdown-item @click="copyDatasetToWorkspace(data)">复制到空间</el-dropdown-item>
                 <el-dropdown-item @click="moveDatasetToWorkspace(data)">移动到空间</el-dropdown-item>
-                <el-dropdown-item @click="deleteDataset(data.datasetNo)">删除</el-dropdown-item>
+                <el-dropdown-item @click="deleteDataset(data)">删除</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -50,16 +50,14 @@
 </template>
 
 <script lang="jsx" setup>
-// import { mapState } from 'vuex'
+import { More } from '@element-plus/icons-vue'
 import * as VariablesService from '@/api/script/variables'
 import useElTree from '@/composables/useElTree'
-import useElTreeNodeFilter from '@/composables/useElTreeNodeFilter'
 import useWorkspaceState from '@/composables/useWorkspaceState'
 import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceList.vue'
 
-const { hoveredNode, mouseenter, mouseleave, visibleChange } = useElTree()
-const { filterNode } = useElTreeNodeFilter('datasetName')
+const { eltreeVNode, hoveredNode, mouseenter, mouseleave, visibleChange } = useElTree()
 const { datasetList } = usePyMeterState()
 const { workspaceList } = useWorkspaceState()
 </script>
@@ -67,35 +65,22 @@ const { workspaceList } = useWorkspaceState()
 <script lang="jsx">
 export default {
   name: 'DatasetTree',
-  // props: {
-  //   filterText: { type: String, default: '' }
-  // },
-  // computed: {
-  //   ...mapState('workspace', {
-  //     workspaceList: (state) => state.workspaceList
-  //   }),
-  //   ...mapState('pymeter', {
-  //     globalDatasetList: (state) => state.globalDatasetList,
-  //     environmentDatasetList: (state) => state.environmentDatasetList,
-  //     customDatasetList: (state) => state.customDatasetList
-  //   }),
-  //   datasetList() {
-  //     return [...this.globalDatasetList, ...this.environmentDatasetList, ...this.customDatasetList]
-  //   }
-  // },
-  // watch: {
-  //   filterText(val) {
-  //     this.$refs.tree.filter(val)
-  //   }
-  // },
+  props: {
+    filterText: { type: String, default: '' }
+  },
+  watch: {
+    filterText(val) {
+      this.$refs.eltreeVNode.filter(val)
+    }
+  },
   methods: {
-    // filter(val) {
-    //   this.$refs.tree.filter(val)
-    // },
-    // filterNode(value, data) {
-    //   if (!value) return true
-    //   return data.datasetName.indexOf(value) !== -1
-    // },
+    filter(val) {
+      this.$refs.eltreeVNode.filter(val)
+    },
+    filterNode(value, data) {
+      if (!value) return true
+      return data.datasetName.indexOf(value) !== -1
+    },
     handleNodeClick(data) {
       this.$store.commit({
         type: 'pymeter/addTab',
@@ -110,71 +95,103 @@ export default {
         }
       })
     },
-    duplicateDataset({ datasetNo }) {
-      this.$confirm('确定复制吗？', '警告', {
+
+    /**
+     * 复制变量集
+     */
+    async duplicateDataset({ datasetNo }) {
+      // 二次确认
+      const error = await this.$confirm('确定复制吗？', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        VariablesService.duplicateVariableDataset({ datasetNo: datasetNo }).then(() => {
-          this.$store.dispatch('pymeter/queryDatasetAll')
-          this.$message({ message: '复制成功', type: 'info', duration: 2 * 1000 })
-        })
       })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 复制变量集
+      await VariablesService.duplicateVariableDataset({ datasetNo: datasetNo })
+      // 重新查询列表
+      this.$store.dispatch('pymeter/queryDatasetAll')
+      // 成功提示
+      this.$message({ message: '复制成功', type: 'info', duration: 2 * 1000 })
     },
-    copyDatasetToWorkspace({ datasetNo }) {
+
+    /**
+     * 复制变量集至指定空间
+     */
+    async copyDatasetToWorkspace({ datasetNo }) {
       let workspaceNo = null
-      this.$confirm(null, {
+      // 弹出选择空间的对话框
+      const error = await this.$confirm(null, {
         title: '请选择工作空间',
         message: (
           <WorkspaceList
             key={datasetNo}
             data={this.workspaceList}
-            on-node-click={(data) => {
-              workspaceNo = data.workspaceNo
-            }}
-          ></WorkspaceList>
+            onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
+          />
         ),
         confirmButtonText: '确定',
         cancelButtonText: '取消'
-      }).then(() => {
-        VariablesService.copyVariableDatasetToWorkspace({ datasetNo: datasetNo, workspaceNo: workspaceNo }).then(() => {
-          this.$message({ message: '复制成功', type: 'info', duration: 1 * 1000 })
-        })
       })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 复制变量集到指定的空间
+      await VariablesService.copyVariableDatasetToWorkspace({ datasetNo: datasetNo, workspaceNo: workspaceNo })
+      // 成功提示
+      this.$message({ message: '复制成功', type: 'info', duration: 2 * 1000 })
     },
-    moveDatasetToWorkspace({ datasetNo }) {
+
+    /**
+     * 移动变量集至指定空间
+     */
+    async moveDatasetToWorkspace({ datasetNo }) {
       let workspaceNo = null
-      this.$confirm(null, {
+      // 弹出选择空间的对话框
+      const error = await this.$confirm(null, {
         title: '请选择工作空间',
         message: (
           <WorkspaceList
             key={datasetNo}
             data={this.workspaceList}
-            on-node-click={(data) => {
-              workspaceNo = data.workspaceNo
-            }}
-          ></WorkspaceList>
+            onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
+          />
         ),
         confirmButtonText: '确定',
         cancelButtonText: '取消'
-      }).then(() => {
-        VariablesService.moveVariableDatasetToWorkspace({ datasetNo: datasetNo, workspaceNo: workspaceNo }).then(() => {
-          this.$store.dispatch('pymeter/queryDatasetAll')
-          this.$message({ message: '移动成功', type: 'info', duration: 1 * 1000 })
-        })
       })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 移动变量集到指定的空间
+      await VariablesService.moveVariableDatasetToWorkspace({ datasetNo: datasetNo, workspaceNo: workspaceNo })
+      // 重新查询列表
+      this.$store.dispatch('pymeter/queryDatasetAll')
+      // 成功提示
+      this.$message({ message: '移动成功', type: 'info', duration: 2 * 1000 })
     },
-    deleteDataset(datasetNo) {
-      this.$confirm('确定删除吗？', '警告', {
+
+    /**
+     * 删除变量集
+     */
+    async deleteDataset({ datasetNo }) {
+      // 二次确认
+      const error = await this.$confirm('确定删除吗？', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        VariablesService.deleteVariableDataset({ datasetNo: datasetNo }).then(() => {
-          this.$store.dispatch('pymeter/queryDatasetAll')
-        })
       })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 删除变量集
+      await VariablesService.deleteVariableDataset({ datasetNo: datasetNo })
+      // 重新查询列表
+      this.$store.dispatch('pymeter/queryDatasetAll')
+      // 成功提示
+      this.$message({ message: '删除成功', type: 'info', duration: 2 * 1000 })
     }
   }
 }
@@ -196,8 +213,8 @@ export default {
 }
 
 .tree-item-icon {
-  height: 1.8em !important;
-  width: 1.8em !important;
+  height: 1.6em !important;
+  width: 1.6em !important;
   padding-right: 5px;
 }
 
