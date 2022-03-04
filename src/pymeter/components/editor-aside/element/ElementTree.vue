@@ -1,6 +1,6 @@
 <template>
   <el-tree
-    ref="tree"
+    ref="treeRef"
     node-key="elementNo"
     empty-text="请开始编辑脚本"
     highlight-current
@@ -24,6 +24,7 @@
     @keyup.meta.v="handleMetaKeyV"
   >
     <template #default="{ node, data }">
+      <!-- 树结点 -->
       <span class="tree-item" @mouseenter="mouseenter(node)" @mouseleave="mouseleave()">
         <!-- 元素名称 -->
         <ElementTreeItemName :data="data" @dblclick="handleNodeDoubleClick(node)" />
@@ -127,28 +128,32 @@
 </template>
 
 <script lang="jsx" setup>
+import { defineExpose } from 'vue'
 import { mapState } from 'vuex'
 import { More } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
-import useTree from '@/composables/useTree'
-// import useWorkspaceState from '@/composables/useWorkspaceState'
-// import usePyMeterState from '@/pymeter/composables/usePyMeterState'
+import useElTree from '@/composables/useElTree'
 import ElementTreeItemName from './ElementTreeItemName.vue'
-import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceListDialog.vue'
+import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceList.vue'
 
 const {
+  treeRef,
   hoveredNode,
   expandedList,
   mouseenter,
   mouseleave,
   visibleChange,
-  getRootNode,
   handleNodeDoubleClick,
   handleNodeExpand,
-  handleNodeCollapse
-} = useTree()
-// const { workspaceNo, workspaceList } = useWorkspaceState()
-// const { refreshElementTree } = usePyMeterState()
+  handleNodeCollapse,
+  expandAll,
+  expandNode
+} = useElTree()
+
+defineExpose({
+  expandAll,
+  expandNode
+})
 </script>
 
 <script lang="jsx">
@@ -186,7 +191,7 @@ export default {
       if (!val) return
       this.queryElementsTree()
     },
-    refreshElementTree(val) {
+    refreshElementTree() {
       this.queryElementsTree()
     }
   },
@@ -549,54 +554,57 @@ export default {
     /**
      * 复制元素至指定空间
      */
-    copyElementToWorkspace({ elementNo }) {
+    async copyElementToWorkspace({ elementNo }) {
       let workspaceNo = null
-      this.$confirm(null, {
+      // 弹出选择空间的对话框
+      const error = await this.$confirm(null, {
         title: '请选择工作空间',
         message: (
-          <workspace-list
+          <WorkspaceList
             key={elementNo}
             data={this.workspaceList}
-            on-node-click={(data) => {
-              workspaceNo = data.workspaceNo
-            }}
-          ></workspace-list>
+            onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
+          />
         ),
         confirmButtonText: '确定',
         cancelButtonText: '取消'
-      }).then(() => {
-        ElementService.copyElementToWorkspace({ elementNo: elementNo, workspaceNo: workspaceNo }).then(() => {
-          this.$message({ message: '复制成功', type: 'info', duration: 1 * 1000 })
-        })
       })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 复制元素到指定的空间
+      await ElementService.copyElementToWorkspace({ elementNo: elementNo, workspaceNo: workspaceNo })
+      // 成功提示
+      this.$message({ message: '复制成功', type: 'info', duration: 1 * 1000 })
     },
 
     /**
      * 移动元素至指定空间
      */
-    moveElementToWorkspace({ elementNo }) {
+    async moveElementToWorkspace({ elementNo }) {
       let workspaceNo = null
-      this.$confirm(null, {
+      // 弹出选择空间的对话框
+      const error = await this.$confirm(null, {
         title: '请选择工作空间',
         message: (
-          <workspace-list
+          <WorkspaceList
             key={elementNo}
             data={this.workspaceList}
-            on-node-click={(data) => {
-              workspaceNo = data.workspaceNo
-            }}
-          ></workspace-list>
+            onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
+          />
         ),
         confirmButtonText: '确定',
         cancelButtonText: '取消'
-      }).then(() => {
-        ElementService.moveElementToWorkspace({ elementNo: elementNo, workspaceNo: workspaceNo }).then(() => {
-          // 重新查询列表
-          this.queryElementsTree()
-          // 成功提示
-          this.$message({ message: '移动成功', type: 'info', duration: 1 * 1000 })
-        })
       })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 移动元素到指定空间
+      await ElementService.moveElementToWorkspace({ elementNo: elementNo, workspaceNo: workspaceNo })
+      // 重新查询列表
+      this.queryElementsTree()
+      // 成功提示
+      this.$message({ message: '移动成功', type: 'info', duration: 1 * 1000 })
     },
 
     /**
@@ -604,6 +612,7 @@ export default {
      */
     enableElement({ elementNo }) {
       if (!elementNo) return
+      // 启用元素
       ElementService.enableElement({ elementNo: elementNo }).then(() => {
         // 重新查询列表
         this.queryElementsTree()
@@ -615,6 +624,7 @@ export default {
      */
     disableElement({ elementNo }) {
       if (!elementNo) return
+      // 禁用元素
       ElementService.disableElement({ elementNo: elementNo }).then(() => {
         // 重新查询列表
         this.queryElementsTree()
@@ -624,8 +634,9 @@ export default {
     /**
      * 删除元素
      */
-    removeElement({ elementNo, elementName }) {
-      this.$confirm(null, {
+    async removeElement({ elementNo, elementName }) {
+      // 二次确认
+      const error = await this.$confirm(null, {
         title: '警告',
         type: 'warning',
         confirmButtonText: '确定',
@@ -637,12 +648,16 @@ export default {
             <p style="white-space:normal; overflow:hidden; text-overflow:ellipsis;">{elementName}</p>
           </div>
         )
-      }).then(() => {
-        ElementService.removeElement({ elementNo: elementNo }).then(() => {
-          this.$store.commit({ type: 'pymeter/removeTab', editorNo: elementNo })
-          this.queryElementsTree()
-        })
       })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 删除元素
+      await ElementService.removeElement({ elementNo: elementNo })
+      // 关闭tab
+      this.$store.commit({ type: 'pymeter/removeTab', editorNo: elementNo })
+      // 重新查询列表
+      this.queryElementsTree()
     },
 
     /**

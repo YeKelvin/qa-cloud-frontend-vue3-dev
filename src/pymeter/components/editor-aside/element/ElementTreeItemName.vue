@@ -20,24 +20,24 @@
     <!-- 名称 -->
     <span class="element-name">{{ data.elementName }}</span>
     <!-- 集合标识 -->
-    <el-tag v-if="data.elementClass == 'TestCollection'" size="small" style="margin-left: 5px">集合</el-tag>
+    <el-tag v-if="data.elementClass == 'TestCollection'" size="small">集合</el-tag>
     <!-- 片段标识 -->
-    <el-tag v-if="data.elementClass == 'TestSnippets'" size="small" style="margin-left: 5px">片段</el-tag>
+    <el-tag v-if="data.elementClass == 'TestSnippets'" size="small">片段</el-tag>
     <!-- 禁用标识 -->
-    <el-tag v-if="!data.enabled" type="danger" size="small" style="margin-left: 5px">禁用</el-tag>
+    <el-tag v-if="!data.enabled" type="danger" size="small">禁用</el-tag>
     <!-- Setup标识 -->
-    <el-tag v-if="data.elementClass == 'SetupGroup'" size="small" style="margin-left: 5px">setup</el-tag>
+    <el-tag v-if="data.elementClass == 'SetupGroup'" size="small">setup</el-tag>
     <!-- TearDown标识 -->
-    <el-tag v-if="data.elementClass == 'TearDownGroup'" size="small" style="margin-left: 5px">teardown</el-tag>
+    <el-tag v-if="data.elementClass == 'TearDownGroup'" size="small">teardown</el-tag>
     <!-- SetupDebuger标识 -->
     <template v-if="data.elementClass == 'SetupGroupDebuger'">
-      <el-tag size="small" style="margin-left: 5px">setup</el-tag>
-      <el-tag size="small" style="margin-left: 5px">debuger</el-tag>
+      <el-tag size="small">setup</el-tag>
+      <el-tag size="small">debuger</el-tag>
     </template>
     <!-- TearDownDebuger标识 -->
     <template v-if="data.elementClass == 'TearDownGroupDebuger'">
-      <el-tag size="small" style="margin-left: 5px">teardown</el-tag>
-      <el-tag size="small" style="margin-left: 5px">debuger</el-tag>
+      <el-tag size="small">teardown</el-tag>
+      <el-tag size="small">debuger</el-tag>
     </template>
   </span>
 </template>
@@ -63,5 +63,9 @@ export default {
   white-space: normal;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.el-tag {
+  margin-left: 5px;
 }
 </style>

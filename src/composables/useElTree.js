@@ -1,12 +1,12 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 
-export default function useTree() {
+export default function useElTree() {
   const hoveredNode = ref(null)
   const menuOpened = ref(false)
   const expandedList = ref([])
 
-  const tree = ref()
+  const treeRef = ref()
 
   /**
    * el-tree-node 鼠标移入事件
@@ -80,7 +80,7 @@ export default function useTree() {
    * 展开或收起所有节点
    */
   const expandAll = (expand) => {
-    expandNode(tree.value.store.root, expand)
+    expandNode(treeRef.value.store.root, expand)
   }
 
   /**
@@ -107,6 +107,7 @@ export default function useTree() {
   }
 
   return {
+    treeRef,
     hoveredNode,
     menuOpened,
     expandedList,

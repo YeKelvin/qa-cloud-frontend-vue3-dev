@@ -48,7 +48,7 @@
 <script lang="jsx">
 import { mapState } from 'vuex'
 // import ElTreeMixin from '@/mixins/el-tree-mixin'
-import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceListDialog.vue'
+import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceList.vue'
 import * as HeadersService from '@/api/script/headers'
 
 export default {

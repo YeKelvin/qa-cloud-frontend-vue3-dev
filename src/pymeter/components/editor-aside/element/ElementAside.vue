@@ -11,9 +11,10 @@
       <el-select
         v-model="selectedCollectionNumberList"
         :teleported="false"
+        effect="dark"
         size="large"
         style="flex-grow: 1"
-        placeholder="脚本集合"
+        tag-type="danger"
         filterable
         multiple
       >
@@ -90,7 +91,7 @@
       <el-divider />
       <!-- 脚本内容 -->
       <el-scrollbar style="width: 100%; height: 100%" wrap-style="overflow-x:auto;" view-style="padding:10px;">
-        <ElementTree ref="tree" :collection-number-list="selectedCollectionNumberList" />
+        <ElementTree ref="treeRef" :collection-number-list="selectedCollectionNumberList" />
       </el-scrollbar>
     </template>
 
@@ -191,7 +192,7 @@ export default {
      * 根据集合编号查询测试案例
      */
     queryElementsTree() {
-      this.$refs.tree.queryElementsTree()
+      this.$refs.treeRef.queryElementsTree()
     },
 
     /**
@@ -224,7 +225,7 @@ export default {
      * 展开或收起所有节点
      */
     expandAll(expand) {
-      this.$refs.tree.expandAll(expand)
+      this.$refs.treeRef.expandAll(expand)
     }
   }
 }
@@ -248,7 +249,7 @@ export default {
 .operation-container {
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-evenly;
   align-items: center;
 
   .el-button--text {

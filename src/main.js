@@ -13,7 +13,7 @@ import Router from './router'
 import './permission'
 
 // element-ui
-import ElementPlus from 'element-plus'
+import ElementPlus, { ElMessage } from 'element-plus'
 import zh_cn from 'element-plus/es/locale/lang/zh-cn'
 import 'element-plus/dist/index.css'
 
@@ -46,9 +46,9 @@ app.directive('permission', PermissionDirective)
 app.config.globalProperties.$dayjs = DayJs
 app.config.globalProperties.$_ = Lodash
 // 全局异常处理
-app.config.errorHandler = (err, vm, info) => {
+app.config.errorHandler = (err) => {
   console.error(err)
-  ElementPlus.ElMessage.error(err.toString() || '服务开小差')
+  ElMessage.error(err.toString() || '服务开小差')
 }
 
 // 挂载实例

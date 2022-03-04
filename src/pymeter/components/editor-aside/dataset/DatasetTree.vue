@@ -52,14 +52,14 @@
 <script lang="jsx" setup>
 // import { mapState } from 'vuex'
 import * as VariablesService from '@/api/script/variables'
-import useTree from '@/composables/useTree'
-import useTreeNodeFilter from '@/composables/useTreeNodeFilter'
+import useElTree from '@/composables/useElTree'
+import useElTreeNodeFilter from '@/composables/useElTreeNodeFilter'
 import useWorkspaceState from '@/composables/useWorkspaceState'
 import usePyMeterState from '@/pymeter/composables/usePyMeterState'
-import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceListDialog.vue'
+import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceList.vue'
 
-const { hoveredNode, mouseenter, mouseleave, visibleChange } = useTree()
-const { filterNode } = useTreeNodeFilter('datasetName')
+const { hoveredNode, mouseenter, mouseleave, visibleChange } = useElTree()
+const { filterNode } = useElTreeNodeFilter('datasetName')
 const { datasetList } = usePyMeterState()
 const { workspaceList } = useWorkspaceState()
 </script>

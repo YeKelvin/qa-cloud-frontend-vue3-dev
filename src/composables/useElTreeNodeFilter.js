@@ -1,13 +1,11 @@
 import { defineProps, toRefs, ref, watch } from 'vue'
 
-export default function useTreeNodeFilter(filterKey) {
+export default function useElTreeNodeFilter(filterKey) {
   const props = defineProps({
     filterText: { type: String, default: '' }
   })
   const { filterText } = toRefs(props)
   const tree = ref()
-
-  watch(filterText, (val) => tree.value.filter(val))
 
   const filter = (val) => {
     tree.value.filter(val)
@@ -18,9 +16,7 @@ export default function useTreeNodeFilter(filterKey) {
     return data[filterKey].indexOf(val) !== -1
   }
 
-  defineExpose({
-    filter
-  })
+  watch(filterText, (val) => tree.value.filter(val))
 
   return {
     filterText,
