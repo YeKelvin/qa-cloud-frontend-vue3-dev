@@ -27,31 +27,8 @@
 </template>
 
 <script setup>
-// ** PyMeter Components ******************************************************************************************** /
-// import CollectionEditor from './collections/collection-editor'
-// import SnippetsEditor from './collections/snippets-editor'
-// import GroupEditor from './groups/group-editor'
-// import SetupGroupEditor from './groups/setup-group-editor'
-// import TeardownGroupEditor from './groups/teardown-group-editor'
-// import SetupGroupDebugerEditor from './groups/setup-group-debuger-editor'
-// import TeardownGroupDebugerEditor from './groups/teardown-group-debuger-editor'
-// import HTTPSamplerEditor from './samplers/http-sampler-editor'
-// import PythonSamplerEditor from './samplers/python-sampler-editor'
-// import SnippetSamplerEditor from './samplers/snippet-sampler-editor'
-// import PythonPreProcessorEditor from './pre-processors/python-pre-processor-editor'
-// import PythonPostProcessorEditor from './post-processors/python-post-processor-editor'
-// import PythonAssertionEditor from './assertions/python-assertion-editor'
-// import IfControllerEditor from './controllers/if-controller-editor'
-// import ForInControllerEditor from './controllers/for-in-controller-editor'
-// import LoopControllerEditor from './controllers/loop-controller-editor'
-// import RetryControllerEditor from './controllers/retry-controller-editor'
-// import TransactionControllerEditor from './controllers/transaction-controller-editor'
-// import WhileControllerEditor from './controllers/while-controller-editor'
-// import VariableDatasetEditor from './configs/variable-dataset-editor'
-// import HttpHeadersTemplateEditor from './configs/http-headers-template-editor'
-// import ConstantTimerEditor from './timers/constant-timer-editor'
-// ** PyMeter Components ******************************************************************************************** /
 import { mapState } from 'vuex'
+import { markRaw, defineAsyncComponent } from 'vue'
 // import middleBar from './middle-bar'
 </script>
 
@@ -61,7 +38,7 @@ export default {
   data() {
     return {
       editors: {
-        // TestCollection: CollectionEditor,
+        TestCollection: markRaw(defineAsyncComponent(() => import('./collections/TestCollection.vue')))
         // TestSnippets: SnippetsEditor,
         // TestGroup: GroupEditor,
         // SetupGroup: SetupGroupEditor,

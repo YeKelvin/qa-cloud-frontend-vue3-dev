@@ -128,7 +128,6 @@
 </template>
 
 <script lang="jsx" setup>
-import { defineExpose } from 'vue'
 import { mapState } from 'vuex'
 import { More } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
