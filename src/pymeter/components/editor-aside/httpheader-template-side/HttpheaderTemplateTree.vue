@@ -12,7 +12,7 @@
         <!-- 树节点 -->
         <span class="tree-item-name-wrapper">
           <!-- 图标 -->
-          <SvgIcon icon-name="pymeter-header" class-name="tree-item-icon" />
+          <SvgIcon icon-name="pymeter-httpheader-template" class-name="tree-item-icon" />
           <!-- 变量集名称 -->
           <span class="tree-item-name">{{ node.label }}</span>
         </span>
@@ -75,7 +75,7 @@ export default {
     },
     filterNode(value, data) {
       if (!value) return true
-      return data.datasetName.indexOf(value) !== -1
+      return data.templateName.indexOf(value) !== -1
     },
     handleNodeClick(data) {
       this.$store.commit({

@@ -24,7 +24,7 @@ export default {
         ELEMENT: markRaw(defineAsyncComponent(() => import('./element-side/ElementSide.vue'))),
         DATASET: markRaw(defineAsyncComponent(() => import('./dataset-side/DatasetSide.vue'))),
         HTTP_HEADER_TEMPLATE: markRaw(
-          defineAsyncComponent(() => import('./http-header-template-side/HttpHeaderTemplateSide.vue'))
+          defineAsyncComponent(() => import('./httpheader-template-side/HttpheaderTemplateSide.vue'))
         )
       }
     }
