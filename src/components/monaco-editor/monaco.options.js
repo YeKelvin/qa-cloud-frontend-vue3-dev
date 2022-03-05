@@ -9,7 +9,7 @@ const DEFAULT_OPTIONS = {
   // 自适应布局
   automaticLayout: true,
   // 括号高亮
-  // bracketPairColorization: true,
+  bracketPairColorization: { enabled: true },
   // 光标样式
   cursorStyle: 'line',
   // 开启右键菜单那
@@ -28,6 +28,8 @@ const DEFAULT_OPTIONS = {
   lineNumbersMinChars: 3,
   // 启用字形边距的渲染，默认为false
   glyphMargin: true,
+  // 括号高亮
+  guides: { bracketPairs: 'active' },
   // 小地图
   minimap: { enabled: false },
   // 自动匹配括号
@@ -51,6 +53,9 @@ const DEFAULT_OPTIONS = {
   renderWhitespace: 'all',
   selectionHighlight: true,
   smoothScrolling: true,
+  snippetSuggestions: 'top',
+  suggestSelection: 'first',
+  tabCompletion: 'on',
   // 缩进大小
   tabIndex: 4,
   // 在制表位后插入和删除空格

@@ -42,8 +42,8 @@
 
       <!-- 操作按钮 -->
       <el-form-item v-if="queryMode">
-        <el-button :icon="Edit" type="primary" @click="editNow">编 辑</el-button>
-        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Edit" type="primary" @click="editNow()">编 辑</el-button>
+        <el-button :icon="Close" @click="closeTab()">关 闭</el-button>
         <el-dropdown
           split-button
           trigger="click"
@@ -62,12 +62,12 @@
         </el-dropdown>
       </el-form-item>
       <el-form-item v-else-if="modifyMode">
-        <el-button :icon="Check" type="danger" @click="modifyCollectionElement">保 存</el-button>
-        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Check" type="danger" @click="modifyCollectionElement()">保 存</el-button>
+        <el-button :icon="Close" @click="closeTab()">关 闭</el-button>
       </el-form-item>
       <el-form-item v-else-if="createMode">
-        <el-button :icon="Check" type="primary" @click="createCollectionElement">保 存</el-button>
-        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Check" type="primary" @click="createCollectionElement()">保 存</el-button>
+        <el-button :icon="Close" @click="closeTab()">关 闭</el-button>
       </el-form-item>
     </el-form>
 
@@ -80,9 +80,9 @@
 <script setup>
 import { mapState } from 'vuex'
 import { Check, Close, Edit, Pointer } from '@element-plus/icons-vue'
-import baseEditorProps from '@/pymeter/composables/editorPropsBase'
 import * as ElementService from '@/api/script/element'
 import * as ExecutionService from '@/api/script/execution'
+import baseEditorProps from '@/pymeter/composables/editorPropsBase'
 import useEditor from '@/pymeter/composables/useEditor'
 
 const props = defineProps(baseEditorProps)
@@ -125,11 +125,10 @@ export default {
 
   mounted: function () {
     // 查询或更新模式时先拉取元素信息
-    if (this.queryMode || this.modifyMode) {
-      ElementService.queryElementInfo({ elementNo: this.elementNo }).then((response) => {
-        this.elementInfo = response.result
-      })
-    }
+    if (this.createMode) return
+    ElementService.queryElementInfo({ elementNo: this.elementNo }).then((response) => {
+      this.elementInfo = response.result
+    })
   },
 
   methods: {
@@ -152,7 +151,7 @@ export default {
       this.$message({ message: '修改元素成功', type: 'info', duration: 2 * 1000 })
       // 修改tab标题
       this.$store.commit('pymeter/updateTab', { editorNo: this.elementNo, editorName: this.elementInfo.elementName })
-      // 重新查询列表
+      // 重新查询脚本列表
       this.$store.commit('pymeter/refreshCollectionsNow')
       // 表单设置为只读
       this.setReadonly()
@@ -178,7 +177,7 @@ export default {
       this.$message({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
       // 关闭tab
       this.$store.commit('pymeter/removeTab', { editorNo: 'UNSAVED_COLLECTION' })
-      // 重新查询列表
+      // 重新查询脚本列表
       this.$store.commit('pymeter/refreshCollectionsNow')
     },
 

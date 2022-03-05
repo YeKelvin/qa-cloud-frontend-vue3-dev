@@ -38,7 +38,7 @@ export default {
   data() {
     return {
       editors: {
-        TestCollection: markRaw(defineAsyncComponent(() => import('./collections/TestCollection.vue')))
+        TestCollection: markRaw(defineAsyncComponent(() => import('./collections/TestCollection.vue'))),
         // TestSnippets: SnippetsEditor,
         // TestGroup: GroupEditor,
         // SetupGroup: SetupGroupEditor,
@@ -46,7 +46,7 @@ export default {
         // SetupGroupDebuger: SetupGroupDebugerEditor,
         // TeardownGroupDebuger: TeardownGroupDebugerEditor,
         // HTTPSampler: HTTPSamplerEditor,
-        // PythonSampler: PythonSamplerEditor,
+        PythonSampler: markRaw(defineAsyncComponent(() => import('./samplers/PythonSampler.vue')))
         // SnippetSampler: SnippetSamplerEditor,
         // PythonPreProcessor: PythonPreProcessorEditor,
         // PythonPostProcessor: PythonPostProcessorEditor,
