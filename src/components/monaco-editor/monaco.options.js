@@ -9,7 +9,8 @@ const DEFAULT_OPTIONS = {
   // 自适应布局
   automaticLayout: true,
   // 括号高亮
-  bracketPairColorization: { enabled: true },
+  // bracketPairColorization: { enabled: true }, // 这样会无效
+  'bracketPairColorization.enabled': true,
   // 光标样式
   cursorStyle: 'line',
   // 开启右键菜单那

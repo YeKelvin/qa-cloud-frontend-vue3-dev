@@ -1,4 +1,4 @@
-import * as monaco from 'monaco-editor'
+import monaco from '../monaco.base.js'
 import { language } from 'monaco-editor/esm/vs/basic-languages/python/python.js'
 
 const PYTHON_LANGUAGE_DEFINE = { ...language }
@@ -122,17 +122,7 @@ const PYTHON_KEYWORDS = [
   'xrange',
   'zip',
   'True',
-  'False',
-  '__dict__',
-  '__methods__',
-  '__members__',
-  '__class__',
-  '__bases__',
-  '__name__',
-  '__mro__',
-  '__subclasses__',
-  '__init__',
-  '__import__'
+  'False'
 ]
 
 const PYTHON_KEYWORDS_COMPLETION_PROVIDER = (range) => {

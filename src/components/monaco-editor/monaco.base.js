@@ -1,5 +1,25 @@
 // import * as monaco from 'monaco-editor'
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.main'
+
+import 'monaco-editor/esm/vs/editor/editor.all.js'
+
+import 'monaco-editor/esm/vs/language/css/monaco.contribution.js'
+import 'monaco-editor/esm/vs/language/html/monaco.contribution.js'
+import 'monaco-editor/esm/vs/language/json/monaco.contribution.js'
+import 'monaco-editor/esm/vs/language/typescript/monaco.contribution.js'
+import 'monaco-editor/esm/vs/basic-languages/python/python.contribution.js'
+
+import 'monaco-editor/esm/vs/editor/standalone/browser/accessibilityHelp/accessibilityHelp.js'
+import 'monaco-editor/esm/vs/editor/standalone/browser/iPadShowKeyboard/iPadShowKeyboard.js'
+import 'monaco-editor/esm/vs/editor/standalone/browser/inspectTokens/inspectTokens.js'
+import 'monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneHelpQuickAccess.js'
+import 'monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneGotoLineQuickAccess.js'
+import 'monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneGotoSymbolQuickAccess.js'
+import 'monaco-editor/esm/vs/editor/standalone/browser/quickAccess/standaloneCommandsQuickAccess.js'
+import 'monaco-editor/esm/vs/editor/standalone/browser/referenceSearch/standaloneReferenceSearch.js'
+import 'monaco-editor/esm/vs/editor/standalone/browser/toggleHighContrast/toggleHighContrast.js'
+
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api.js'
+
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
 import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
@@ -67,15 +87,26 @@ registerCompletion('python', PYMETER_FUNCTION_COMPLETION_PROVIDER)
 monaco.editor.defineTheme('vs', {
   base: 'vs',
   inherit: true,
-  rules: [...LOG_TOKEN_COLORS, ...PYTHON_TOKEN_COLORS],
+  rules: [
+    {
+      fontStyle: 'bold',
+      token: 'delimiter.parenthesis.js'
+    },
+    {
+      fontStyle: 'bold',
+      token: 'delimiter.bracket.js'
+    },
+    ...LOG_TOKEN_COLORS,
+    ...PYTHON_TOKEN_COLORS
+  ],
   colors: {
-    'editorBracketHighlight.foreground1': '#ffd700',
-    'editorBracketHighlight.foreground2': '#da70d6',
-    'editorBracketHighlight.foreground3': '#87cefa',
-    'editorBracketHighlight.foreground4': '#ffd700',
-    'editorBracketHighlight.foreground5': '#da70d6',
-    'editorBracketHighlight.foreground6': '#87cefa',
-    'editorBracketHighlight.unexpectedBracket.foreground': '#ff0000'
+    'editorBracketHighlight.foreground1': '#FF0000', // 红
+    'editorBracketHighlight.foreground2': '#DA70D6',
+    'editorBracketHighlight.foreground3': '#87CEFA',
+    'editorBracketHighlight.foreground4': '#FFD700', // 黄
+    'editorBracketHighlight.foreground5': '#DA70D6',
+    'editorBracketHighlight.foreground6': '#87CEFA',
+    'editorBracketHighlight.unexpectedBracket.foreground': '#FF0000'
   }
 })
 

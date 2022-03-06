@@ -1,4 +1,4 @@
-import * as monaco from 'monaco-editor'
+import monaco from '../monaco.base.js'
 
 const PYMETER_COMPLETION_PROVIDER = (range) => {
   return [
