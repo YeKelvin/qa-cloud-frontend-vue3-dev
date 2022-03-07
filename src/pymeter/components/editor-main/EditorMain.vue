@@ -5,8 +5,8 @@
       <el-tab-pane v-for="tab in tabs" :key="tab.editorNo" :label="tab.editorName" :name="tab.editorNo" />
     </el-tabs>
 
-    <!-- 中间栏 -->
-    <!-- <middle-bar :component="activeTab.editorComponent" /> -->
+    <!-- 顶栏 -->
+    <Topbar :component="activeTab.editorComponent" />
 
     <!-- pymeter 组件 -->
     <el-scrollbar id="editor-main-scrollbar" style="width: 100%; height: 100%" wrap-style="overflow-x:auto;">
@@ -29,7 +29,7 @@
 <script setup>
 import { mapState } from 'vuex'
 import { markRaw, defineAsyncComponent } from 'vue'
-// import middleBar from './middle-bar'
+import Topbar from './topbar/Topbar.vue'
 </script>
 
 <script>
@@ -40,11 +40,11 @@ export default {
       editors: {
         TestCollection: markRaw(defineAsyncComponent(() => import('./collections/TestCollection.vue'))),
         // TestSnippets: SnippetsEditor,
-        // TestGroup: GroupEditor,
-        // SetupGroup: SetupGroupEditor,
-        // TeardownGroup: TeardownGroupEditor,
-        // SetupGroupDebuger: SetupGroupDebugerEditor,
-        // TeardownGroupDebuger: TeardownGroupDebugerEditor,
+        TestGroup: markRaw(defineAsyncComponent(() => import('./groups/TestGroup.vue'))),
+        SetupGroup: markRaw(defineAsyncComponent(() => import('./groups/SetupGroup.vue'))),
+        TeardownGroup: markRaw(defineAsyncComponent(() => import('./groups/TeardownGroup.vue'))),
+        SetupGroupDebuger: markRaw(defineAsyncComponent(() => import('./groups/SetupGroupDebuger.vue'))),
+        TeardownGroupDebuger: markRaw(defineAsyncComponent(() => import('./groups/TeardownGroupDebuger.vue'))),
         // HTTPSampler: HTTPSamplerEditor,
         PythonSampler: markRaw(defineAsyncComponent(() => import('./samplers/PythonSampler.vue')))
         // SnippetSampler: SnippetSamplerEditor,
@@ -108,6 +108,10 @@ export default {
 
   padding: 0;
   overflow: auto;
+}
+
+:deep(.el-tabs__header) {
+  margin: 0 0 10px;
 }
 
 :deep(.el-tabs__item) {

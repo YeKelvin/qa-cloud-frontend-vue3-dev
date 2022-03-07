@@ -1,17 +1,19 @@
 <template>
-  <el-dialog ref="dialog" center destroy-on-close width="50%" :show-close="false" v-bind="$attrs">
+  <el-dialog ref="dialogRef" width="50%" :show-close="false" center destroy-on-close>
     <!-- 顶栏 -->
-    <div v-show="selectedDatasetList.length > 0" slot="title" style="display: flex">
-      <el-tabs v-model="activeTabNo" type="card" style="flex-grow: 1">
-        <el-tab-pane
-          v-for="item in selectedDatasetList"
-          :key="item.datasetNo"
-          :label="item.datasetName"
-          :name="item.datasetNo"
-        />
-      </el-tabs>
-      <el-button type="text" icon="el-icon-edit" @click="openVariableDatasetEditor">编辑</el-button>
-    </div>
+    <template #title>
+      <div v-show="!isEmpty(selectedDatasetList)" style="display: flex">
+        <el-tabs v-model="activeTabNo" type="card" style="flex-grow: 1">
+          <el-tab-pane
+            v-for="item in selectedDatasetList"
+            :key="item.datasetNo"
+            :label="item.datasetName"
+            :name="item.datasetNo"
+          />
+        </el-tabs>
+        <el-button type="text" :icon="Edit" @click="openVariableDatasetEditor">编辑</el-button>
+      </div>
+    </template>
 
     <!-- 滚动条 -->
     <el-scrollbar
@@ -23,7 +25,7 @@
       <!-- 变量表格 -->
       <el-table ref="table" :data="rows" fit stripe highlight-current-row>
         <!-- 空表格 -->
-        <el-empty slot="empty" />
+        <template #empty><el-empty /></template>
 
         <!-- 变量名称 -->
         <el-table-column label="名称" width="auto">
@@ -49,15 +51,15 @@
           </template>
           <template #default="{ row }">
             <span v-if="row.editing" style="display: flex; flex-direction: column; padding-top: 10px">
-              <el-input v-model="row.currentValue" autosize type="textarea" size="mini" :rows="1" />
+              <el-input v-model="row.currentValue" autosize type="textarea" size="small" :rows="1" />
               <span id="current-value-button" style="display: flex; justify-content: flex-end">
-                <el-button type="text" icon="el-icon-close" @click="row.editing = false" />
-                <el-button type="text" icon="el-icon-check" @click="updateCurrentValue(row)" />
+                <el-button type="text" :icon="Close" @click="row.editing = false" />
+                <el-button type="text" :icon="Check" @click="updateCurrentValue(row)" />
               </span>
             </span>
             <span v-else style="display: flex; align-items: center; justify-content: space-between">
               <span>{{ row.currentValue || '-' }}</span>
-              <el-button type="text" icon="el-icon-edit" @click="$set(row, 'editing', true)" />
+              <el-button type="text" :icon="Edit" @click="$set(row, 'editing', true)" />
             </span>
           </template>
         </el-table-column>
@@ -72,12 +74,22 @@
   </el-dialog>
 </template>
 
-<script>
-import { mapState } from 'vuex'
+<script setup>
+import { Check, Close, Edit } from '@element-plus/icons-vue'
+import { isEmpty } from 'lodash-es'
 import * as VariablesService from '@/api/script/variables'
+import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 
+const { globalDatasetList, environmentDatasetList, customDatasetList, datasetList, selectedDatasetNumberList } =
+  usePyMeterState()
+</script>
+
+<script>
 export default {
   name: 'VariablesDialog',
+
+  emits: ['update:model-value'],
+
   data() {
     return {
       activeTabNo: '',
@@ -90,12 +102,6 @@ export default {
   },
 
   computed: {
-    ...mapState('pymeter', {
-      globalDatasetList: (state) => state.globalDatasetList,
-      environmentDatasetList: (state) => state.environmentDatasetList,
-      customDatasetList: (state) => state.customDatasetList,
-      selectedDatasetNumberList: (state) => state.selectedDatasetNumberList
-    }),
     // 是否使用当前值
     useCurrentValue: {
       get() {
@@ -104,9 +110,6 @@ export default {
       set(val) {
         this.$store.commit('pymeter/setUseCurrentValue', val)
       }
-    },
-    datasetList() {
-      return [...this.globalDatasetList, ...this.environmentDatasetList, ...this.customDatasetList]
     },
     selectedDatasetList() {
       return this.datasetList.filter((item) => this.selectedDatasetNumberList.indexOf(item.datasetNo) > -1)
@@ -121,7 +124,7 @@ export default {
     // 查询第一个变量集
     this.queryVariables()
     // 计算 backtop 位置
-    const dialog = this.$refs.dialog.$el.querySelector('.el-dialog')
+    const dialog = this.$refs.dialogRef.$el.querySelector('.el-dialog')
     this.backtop.right = (document.body.clientWidth - dialog.clientWidth) / 2 + 20
     this.backtop.bottom = document.body.clientHeight - dialog.offsetTop - 40 - 600 - 40
   },
@@ -132,11 +135,9 @@ export default {
      */
     queryVariables() {
       if (this.selectedDatasetNumberList.length === 0 || this.activeTabNo === '') return
-      VariablesService.queryVariablesByDataset({ datasetNo: this.activeTabNo })
-        .then((response) => {
-          this.rows = response.result
-        })
-        .catch(() => {})
+      VariablesService.queryVariablesByDataset({ datasetNo: this.activeTabNo }).then((response) => {
+        this.rows = response.result
+      })
     },
 
     updateCurrentValue(row) {
@@ -152,7 +153,7 @@ export default {
       const dataset = this.datasetList.find((item) => item.datasetNo === this.activeTabNo)
       if (!dataset) return
 
-      this.$emit('update:visible', false)
+      this.$emit('update:model-value', false)
       this.$store.commit({
         type: 'pymeter/addTab',
         editorNo: dataset.datasetNo,

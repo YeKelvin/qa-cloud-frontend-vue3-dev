@@ -1,9 +1,9 @@
 <template>
   <div class="pymeter-component-container">
     <el-form
-      ref="elformVNode"
+      ref="elformRef"
       label-position="right"
-      label-width="100px"
+      label-width="120px"
       style="width: 100%"
       inline-message
       :model="elementInfo"
@@ -20,23 +20,29 @@
       </el-form-item>
 
       <!-- 元素属性 -->
-      <el-form-item label="顺序执行：" prop="property.TestCollection__serialize_groups">
-        <el-switch
-          v-model="elementInfo.property.TestCollection__serialize_groups"
-          active-color="#13ce66"
-          active-value="true"
-          inactive-value="false"
-          :disabled="true"
-        />
+      <el-form-item label="失败时的处理：" prop="property.TearDownGroup__on_sample_error">
+        <el-select
+          v-model="elementInfo.property.TearDownGroup__on_sample_error"
+          :disabled="queryMode"
+          style="width: 100%"
+        >
+          <el-option label="继续" value="continue" />
+          <el-option label="开始下一个主控制器的循环" value="start_next_coroutine" />
+          <el-option label="开始下一个当前控制器的循环" value="start_next_current_loop" />
+          <el-option label="中断当前控制器的循环" value="break_current_loop" />
+          <el-option label="停止主控制器" value="stop_test_group" />
+          <el-option label="停止测试" value="stop_test" />
+          <el-option label="立即停止测试" value="stop_test_now" />
+        </el-select>
       </el-form-item>
-
-      <!-- 延迟 -->
-      <el-form-item label="延迟ms：" prop="property.TestCollection__delay">
+      <el-form-item label="并发数：" prop="property.TearDownGroup__number_groups">
+        <el-input v-model="elementInfo.property.TearDownGroup__number_groups" clearable disabled />
+      </el-form-item>
+      <el-form-item label="循环次数：" prop="property.TearDownGroup__main_controller.property.LoopController__loops">
         <el-input
-          v-model="elementInfo.property.TestCollection__delay"
-          placeholder="延迟运行"
+          v-model="elementInfo.property.TearDownGroup__main_controller.property.LoopController__loops"
           clearable
-          :disabled="true"
+          disabled
         />
       </el-form-item>
 
@@ -50,23 +56,24 @@
           type="danger"
           style="margin-left: 10px"
           placement="bottom-start"
-          @click="executeCollection()"
+          @click="executeGroup(false)"
         >
           <el-icon><Pointer /></el-icon>
           <span style="margin-left: 5px">运 行</span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="queryCollectionJson()">查看JSON</el-dropdown-item>
+              <el-dropdown-item @click="executeGroup(true)">独立运行</el-dropdown-item>
+              <el-dropdown-item @click="queryGroupJson()">查看JSON</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
       </el-form-item>
       <el-form-item v-else-if="modifyMode">
-        <el-button :icon="Check" type="danger" @click="modifyCollectionElement()">保 存</el-button>
+        <el-button :icon="Check" type="danger" @click="modifyGroupElement()">保 存</el-button>
         <el-button :icon="Close" @click="closeTab()">关 闭</el-button>
       </el-form-item>
       <el-form-item v-else-if="createMode">
-        <el-button :icon="Check" type="primary" @click="createCollectionElement()">保 存</el-button>
+        <el-button :icon="Check" type="primary" @click="createGroupElement()">保 存</el-button>
         <el-button :icon="Close" @click="closeTab()">关 闭</el-button>
       </el-form-item>
     </el-form>
@@ -78,10 +85,8 @@
 </template>
 
 <script setup>
-import { mapState } from 'vuex'
 import { Check, Close, Edit, Pointer } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
-import * as ExecutionService from '@/api/script/execution'
 import baseEditorProps from '@/pymeter/composables/editorPropsBase'
 import useEditor from '@/pymeter/composables/useEditor'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
@@ -93,35 +98,41 @@ const { editorNo, editorMode, metadata, queryMode, modifyMode, createMode, editN
 
 <script>
 export default {
-  name: 'TestCollection',
+  name: 'TeardownGroup',
+
   data() {
     return {
       elementNo: this.editorNo,
       elementInfo: {
-        elementName: 'Collection',
+        elementName: 'TearDown Group',
         elementRemark: '',
-        elementType: 'COLLECTION',
-        elementClass: 'TestCollection',
+        elementType: 'GROUP',
+        elementClass: 'TearDownGroup',
         property: {
-          TestCollection__serialize_groups: 'true',
-          TestCollection__delay: '0'
+          TearDownGroup__on_sample_error: 'start_next_coroutine',
+          TearDownGroup__number_groups: '1',
+          TearDownGroup__start_interval: '',
+          TearDownGroup__main_controller: {
+            class: 'LoopController',
+            property: {
+              LoopController__loops: '1',
+              LoopController__continue_forever: false
+            }
+          }
         }
       },
       elementFormRules: {
-        elementName: [{ required: true, message: '元素名称不能为空', trigger: 'blur' }]
+        elementName: [{ required: true, message: '元素名称不能为空', trigger: 'blur' }],
+        'property.TearDownGroup__on_sample_error': [
+          { required: true, message: '失败时的处理不能为空', trigger: 'blur' }
+        ],
+        'property.TearDownGroup__number_groups': [{ required: true, message: '并发数不能为空', trigger: 'blur' }],
+        'property.TearDownGroup__main_controller.property.LoopController__loops': [
+          { required: true, message: '循环次数不能为空', trigger: 'blur' }
+        ]
       },
       showJsonScript: false
     }
-  },
-
-  computed: {
-    ...mapState('workspace', {
-      workspaceNo: (state) => state.workspaceNo
-    }),
-    ...mapState('pymeter', {
-      selectedDatasetNumberList: (state) => state.selectedDatasetNumberList,
-      useCurrentValue: (state) => state.useCurrentValue
-    })
   },
 
   mounted: function () {
@@ -136,9 +147,9 @@ export default {
     /**
      * 修改元素信息
      */
-    async modifyCollectionElement() {
+    async modifyGroupElement() {
       // 表单校验
-      const error = await this.$refs.elformVNode
+      const error = await this.$refs.elformRef
         .validate()
         .then(() => false)
         .catch(() => true)
@@ -148,23 +159,22 @@ export default {
       }
       // 修改元素
       await ElementService.modifyElement({ elementNo: this.elementNo, ...this.elementInfo })
-      // 成功提示
+      //  成功提示
       this.$message({ message: '修改元素成功', type: 'info', duration: 2 * 1000 })
       // 修改tab标题
       this.$store.commit('pymeter/updateTab', { editorNo: this.elementNo, editorName: this.elementInfo.elementName })
-      // 重新查询脚本列表
-      this.$store.commit('pymeter/refreshCollectionsNow')
+      // 重新查询脚本
+      this.$store.commit('pymeter/refreshElementTreeNow')
       // 表单设置为只读
       this.setReadonly()
     },
 
     /**
      * 创建元素
-     * TODO: workspaceNo非空判断，为空时弹出workspace选择列表
      */
-    async createCollectionElement() {
+    async createGroupElement() {
       // 表单校验
-      const error = await this.$refs.elformVNode
+      const error = await this.$refs.elformRef
         .validate()
         .then(() => false)
         .catch(() => true)
@@ -173,66 +183,17 @@ export default {
         return
       }
       // 新增元素
-      await ElementService.createElement({ workspaceNo: this.workspaceNo, ...this.elementInfo })
-      // 成功提示
+      await ElementService.createElementChildren({
+        rootNo: this.metadata.rootNo,
+        parentNo: this.metadata.parentNo,
+        children: [this.elementInfo]
+      })
+      //  成功提示
       this.$message({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
       // 关闭tab
-      this.$store.commit('pymeter/removeTab', { editorNo: 'UNSAVED_COLLECTION' })
-      // 重新查询脚本列表
-      this.$store.commit('pymeter/refreshCollectionsNow')
-    },
-
-    /**
-     * 根据 collectionNo 执行脚本
-     */
-    async executeCollection() {
-      try {
-        // 没有选择变量集时给出提示
-        if (this.selectedDatasetNumberList.length === 0) {
-          await this.$confirm('当前没有选择[环境/变量]，确定执行吗？', '警告', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          })
-        }
-        // 连接 socket
-        this.socketConnect()
-        // 等待获取 sid，后再执行脚本
-        const sid = await this.getSID()
-        // 后端异步执行脚本
-        await ExecutionService.executeCollection({
-          collectionNo: this.elementNo,
-          socketId: sid,
-          variableDataSet: {
-            useCurrentValue: this.useCurrentValue,
-            numberList: this.selectedDatasetNumberList
-          }
-        })
-        // 打开结果面板
-        this.$store.commit('pymeter/openResultDrawer')
-      } catch {
-        // 异常时断开 socket 连接
-        this.socketDisconnect()
-      }
-    },
-
-    /**
-     * 查看 Json 脚本
-     */
-    queryCollectionJson() {
-      ExecutionService.queryCollectionJson({
-        collectionNo: this.elementNo,
-        dataSetNumberList: this.selectedDatasetNumberList,
-        useCurrentValue: this.useCurrentValue
-      }).then((response) => {
-        this.showJsonScript = true
-        this.$nextTick(() => {
-          this.$refs.jsonEditor.setValue(JSON.stringify(response.result))
-          setTimeout(() => {
-            this.$refs.jsonEditor.formatDocument()
-          }, 200)
-        })
-      })
+      this.$store.commit('pymeter/removeTab', { editorNo: 'UNSAVED_TEARDOWN_GROUP' })
+      // 重新查询脚本
+      this.$store.commit('pymeter/refreshElementTreeNow')
     }
   }
 }

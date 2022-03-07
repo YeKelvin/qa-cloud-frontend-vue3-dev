@@ -1,13 +1,13 @@
 <template>
   <el-select
     v-model="selectedDatasetNumberList"
+    placeholder="环境 / 变量"
+    tag-type="danger"
     multiple
     collapse-tags
     clearable
-    size="small"
-    placeholder="环境 / 变量"
   >
-    <el-option-group v-if="customDatasetList.length > 0" key="custom" label="自定义">
+    <el-option-group v-if="!isEmpty(customDatasetList)" key="custom" label="自定义">
       <el-option
         v-for="item in customDatasetList"
         :key="item.datasetNo"
@@ -15,7 +15,7 @@
         :value="item.datasetNo"
       />
     </el-option-group>
-    <el-option-group v-if="environmentDatasetList.length > 0" key="environment" label="环境">
+    <el-option-group v-if="!isEmpty(environmentDatasetList)" key="environment" label="环境">
       <el-option
         v-for="item in environmentDatasetList"
         :key="item.datasetNo"
@@ -36,42 +36,37 @@
   </el-select>
 </template>
 
-<script>
-import { mapState } from 'vuex'
+<script setup>
+import { computed, onMounted } from 'vue'
+import { useStore } from 'vuex'
+import { isEmpty } from 'lodash-es'
+import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 
-export default {
-  name: 'DatasetSelect',
-  props: {
-    show: { type: Boolean, default: () => false }
+const props = defineProps({
+  show: { type: Boolean, default: () => false }
+})
+
+const { globalDatasetList, environmentDatasetList, customDatasetList } = usePyMeterState()
+const store = useStore()
+const selectedDatasetNumberList = computed({
+  get() {
+    return store.state.pymeter.selectedDatasetNumberList
   },
-  computed: {
-    ...mapState('pymeter', {
-      globalDatasetList: (state) => state.globalDatasetList,
-      environmentDatasetList: (state) => state.environmentDatasetList,
-      customDatasetList: (state) => state.customDatasetList
-    }),
+  set(val) {
+    if (props.show) store.dispatch('pymeter/setSelectedDatasetNumberList', val)
+  }
+})
 
-    // 当前选中的变量集编号列表
-    selectedDatasetNumberList: {
-      get() {
-        return this.$store.state.pymeter.selectedDatasetNumberList
-      },
-      set(val) {
-        if (this.show) this.$store.dispatch('pymeter/setSelectedDatasetNumberList', val)
-      }
-    }
-  },
-
-  mounted() {
-    this.$store.dispatch('pymeter/queryDatasetAll')
-  },
-
-  methods: {}
-}
+onMounted(() => {
+  store.dispatch('pymeter/queryDatasetAll')
+})
 </script>
 
 <style lang="scss" scoped>
 .el-select {
+  --el-select-border-color-hover: none;
+  --el-select-input-focus-border-color: none;
+
   :deep(.el-select__tags-text) {
     display: inline-block;
     max-width: 100px;
@@ -92,5 +87,6 @@ export default {
 :deep(.el-input__inner) {
   border: 0;
   border-radius: 0;
+  box-shadow: none;
 }
 </style>

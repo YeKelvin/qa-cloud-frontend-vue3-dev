@@ -7,7 +7,7 @@
       :class="{ active: activeId == collection.id }"
       shadow="hover"
       style="cursor:pointer; margin-bottom:6px;"
-      @click.native="$emit('click', collection);activeId=collection.id;"
+      @click="$emit('click', collection);activeId=collection.id;"
     >
       <div class="collection-card">
         <!-- 序号 -->

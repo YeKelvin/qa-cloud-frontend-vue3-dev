@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import { omit } from 'lodash-es'
 import * as RoleService from '@/api/usercenter/role'
 import * as UserService from '@/api/usercenter/user'
 
@@ -54,7 +55,7 @@ export default {
     row(val) {
       if (!val) return
       // 除 roles 属性外其余赋值给 form
-      this.form = this.$_.omit(val, ['roles'])
+      this.form = omit(val, ['roles'])
       // 提取 roleNo
       this.form.roleNumberList = this.row.roles.map((item) => item.roleNo)
     }

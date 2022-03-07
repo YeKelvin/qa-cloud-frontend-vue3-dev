@@ -17,7 +17,15 @@ export default function usePyMeterState() {
 
   const httpHeaderTemplateList = computed(() => store.state.pymeter.httpHeaderTemplateList)
 
-  const selectedDatasetNumberList = computed(() => store.state.pymeter.selectedDatasetNumberList)
+  // const selectedDatasetNumberList = computed(() => store.state.pymeter.selectedDatasetNumberList)
+  const selectedDatasetNumberList = computed({
+    get() {
+      return store.state.pymeter.selectedDatasetNumberList
+    },
+    set(val) {
+      if (this.show) this.$store.dispatch('pymeter/setSelectedDatasetNumberList', val)
+    }
+  })
   const useCurrentValue = computed(() => store.state.pymeter.useCurrentValue)
 
   return {

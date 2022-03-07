@@ -1,18 +1,16 @@
 <template>
-  <div v-show="show" class="middle-bar-container">
-
+  <div v-show="show" class="topbar-container">
     <!-- 操作栏 -->
-    <div class="middle-bar-body">
-
+    <div class="topbar-main">
       <!-- 左侧：组件名称 -->
-      <div style="user-select: none;">{{ componentName }}</div>
+      <div style="user-select: none">{{ componentName }}</div>
 
       <!-- 右侧：操作区域 -->
-      <span class="dataset-selector-container">
+      <span class="dataset-container">
         <!-- 变量集选择器 -->
-        <variable-dataset-selector :show="show" />
+        <DatasetSelect :show="show" />
         <!-- 详情按钮 -->
-        <el-button type="text" icon="el-icon-view" size="mini" @click="showVariables=true" />
+        <el-button type="text" size="small" :icon="View" @click="showVariables = true" />
       </span>
     </div>
 
@@ -20,25 +18,23 @@
     <el-divider />
 
     <!-- 变量详情视图 -->
-    <variables-view v-if="showVariables" :visible.sync="showVariables" />
+    <VariablesDialog v-if="showVariablesDialog" v-model="showVariablesDialog" />
   </div>
 </template>
 
+<script setup>
+import { View } from '@element-plus/icons-vue'
+import { isEmpty } from 'lodash-es'
+import DatasetSelect from './DatasetSelect.vue'
+import VariablesDialog from './VariablesDialog.vue'
+</script>
+
 <script>
-import * as StringUtil from '@/utils/string-util'
-import VariableDatasetSelector from './variable-dataset-selector'
-import VariablesView from './variables-view'
-
 export default {
-
-  name: 'MiddleBar',
-
-  components: { VariableDatasetSelector, VariablesView },
-
+  name: 'Topbar',
   props: {
     component: { type: String, default: '' }
   },
-
   data() {
     return {
       // 组件名称
@@ -66,26 +62,26 @@ export default {
       },
 
       // 是否显示变量详情视图
-      showVariables: false
+      showVariablesDialog: false
     }
   },
 
   computed: {
     // 组件名称
-    componentName() { return this.componentNames[this.component] },
+    componentName() {
+      return this.componentNames[this.component]
+    },
 
     // 是否显示操作栏的标识
-    show() { return StringUtil.isNotBlank(this.componentName) }
-  },
-
-  methods: {
+    show() {
+      return !isEmpty(this.componentName)
+    }
   }
-
 }
 </script>
 
 <style lang="scss" scoped>
-.middle-bar-container {
+.topbar-container {
   padding: 0 10px;
 
   .el-divider--horizontal {
@@ -93,7 +89,7 @@ export default {
   }
 }
 
-.middle-bar-body {
+.topbar-main {
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
@@ -101,7 +97,7 @@ export default {
   width: 100%;
 }
 
-.dataset-selector-container {
+.dataset-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -113,7 +109,7 @@ export default {
   margin: 0 5px;
   font-size: 15px;
 
-  ::v-deep .el-icon-view {
+  :deep(.el-icon-view) {
     font-weight: 500;
   }
 }

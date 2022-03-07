@@ -104,7 +104,8 @@
       padding: 0 !important;
       position: relative;
 
-      .el-tooltip {
+      // element-plus 2.0.5 el-tooltip rename to el-tooltip__trigger
+      .el-tooltip__trigger {
         padding: 0 !important;
 
         .svg-icon {

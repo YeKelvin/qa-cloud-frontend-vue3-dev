@@ -26,7 +26,6 @@ import PermissionDirective from '@/directive/permission'
 
 // 工具库
 import DayJs from 'dayjs'
-import Lodash from 'lodash-es'
 
 // socket-io
 import SocketIO from '@/plugins/socketio'
@@ -44,7 +43,6 @@ app.component('SvgIcon', SvgIcon)
 app.directive('permission', PermissionDirective)
 // 全局属性
 app.config.globalProperties.$dayjs = DayJs
-app.config.globalProperties.$_ = Lodash
 // 全局异常处理
 app.config.errorHandler = (err) => {
   console.error(err)
