@@ -1,44 +1,31 @@
 <template>
-  <el-drawer
-    direction="btt"
-    size="50%"
-    :show-close="false"
-    v-bind="$attrs"
-    @open="setFirstLoading"
-
-  >
+  <el-drawer direction="btt" size="50%" :show-close="false" v-bind="$attrs" @open="setFirstLoading">
     <span slot="title" class="drawer-title">
       <el-tabs
         v-model="activeTabNo"
         type="card"
-        style="width:100%;"
+        style="width: 100%"
         closable
         @tab-click="handleTabClick"
         @tab-remove="handleTabRemove"
       >
-        <el-tab-pane
-          v-for="tab in tabs"
-          :key="tab.id"
-          :label="tab.name"
-          :name="tab.id"
-        />
+        <el-tab-pane v-for="tab in tabs" :key="tab.id" :label="tab.name" :name="tab.id" />
       </el-tabs>
-      <div v-show="tabs.length > 0" style="padding:4px; padding-right:20px; border-bottom: 1px solid #E4E7ED;">
+      <div v-show="tabs.length > 0" style="padding: 4px; padding-right: 20px; border-bottom: 1px solid #e4e7ed">
         <el-button type="danger" icon="el-icon-delete" size="small" circle plain @click="clean()" />
       </div>
     </span>
 
-    <result-collector v-if="tabs.length > 0" :groups="activeDetails" />
+    <ResultCollector v-if="tabs.length > 0" :groups="activeDetails" />
     <el-empty v-if="tabs.length == 0 && !loading" description="暂无结果" />
-    <el-skeleton :loading="loading" :rows="6" style="padding: 40px;" animated />
+    <el-skeleton :loading="loading" :rows="6" style="padding: 40px" animated />
   </el-drawer>
 </template>
 
 <script>
-import ResultCollector from './result-collector'
+import ResultCollector from './ResultCollector.vue'
 
 export default {
-
   name: 'ResultDrawer',
 
   components: { ResultCollector },
@@ -76,11 +63,11 @@ export default {
 
   methods: {
     handleTabClick(tab) {
-      const result = this.tabs.find(result => result.id === tab.name)
+      const result = this.tabs.find((result) => result.id === tab.name)
       this.activeDetails = result.details
     },
     handleTabRemove(tabName) {
-      const index = this.tabs.findIndex(result => result.id === tabName)
+      const index = this.tabs.findIndex((result) => result.id === tabName)
       if (index > -1) {
         this.tabs.splice(index, 1)
       }

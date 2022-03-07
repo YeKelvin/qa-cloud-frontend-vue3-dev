@@ -8,28 +8,25 @@
       运行日志
     </el-button>
 
-    <result-drawer
+    <ResultDrawer
       v-model="results"
       v-model:visible="showResultDrawer"
       @open="resultsReaded = true"
       @closed="resultsReaded = true"
     />
 
-    <log-drawer v-model="logs" v-model:visible="showLogDrawer" />
+    <LogDrawer v-model="logs" v-model:visible="showLogDrawer" />
   </el-card>
 </template>
 
-<script>
-import SocketIoMixin from '@/mixins/socketio-mixin'
-import ResultDrawer from './result-drawer'
-import LogDrawer from './log-drawer'
+<script setup>
+import ResultDrawer from './result/ResultDrawer.vue'
+import LogDrawer from './log/LogDrawer.vue'
+</script>
 
+<script>
 export default {
   name: 'EditorFooter',
-
-  components: { ResultDrawer, LogDrawer },
-
-  mixins: [SocketIoMixin],
 
   data() {
     return {
@@ -116,6 +113,9 @@ export default {
       this.$notify({ message: data, type: 'error', duration: 2 * 1000 })
       this.$socket.close()
     }
+    // this.$soketio.on('new-message', (data) => {
+    //   this.messages.push(data);
+    // })
   }
 }
 </script>
