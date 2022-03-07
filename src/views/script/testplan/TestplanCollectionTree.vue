@@ -1,14 +1,14 @@
 <template>
   <div class="tree-container">
-    <div v-show="collections.length > 0" style="width:100%; height:100%;">
+    <div v-show="collections.length > 0" style="width: 100%; height: 100%">
       <!-- 按钮 -->
-      <div style="display:flex; justify-content:flex-end;">
+      <div style="display: flex; justify-content: flex-end">
         <el-button type="text" :disabled="readonly" @click="setAllChecked">全选</el-button>
         <el-button type="text" :disabled="readonly" @click="resetChecked">清空</el-button>
       </div>
 
       <!-- 搜索 -->
-      <el-input v-model="filterText" size="small" placeholder="请输入搜索内容" style="margin-bottom:10px;" clearable />
+      <el-input v-model="filterText" size="small" placeholder="请输入搜索内容" style="margin-bottom: 10px" clearable />
 
       <el-tree
         ref="tree"
@@ -22,12 +22,14 @@
         :filter-node-method="filterNode"
         @node-click="handleNodeClick"
       >
-        <span slot-scope="{ node, data }" style="display:inline-flex; align-items:center;">
-          <el-tag size="mini" style="margin-right:10px;">
-            {{ node.parent.childNodes.findIndex(item=>item.key == data.elementNo) + 1 }}
-          </el-tag>
-          <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ node.label }}</span>
-        </span>
+        <template #default="{ node, data }">
+          <span style="display: inline-flex; align-items: center">
+            <el-tag size="mini" style="margin-right: 10px">
+              {{ node.parent.childNodes.findIndex((item) => item.key == data.elementNo) + 1 }}
+            </el-tag>
+            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ node.label }}</span>
+          </span>
+        </template>
       </el-tree>
     </div>
 
@@ -41,7 +43,6 @@ import { mapState } from 'vuex'
 import * as ElementService from '@/api/script/element'
 
 export default {
-
   name: 'CollectionTree',
 
   props: {
@@ -61,7 +62,7 @@ export default {
 
   computed: {
     ...mapState('workspace', {
-      workspaceNo: state => state.workspaceNo
+      workspaceNo: (state) => state.workspaceNo
     })
   },
 
@@ -75,9 +76,13 @@ export default {
     },
     readonly(val) {
       if (val) {
-        this.collections.forEach(item => { item.disabled = true })
+        this.collections.forEach((item) => {
+          item.disabled = true
+        })
       } else {
-        this.collections.forEach(item => { item.disabled = false })
+        this.collections.forEach((item) => {
+          item.disabled = false
+        })
       }
     }
   },
@@ -94,16 +99,19 @@ export default {
      */
     queryCollections() {
       ElementService.queryElementAll({
-        workspaceNo: this.workspaceNo, elementType: 'COLLECTION', elementClass: 'TestCollection'
+        workspaceNo: this.workspaceNo,
+        elementType: 'COLLECTION',
+        elementClass: 'TestCollection'
       })
-        .then(response => {
+        .then((response) => {
           this.collections = response.result
           if (this.readonly) {
-            this.collections.forEach(item => { item.disabled = true })
+            this.collections.forEach((item) => {
+              item.disabled = true
+            })
           }
         })
-        .catch(() => {
-        })
+        .catch(() => {})
     },
 
     filterNode(value, data) {
@@ -132,7 +140,7 @@ export default {
     },
 
     setAllChecked() {
-      this.$refs.tree.setCheckedKeys(this.collections.map(item => item.elementNo))
+      this.$refs.tree.setCheckedKeys(this.collections.map((item) => item.elementNo))
     },
 
     resetChecked() {
@@ -154,14 +162,14 @@ export default {
 
 <style lang="scss" scoped>
 .tree-container {
-  height:100%;
+  height: 100%;
 
   padding: 10px;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 }
 
-::v-deep .el-tree-node {
+:deep(.el-tree-node) {
   margin-bottom: 5px;
 }
 </style>
