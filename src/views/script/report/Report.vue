@@ -218,7 +218,7 @@ export default {
     font-size: 16px;
   }
 
-  ::v-deep .el-card__body {
+  :deep(.el-card__body) {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -264,11 +264,11 @@ export default {
   color: #606266;
 }
 
-::v-deep .el-card__header {
+:deep(.el-card__header) {
   padding: 10px 10px;
 }
 
-::v-deep .el-card__body {
+:deep(.el-card__body) {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -279,7 +279,7 @@ export default {
   padding: 0;
 }
 
-::v-deep .el-tree-node__content {
+:deep(.el-tree-node__content) {
   height: 100%;
 }
 </style>

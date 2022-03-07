@@ -8,7 +8,7 @@
       </div>
 
       <!-- 搜索 -->
-      <el-input v-model="filterText" size="small" placeholder="请输入搜索内容" style="margin-bottom: 10px" clearable />
+      <el-input v-model="filterText" placeholder="请输入搜索内容" style="margin-bottom: 10px" clearable />
 
       <el-tree
         ref="tree"
@@ -16,7 +16,7 @@
         draggable
         highlight-current
         show-checkbox
-        :props="definedProps"
+        :props="{ label: 'elementName', children: 'children' }"
         :data="collections"
         :allow-drop="allowDrop"
         :filter-node-method="filterNode"
@@ -24,7 +24,7 @@
       >
         <template #default="{ node, data }">
           <span style="display: inline-flex; align-items: center">
-            <el-tag size="mini" style="margin-right: 10px">
+            <el-tag size="small" style="margin-right: 10px">
               {{ node.parent.childNodes.findIndex((item) => item.key == data.elementNo) + 1 }}
             </el-tag>
             <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ node.label }}</span>
@@ -51,10 +51,6 @@ export default {
 
   data() {
     return {
-      definedProps: {
-        label: 'elementName',
-        children: 'children'
-      },
       collections: [],
       filterText: ''
     }
@@ -102,16 +98,12 @@ export default {
         workspaceNo: this.workspaceNo,
         elementType: 'COLLECTION',
         elementClass: 'TestCollection'
+      }).then((response) => {
+        this.collections = response.result
+        if (this.readonly) {
+          this.collections.forEach((item) => (item.disabled = true))
+        }
       })
-        .then((response) => {
-          this.collections = response.result
-          if (this.readonly) {
-            this.collections.forEach((item) => {
-              item.disabled = true
-            })
-          }
-        })
-        .catch(() => {})
     },
 
     filterNode(value, data) {
@@ -143,6 +135,10 @@ export default {
       this.$refs.tree.setCheckedKeys(this.collections.map((item) => item.elementNo))
     },
 
+    setCheckedKeys(keys) {
+      this.$refs.tree.setCheckedKeys(keys)
+    },
+
     resetChecked() {
       this.$refs.tree.setCheckedKeys([])
     },
@@ -151,10 +147,6 @@ export default {
       if (this.readonly) return
       // 点击节点勾选 checkbox
       node.checked = !node.checked
-    },
-
-    setCheckedKeys(keys) {
-      this.$refs.tree.setCheckedKeys(keys)
     }
   }
 }

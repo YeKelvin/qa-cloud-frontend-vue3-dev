@@ -164,13 +164,13 @@ export default {
 }
 
 .el-descriptions {
-  ::v-deep .el-descriptions-item__container {
+  :deep(.el-descriptions-item__container) {
     display: inline-flex;
     align-items: center;
   }
 }
 
-::v-deep .el-descriptions-row {
+:deep(.el-descriptions-row) {
   display: flex;
   flex-wrap: wrap;
 

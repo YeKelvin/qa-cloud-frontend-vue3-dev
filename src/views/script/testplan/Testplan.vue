@@ -183,34 +183,38 @@ export default {
     /**
      * 执行测试计划
      */
-    executeTestplan({ planNo, testPhase }) {
+    async executeTestplan({ planNo, testPhase }) {
       let datasetNumberList = []
       let useCurrentValue = false
-      this.$confirm(null, {
+      // 弹出选择变量集的对话框
+      const error = await this.$confirm(null, {
         title: '请选择测试环境',
         message: (
           <TestplanDatasetSelect
             key={new Date().getTime()}
             workspaceNo={this.workspaceNo}
             testPhase={this.TestPhase[testPhase]}
-            on-change-dataset-number-list={(val) => (datasetNumberList = val)}
-            on-change-use-current-value={(val) => (useCurrentValue = val)}
+            onChangeDatasetNumberList={(val) => (datasetNumberList = val)}
+            onChangeUseCurrentValue={(val) => (useCurrentValue = val)}
           />
         ),
         confirmButtonText: '确定',
         cancelButtonText: '取消'
-      }).then(() => {
-        ExecutionService.executeTestPlan({
-          planNo: planNo,
-          datasetNumberList: datasetNumberList,
-          useCurrentValue: useCurrentValue
-        }).then((response) => {
-          this.$notify({
-            message: `开始执行测试计划，总 ${response.result.total} 个脚本，请稍等片刻`,
-            type: 'success',
-            duration: 2 * 1000
-          })
-        })
+      })
+        .then(() => false)
+        .catch(() => true)
+      if (error) return
+      // 异步执行测试计划
+      const response = await ExecutionService.executeTestPlan({
+        planNo: planNo,
+        datasetNumberList: datasetNumberList,
+        useCurrentValue: useCurrentValue
+      })
+      // 成功提示
+      this.$notify({
+        message: `开始执行测试计划，总 ${response.result.total} 个脚本，请稍等片刻`,
+        type: 'success',
+        duration: 2 * 1000
       })
     },
 

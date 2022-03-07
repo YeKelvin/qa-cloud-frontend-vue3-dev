@@ -1,22 +1,20 @@
 <template>
   <div class="testplan-container">
-
     <span class="testplan-title">
-      <span style="color:#606266; font-weight:700;">测试计划</span>
+      <span style="color: #606266; font-weight: 700">测试计划</span>
       <el-divider />
     </span>
 
     <div class="testplan-body">
       <!-- 脚本列表 -->
-      <collection-tree ref="tree" style="width:50%;" :readonly="queryMode" />
+      <TestplanCollectionTree ref="tree" style="width: 50%" :readonly="queryMode" />
       <!-- 设置表单 -->
-      <div style="width: 50%;" class="settings-container">
+      <div style="width: 50%" class="settings-container">
         <el-form
           ref="form"
           label-position="right"
-          label-width="auto"
+          label-width="140px"
           style="width: 100%"
-          size="small"
           inline-message
           :model="formParams"
           :rules="formRules"
@@ -39,21 +37,21 @@
           <!-- 并发数 -->
           <el-form-item label="并发数：" prop="concurrency">
             <el-input v-model="formParams.concurrency" clearable disabled>
-              <template slot="append">个</template>
+              <template #append>个</template>
             </el-input>
           </el-form-item>
 
           <!-- 迭代次数 -->
           <el-form-item label="迭代数：" prop="iterations">
             <el-input v-model="formParams.iterations" clearable :readonly="queryMode">
-              <template slot="append">次</template>
+              <template #append>次</template>
             </el-input>
           </el-form-item>
 
           <!-- 迭代间隔时间 -->
           <el-form-item label="迭代间隔：" prop="delay">
             <el-input v-model="formParams.delay" clearable :readonly="queryMode">
-              <template slot="append">ms</template>
+              <template #append>ms</template>
             </el-input>
           </el-form-item>
 
@@ -69,35 +67,33 @@
 
           <!-- 操作按钮 -->
           <el-form-item v-if="queryMode">
-            <el-button icon="el-icon-edit" type="primary" @click="editorMode = 'MODIFY'">编 辑</el-button>
-            <el-button icon="el-icon-close" @click="goBack">关 闭</el-button>
+            <el-button :icon="Edit" type="primary" @click="editorMode = 'MODIFY'">编 辑</el-button>
+            <el-button :icon="Close" @click="goBack()">关 闭</el-button>
           </el-form-item>
           <el-form-item v-else-if="modifyMode">
-            <el-button icon="el-icon-check" type="danger" @click="modifyTestplan">保 存</el-button>
-            <el-button icon="el-icon-close" @click="goBack">关 闭</el-button>
+            <el-button :icon="Check" type="danger" @click="modifyTestplan()">保 存</el-button>
+            <el-button :icon="Close" @click="goBack()">关 闭</el-button>
           </el-form-item>
           <el-form-item v-else-if="createMode">
-            <el-button icon="el-icon-check" type="primary" @click="createTestplan">创建计划</el-button>
-            <el-button icon="el-icon-close" @click="goBack">关 闭</el-button>
+            <el-button :icon="Check" type="primary" @click="createTestplan()">创建计划</el-button>
+            <el-button :icon="Close" @click="goBack()">关 闭</el-button>
           </el-form-item>
-
         </el-form>
       </div>
     </div>
   </div>
-
 </template>
 
-<script>
+<script setup>
 import { mapState } from 'vuex'
-import CollectionTree from './collection-tree'
+import { Check, Close, Edit } from '@element-plus/icons-vue'
 import * as TestplanService from '@/api/script/testplan'
+import TestplanCollectionTree from './TestplanCollectionTree.vue'
+</script>
 
+<script>
 export default {
-
   name: 'TestplanEditor',
-
-  components: { CollectionTree },
 
   data() {
     const checkIterations = (rule, value, callback) => {
@@ -137,13 +133,19 @@ export default {
   },
 
   computed: {
-    queryMode() { return this.editorMode === 'QUERY' },
-    modifyMode() { return this.editorMode === 'MODIFY' },
-    createMode() { return this.editorMode === 'CREATE' },
+    queryMode() {
+      return this.editorMode === 'QUERY'
+    },
+    modifyMode() {
+      return this.editorMode === 'MODIFY'
+    },
+    createMode() {
+      return this.editorMode === 'CREATE'
+    },
 
     // 当前选中的工作空间编号
     ...mapState('workspace', {
-      workspaceNo: state => state.workspaceNo
+      workspaceNo: (state) => state.workspaceNo
     })
   },
 
@@ -176,11 +178,10 @@ export default {
 
   methods: {
     queryTestplan() {
-      TestplanService.queryTestplan({ planNo: this.planNo })
-        .then(response => {
-          Object.assign(this.formParams, response.result)
-          this.$refs.tree.setCheckedKeys(response.result.collectionNumberList)
-        })
+      TestplanService.queryTestplan({ planNo: this.planNo }).then((response) => {
+        Object.assign(this.formParams, response.result)
+        this.$refs.tree.setCheckedKeys(response.result.collectionNumberList)
+      })
     },
 
     createTestplan() {
@@ -197,11 +198,10 @@ export default {
           workspaceNo: this.workspaceNo,
           collectionList: collectionList,
           ...this.formParams
+        }).then(() => {
+          this.$message({ message: '创建测试计划成功', type: 'info', duration: 1 * 1000 })
+          this.goBack()
         })
-          .then(() => {
-            this.$message({ message: '创建测试计划成功', type: 'info', duration: 1 * 1000 })
-            this.goBack()
-          })
       })
     },
 
@@ -215,11 +215,10 @@ export default {
           return
         }
 
-        TestplanService.modifyTestplan({ ...this.formParams, collectionList: collectionList })
-          .then(() => {
-            this.$message({ message: '修改测试计划成功', type: 'info', duration: 1 * 1000 })
-            this.goBack()
-          })
+        TestplanService.modifyTestplan({ ...this.formParams, collectionList: collectionList }).then(() => {
+          this.$message({ message: '修改测试计划成功', type: 'info', duration: 1 * 1000 })
+          this.goBack()
+        })
       })
     },
 
@@ -249,7 +248,7 @@ export default {
   padding: 0 10px;
   padding-top: 20px;
 
-  ::v-deep .el-divider--horizontal {
+  :deep(.el-divider--horizontal) {
     margin: 10px 0;
   }
 }
@@ -273,7 +272,7 @@ export default {
   padding: 0 10px;
 }
 
-::v-deep .el-input-group__append {
+:deep(.el-input-group__append) {
   width: 60px;
 }
 </style>

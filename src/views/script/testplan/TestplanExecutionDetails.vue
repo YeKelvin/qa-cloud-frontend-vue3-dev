@@ -174,11 +174,11 @@ export default {
   }
 }
 
-::v-deep .el-card__header {
+:deep(.el-card__header) {
   padding: 10px 10px;
 }
 
-::v-deep .el-card__body {
+:deep(.el-card__body) {
   padding: 10px;
 }
 </style>
