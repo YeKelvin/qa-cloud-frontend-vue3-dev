@@ -6,18 +6,21 @@
       :body-style="{ padding: '10px' }"
       :class="{ active: activeId == collection.id }"
       shadow="hover"
-      style="cursor:pointer; margin-bottom:6px;"
-      @click="$emit('click', collection);activeId=collection.id;"
+      style="cursor: pointer; margin-bottom: 6px"
+      @click="
+        $emit('click', collection)
+        activeId = collection.id
+      "
     >
       <div class="collection-card">
         <!-- 序号 -->
-        <span style="margin-right:10px;">{{ index + 1 }}</span>
+        <span style="margin-right: 10px">{{ index + 1 }}</span>
         <!-- 集合名称 -->
-        <div style="display:flex; flex-direction:column; flex:1;">
+        <div style="display: flex; flex-direction: column; flex: 1">
           <span>{{ collection.name }}</span>
-          <span style="display:inline-flex; margin-top:5px;">
-            <el-tag type="warning" size="mini" style="margin-right:5px;">start: {{ collection.startTime }}</el-tag>
-            <el-tag type="danger" size="mini">elapsed: {{ collection.elapsedTime }}</el-tag>
+          <span style="display: inline-flex; margin-top: 5px">
+            <el-tag type="warning" size="small" style="margin-right: 5px">start: {{ collection.startTime }}</el-tag>
+            <el-tag type="danger" size="small">elapsed: {{ collection.elapsedTime }}</el-tag>
           </span>
         </div>
         <!-- 成功或失败的图标  -->
@@ -60,4 +63,3 @@ export default {
   background-color: #f0f7ff;
 }
 </style>
-

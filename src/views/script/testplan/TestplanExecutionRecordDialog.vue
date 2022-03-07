@@ -1,8 +1,8 @@
 <template>
-  <el-dialog title="执行记录" width="80%" center v-bind="$attrs" v-on="$listeners">
+  <el-dialog title="执行记录" width="80%" center v-bind="$attrs">
     <el-table :data="tableData" style="width: 100%; height: 100%" fit stripe highlight-current-row>
       <!-- 空数据提示 -->
-      <el-empty slot="empty" />
+      <template #empty><el-empty /></template>
       <!-- 列定义 -->
       <el-table-column prop="executionNo" label="执行编号" min-width="100" />
       <el-table-column prop="testPhase" label="测试阶段">

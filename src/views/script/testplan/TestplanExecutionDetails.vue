@@ -1,32 +1,32 @@
 <template>
   <div class="scrollbar details-container">
     <!-- 顶部区域 -->
-    <div style="display:flex; margin-bottom:10px;">
+    <div style="display: flex; margin-bottom: 10px">
       <!-- 执行进度 -->
-      <el-card shadow="hover" style="width:50%; margin-right:10px;">
+      <el-card shadow="hover" style="width: 50%; margin-right: 10px">
         <span slot="header">执行进度</span>
-        <div style="display:flex; flex:1; justify-content:center; align-items:center; align-content: center;">
+        <div style="display: flex; flex: 1; justify-content: center; align-items: center; align-content: center">
           <el-progress type="circle" :percentage="percentage" :width="160" />
         </div>
       </el-card>
 
       <!-- 计划设置 -->
-      <div style="display:flex; flex:1; flex-direction:column; width: 50%;">
+      <div style="display: flex; flex: 1; flex-direction: column; width: 50%">
         <!-- 配置项 -->
-        <el-card shadow="hover" style="height:50%;">
+        <el-card shadow="hover" style="height: 50%">
           <span slot="header">配置项</span>
           <div class="settings-container">
             <el-tag v-if="details.save">保存测试报告</el-tag>
             <el-tag v-if="details.saveOnError">仅保存失败结果</el-tag>
             <el-tag v-if="details.useCurrentValue">使用变量当前值</el-tag>
             <el-tag v-else>不使用变量当前值</el-tag>
-            <el-tag>共 {{ details.concurrency }} 个并发 </el-tag>
+            <el-tag>共 {{ details.concurrency }} 个并发</el-tag>
             <el-tag>循环执行 {{ details.iterations }} 次</el-tag>
             <el-tag>间隔等待 {{ details.delay }} ms</el-tag>
           </div>
         </el-card>
         <!-- 环境/变量 -->
-        <el-card shadow="hover" style="height:50%; margin-top:10px;">
+        <el-card shadow="hover" style="height: 50%; margin-top: 10px">
           <span slot="header">环境/变量</span>
           <div class="settings-container">
             <el-tag v-for="dataset in details.datasetList" :key="dataset.datasetNo">{{ dataset.datasetName }}</el-tag>
@@ -36,37 +36,31 @@
     </div>
 
     <!-- 计划项目详情 -->
-    <el-card shadow="hover" style="width:100%;">
+    <el-card shadow="hover" style="width: 100%">
       <span slot="header">执行详情</span>
-      <el-table
-        :data="tableData"
-        stripe
-        fit
-        highlight-current-row
-      >
-
+      <el-table :data="tableData" stripe fit highlight-current-row>
         <!-- 空数据提示 -->
-        <el-empty slot="empty" />
+        <template #empty><el-empty /></template>
 
         <!-- 列定义 -->
         <el-table-column type="index" label="序号" />
         <el-table-column prop="elementNo" label="元素编号" />
         <el-table-column prop="elementName" label="集合名称" />
         <el-table-column v-if="details.reportNo" prop="runningState" label="执行状态">
-          <template slot-scope="{row}">{{ RunningState[row.runningState] }}</template>
+          <template v-slot="{row}">{{ RunningState[row.runningState] }}</template>
         </el-table-column>
         <el-table-column v-if="details.reportNo" prop="success" label="执行结果">
-          <template slot-scope="{row}">
+          <template v-slot="{row}">
             <template v-if="row.success == null">{{ '' }}</template>
-            <template v-else>{{ row.success? '成功' : '失败' }}</template>
+            <template v-else>{{ row.success ? '成功' : '失败' }}</template>
           </template>
         </el-table-column>
         <template v-if="details.reportNo">
           <el-table-column prop="startTime" label="开始时间">
-            <template slot-scope="{row}">{{ row.startTime? $dayjs(row.startTime).format('YYYY-MM-DD HH:mm:ss'):'' }}</template>
+            <template v-slot="{row}">{{ row.startTime? $dayjs(row.startTime).format('YYYY-MM-DD HH:mm:ss'):'' }}</template>
           </el-table-column>
           <el-table-column prop="endTime" label="结束时间">
-            <template slot-scope="{row}">{{ row.endTime? $dayjs(row.endTime).format('YYYY-MM-DD HH:mm:ss'):'' }}</template>
+            <template v-slot="{row}">{{ row.endTime? $dayjs(row.endTime).format('YYYY-MM-DD HH:mm:ss'):'' }}</template>
           </el-table-column>
           <el-table-column prop="elapsedTime" label="耗时" />
         </template>
@@ -80,11 +74,10 @@
     </el-card>
 
     <!-- 按钮 -->
-    <div style="display:flex; justify-content:center; align-items:center; margin-top:10px;">
+    <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px">
       <el-button v-if="details.reportNo" type="primary" @click="openReport">报告</el-button>
-      <el-button style="margin-left:10px;" @click="goBack">返回</el-button>
+      <el-button style="margin-left: 10px" @click="goBack">返回</el-button>
     </div>
-
   </div>
 </template>
 
@@ -93,7 +86,6 @@ import { RunningState } from '@/api/enum'
 import * as TestplanService from '@/api/script/testplan'
 
 export default {
-
   name: 'ExecutionDetails',
 
   data() {
@@ -107,14 +99,16 @@ export default {
 
   computed: {
     percentage() {
-      if (this.details.iterations > 1) { // 统计迭代的进度
+      if (this.details.iterations > 1) {
+        // 统计迭代的进度
         const percentage = this.details.iterationCount / this.details.iterations
         if (!percentage) return 0
         return percentage * 100
-      } else { // 统计执行进度（需要保存测试报告的计划）
+      } else {
+        // 统计执行进度（需要保存测试报告的计划）
         const total = this.tableData.length
         let completedTotal = 0
-        this.tableData.forEach(item => {
+        this.tableData.forEach((item) => {
           if (item.runningState === 'COMPLETED' || item.runningState === 'ERROR') {
             completedTotal += 1
           }
@@ -136,14 +130,13 @@ export default {
 
   methods: {
     queryTestplanExecutionDetails() {
-      TestplanService.queryTestplanExecutionDetails({ executionNo: this.executionNo })
-        .then(response => {
-          this.details = response.result
-          this.tableData = response.result.collectionList
-        })
+      TestplanService.queryTestplanExecutionDetails({ executionNo: this.executionNo }).then((response) => {
+        this.details = response.result
+        this.tableData = response.result.collectionList
+      })
     },
     openReport() {
-      this.$router.push({ path: '/script/report', query: { reportNo: this.details.reportNo }})
+      this.$router.push({ path: '/script/report', query: { reportNo: this.details.reportNo } })
     },
     goBack() {
       window.history.length > 1 ? this.$router.go(-1) : this.$router.push('/')

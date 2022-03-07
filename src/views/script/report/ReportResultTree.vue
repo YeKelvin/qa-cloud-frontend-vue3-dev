@@ -15,28 +15,38 @@
       <!-- Group -->
       <template v-if="node.level == 1">
         <!-- 元素图标 -->
-        <svg-icon icon-class="group" style="padding-right:5px;" class="group-svg-icon" />
+        <svg-icon icon-class="group" style="padding-right: 5px" class="group-svg-icon" />
         <!-- 元素名称 -->
-        <div style="display:flex; flex-direction:column; flex:1;">
-          <span style="white-space:normal; overflow:hidden; text-overflow:ellipsis;">{{ node.label }}</span>
-          <span style="display:inline-flex; margin-top:2px;">
-            <el-tag type="warning" size="mini" style="margin-right:5px;">{{ node.data.startTime }}</el-tag>
-            <el-tag type="warning" size="mini" style="margin-right:5px;">{{ node.data.endTime }}</el-tag>
-            <el-tag type="danger" size="mini">{{ node.data.elapsedTime }}</el-tag>
+        <div style="display: flex; flex-direction: column; flex: 1">
+          <span style="white-space: normal; overflow: hidden; text-overflow: ellipsis">{{ node.label }}</span>
+          <span style="display: inline-flex; margin-top: 2px">
+            <el-tag type="warning" size="small" style="margin-right: 5px">{{ node.data.startTime }}</el-tag>
+            <el-tag type="warning" size="small" style="margin-right: 5px">{{ node.data.endTime }}</el-tag>
+            <el-tag type="danger" size="small">{{ node.data.elapsedTime }}</el-tag>
           </span>
         </div>
-        <svg-icon v-if="node.data.success" icon-class="success" style="padding-left:5px;" class="stauts-svg-icon" />
-        <svg-icon v-else icon-class="fail" style="padding-left:5px;" class="stauts-svg-icon" />
+        <svg-icon v-if="node.data.success" icon-class="success" style="padding-left: 5px" class="stauts-svg-icon" />
+        <svg-icon v-else icon-class="fail" style="padding-left: 5px" class="stauts-svg-icon" />
       </template>
       <!-- Sampler -->
       <template v-else>
         <!-- 元素图标 -->
-        <svg-icon v-if="node.data.success" icon-class="successful-sampler" style="padding-right:5px;" class="sampler-svg-icon" />
-        <svg-icon v-else-if="!node.data.success && node.data.retrying" icon-class="warning-sampler" style="padding-right:5px;" class="sampler-svg-icon" />
-        <svg-icon v-else icon-class="failure-sampler" style="padding-right:5px;" class="sampler-svg-icon" />
+        <svg-icon
+          v-if="node.data.success"
+          icon-class="successful-sampler"
+          style="padding-right: 5px"
+          class="sampler-svg-icon"
+        />
+        <svg-icon
+          v-else-if="!node.data.success && node.data.retrying"
+          icon-class="warning-sampler"
+          style="padding-right: 5px"
+          class="sampler-svg-icon"
+        />
+        <svg-icon v-else icon-class="failure-sampler" style="padding-right: 5px" class="sampler-svg-icon" />
         <!-- 元素名称 -->
-        <span style="white-space:normal; overflow:hidden; text-overflow:ellipsis;">{{ node.label }}</span>
-        <el-tag type="info" size="mini" style="margin-left:5px;">{{ node.data.elapsedTime }}</el-tag>
+        <span style="white-space: normal; overflow: hidden; text-overflow: ellipsis">{{ node.label }}</span>
+        <el-tag type="info" size="small" style="margin-left: 5px">{{ node.data.elapsedTime }}</el-tag>
       </template>
     </span>
   </el-tree>
