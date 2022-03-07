@@ -3,6 +3,7 @@
     v-model="selectedDatasetNumberList"
     placeholder="环境 / 变量"
     tag-type="danger"
+    effect="dark"
     multiple
     collapse-tags
     clearable
