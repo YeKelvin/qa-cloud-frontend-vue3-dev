@@ -56,10 +56,10 @@
 <script setup>
 import { Check, Close, Edit } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
-import baseEditorProps from '@/pymeter/composables/editorPropsBase'
+import editorProps from '@/pymeter/composables/editor.props'
 import useEditor from '@/pymeter/composables/useEditor'
 
-const props = defineProps(baseEditorProps)
+const props = defineProps(editorProps)
 const { editorNo, editorMode, metadata, queryMode, modifyMode, createMode, editNow, setReadonly, updateTab, closeTab } =
   useEditor(props)
 </script>
