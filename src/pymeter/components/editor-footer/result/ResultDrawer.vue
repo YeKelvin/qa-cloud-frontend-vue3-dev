@@ -18,7 +18,7 @@
         >
           <el-tab-pane v-for="tab in tabs" :key="tab.id" :label="tab.name" :name="tab.id" />
         </el-tabs>
-        <div v-show="!isEmpty(tabs)" style="padding: 4px; padding-right: 20px; border-bottom: 1px solid #e4e7ed">
+        <div v-show="!isEmpty(tabs)" class="clean-btn-wrapper">
           <el-button type="danger" :icon="Delete" circle plain @click="clean()" />
         </div>
       </span>
@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, useAttrs } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import { isEmpty } from 'lodash-es'
 import { Delete } from '@element-plus/icons-vue'
@@ -95,6 +95,12 @@ const setFirstLoading = () => {
   justify-content: space-between;
 
   margin-bottom: 10px;
+}
+
+.clean-btn-wrapper {
+  padding: 4px;
+  padding-right: 20px;
+  border-bottom: 1px solid #e4e7ed;
 }
 
 :deep(.el-tabs__header) {

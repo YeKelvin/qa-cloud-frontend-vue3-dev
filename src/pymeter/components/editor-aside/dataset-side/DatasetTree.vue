@@ -1,6 +1,6 @@
 <template>
   <el-tree
-    ref="eltreeVNode"
+    ref="eltreeRef"
     node-key="datasetNo"
     :props="{ label: 'datasetName' }"
     :data="datasetList"
@@ -57,7 +57,7 @@ import useWorkspaceState from '@/composables/useWorkspaceState'
 import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceList.vue'
 
-const { eltreeVNode, hoveredNode, mouseenter, mouseleave, visibleChange } = useElTree()
+const { eltreeRef, hoveredNode, mouseenter, mouseleave, visibleChange } = useElTree()
 const { datasetList } = usePyMeterState()
 const { workspaceList } = useWorkspaceState()
 </script>
@@ -70,12 +70,12 @@ export default {
   },
   watch: {
     filterText(val) {
-      this.$refs.eltreeVNode.filter(val)
+      this.$refs.eltreeRef.filter(val)
     }
   },
   methods: {
     filter(val) {
-      this.$refs.eltreeVNode.filter(val)
+      this.$refs.eltreeRef.filter(val)
     },
     filterNode(value, data) {
       if (!value) return true

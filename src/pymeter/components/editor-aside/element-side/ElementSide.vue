@@ -52,12 +52,12 @@
         <!-- 下拉框底部的新增脚本按钮 -->
         <el-option-group key="new-operation" label="新增">
           <el-option value="NEW_COLLECTION">
-            <el-button type="text" icon="el-icon-plus" style="width: 100%" @click.stop="openNewCollectionTab">
+            <el-button type="text" :icon="Plus" style="width: 100%" @click.stop="openNewCollectionTab()">
               新增集合
             </el-button>
           </el-option>
           <el-option value="NEW_SNIPPET">
-            <el-button type="text" icon="el-icon-plus" style="width: 100%" @click.stop="openNewSnippetTab">
+            <el-button type="text" :icon="Plus" style="width: 100%" @click.stop="openNewSnippetTab()">
               新增片段
             </el-button>
           </el-option>
@@ -66,7 +66,7 @@
     </span>
 
     <!-- 选择脚本后才显示 -->
-    <template v-if="!loading && selectedCollectionNumberList.length > 0">
+    <template v-if="!loading && !isEmpty(selectedCollectionNumberList)">
       <!-- 元素操作按钮 -->
       <div class="operation-container" style="margin-top: 5px">
         <!-- 展开节点按钮 -->
@@ -82,7 +82,7 @@
         </el-button>
         <el-divider direction="vertical" />
         <!-- 刷新脚本按钮 -->
-        <el-button type="text" @click="queryElementsTree">
+        <el-button type="text" @click="queryElementsTree()">
           <SvgIcon icon-name="pymeter-refresh" style="margin-right: 5px" />
           刷新
         </el-button>
@@ -91,19 +91,21 @@
       <el-divider />
       <!-- 脚本内容 -->
       <el-scrollbar style="width: 100%; height: 100%" wrap-style="overflow-x:auto;" view-style="padding:10px;">
-        <ElementTree ref="eltreeVNode" :collection-number-list="selectedCollectionNumberList" />
+        <ElementTree ref="eltreeRef" :collection-number-list="selectedCollectionNumberList" />
       </el-scrollbar>
     </template>
 
     <!-- 没有选择脚本时给出提示 -->
-    <el-empty v-if="!loading && selectedCollectionNumberList.length == 0" description="请选择脚本" />
+    <el-empty v-if="!loading && isEmpty(selectedCollectionNumberList)" description="请选择脚本" />
   </div>
 </template>
 
 <script setup>
 import { mapState } from 'vuex'
+import { Plus } from '@element-plus/icons-vue'
+import { isEmpty } from 'lodash-es'
 import * as ElementService from '@/api/script/element'
-import ElementTree from './ElementTree'
+import ElementTree from './ElementTree.vue'
 </script>
 
 <script>
@@ -192,7 +194,7 @@ export default {
      * 根据集合编号查询测试案例
      */
     queryElementsTree() {
-      this.$refs.eltreeVNode.queryElementsTree()
+      this.$refs.eltreeRef.queryElementsTree()
     },
 
     /**
@@ -225,7 +227,7 @@ export default {
      * 展开或收起所有节点
      */
     expandAll(expand) {
-      this.$refs.eltreeVNode.expandAll(expand)
+      this.$refs.eltreeRef.expandAll(expand)
     }
   }
 }

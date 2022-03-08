@@ -1,6 +1,6 @@
 <template>
   <el-tree
-    ref="eltreeVNode"
+    ref="eltreeRef"
     node-key="elementNo"
     empty-text="请开始编辑脚本"
     highlight-current
@@ -38,8 +38,10 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
+import { useStore } from 'vuex'
 import { isEmpty } from 'lodash-es'
+import { ElMessage } from 'element-plus'
 import * as ElementService from '@/api/script/element'
 import useElTree from '@/composables/useElTree'
 import usePyMeterState from '@/pymeter/composables/usePyMeterState'
@@ -49,31 +51,36 @@ import ElementTreeItemMenu from './ElementTreeItemMenu.vue'
 const props = defineProps({
   collectionNumberList: { type: Array, default: () => [] }
 })
-watch(props.collectionNumberList, (val) => {
-  if (!val) return
-  queryElementsTree()
-})
-
+const store = useStore()
 const elementList = ref([])
 const pendingPaste = ref(null)
-
+const isMacOS = computed(() => /macintosh|mac os x/i.test(navigator.userAgent))
+const isWindows = computed(() => /windows|win32/i.test(navigator.userAgent))
 const {
-  eltreeVNode,
+  eltreeRef,
   hoveredNode,
   expandedList,
   mouseenter,
   mouseleave,
   visibleChange,
+  getRootNode,
   handleNodeDoubleClick,
   handleNodeExpand,
   handleNodeCollapse,
   expandAll,
   expandNode
 } = useElTree()
-
-// 刷新脚本列表
 const { refreshElementTree } = usePyMeterState()
+
 watch(refreshElementTree, () => queryElementsTree())
+watch(props.collectionNumberList, (val) => {
+  if (!val) return
+  queryElementsTree()
+})
+
+onMounted(() => {
+  if (!isEmpty(props.collectionNumberList)) queryElementsTree()
+})
 
 /**
  * 查询脚本列表
@@ -92,237 +99,217 @@ const queryElementsTree = () => {
   })
 }
 
-onMounted(() => {
-  if (!isEmpty(props.collectionNumberList)) queryElementsTree()
-})
+/**
+ * el-tree handler
+ */
+const handleNodeClick = (data) => {
+  store.commit({
+    type: 'pymeter/addTab',
+    editorNo: data.elementNo,
+    editorName: data.elementName,
+    editorComponent: data.elementClass,
+    editorMode: 'QUERY'
+  })
+}
+
+/**
+ * 拖拽成功完成时触发的事件
+ */
+const handleNodeDrop = (draggingNode, dropNode, dropType) => {
+  let targetParentNo = 0
+  let targetSortNo = 0
+
+  // 跨脚本拖曳
+  const over = draggingNode.data.rootNo !== dropNode.data.rootNo
+  // 移动的方向
+  let moveDirection = draggingNode.data.sortNo > dropNode.data.sortNo ? 'UP' : 'DOWN'
+  if (over) {
+    moveDirection = 'UP'
+  }
+
+  switch (dropType) {
+    case 'inner':
+      targetParentNo = dropNode.data.elementNo
+      targetSortNo = dropNode.childNodes.length
+      break
+    case 'before':
+      targetParentNo = dropNode.parent.data.elementNo
+      targetSortNo = moveDirection === 'UP' ? dropNode.data.sortNo : dropNode.data.sortNo - 1
+      break
+    case 'after':
+      targetParentNo = dropNode.parent.data.elementNo
+      targetSortNo = moveDirection === 'UP' ? dropNode.data.sortNo + 1 : dropNode.data.sortNo
+      break
+    default:
+      return
+  }
+
+  ElementService.moveElement({
+    sourceNo: draggingNode.data.elementNo,
+    targetRootNo: dropNode.data.rootNo,
+    targetParentNo: targetParentNo,
+    targetSortNo: targetSortNo
+  }).then(() => {
+    queryElementsTree()
+  })
+}
+
+/**
+ * 判断节点能否被拖拽
+ */
+const allowDrag = (draggingNode) => {
+  // Collection 不允许拖拽
+  if (draggingNode.data.elementType === 'COLLECTION') return false
+  return true
+}
+
+/**
+ * 拖拽时判定目标节点能否被放置
+ */
+const allowDrop = (draggingNode, dropNode, type) => {
+  // Element 只允许在 Collection 里插入，不允许在 Collection 前后放置
+  if (dropNode.data.elementType === 'COLLECTION' && (type === 'prev' || type === 'next')) return false
+
+  // 拖拽 Group
+  if (draggingNode.data.elementType === 'GROUP') {
+    // Group 只允许同级排序 或 在 Collection 里插入
+    if (!['COLLECTION', 'GROUP'].includes(dropNode.data.elementType)) return false
+    // Group 只允许在 Group 前后放置，不允许在 Group 里插入
+    if (dropNode.data.elementType === 'GROUP' && type === 'inner') return false
+  }
+
+  // 拖拽 Controller
+  if (draggingNode.data.elementType === 'CONTROLLER') {
+    // Controller 只允许在 Group 里插入，不允许在 Group 前后放置
+    if (dropNode.data.elementType === 'GROUP' && (type === 'prev' || type === 'next')) return false
+    // Controller 只允许在以下元素类型的前后放置，不允许在向里插入
+    if (
+      ['SAMPLER', 'CONFIG', 'TIMER', 'PRE_PROCESSOR', 'POST_PROCESSOR', 'ASSERTION', 'LISTENER'].includes(
+        dropNode.data.elementType
+      ) &&
+      type === 'inner'
+    )
+      return false
+    // Controller 只允许在类型为 GROUP 或 CONTROLLER 的父级下前后放置
+    if (!['GROUP', 'CONTROLLER'].includes(dropNode.parent.data.elementType) && (type === 'prev' || type === 'next'))
+      return false
+  }
+
+  // TestCollection
+  const dropRootNode = getRootNode(dropNode)
+  if (dropRootNode && dropRootNode.data.elementClass === 'TestCollection') {
+    // 拖拽 Sampler
+    if (draggingNode.data.elementType === 'SAMPLER') {
+      // Sampler 只允许在 Group 里插入，不允许在 Group 前后放置
+      if (dropNode.data.elementType === 'GROUP' && (type === 'prev' || type === 'next')) return false
+      // Sampler 只允许在以下元素类型的前后放置，不允许在向里插入
+      if (
+        ['SAMPLER', 'CONFIG', 'TIMER', 'PRE_PROCESSOR', 'POST_PROCESSOR', 'ASSERTION', 'LISTENER'].includes(
+          dropNode.data.elementType
+        ) &&
+        type === 'inner'
+      )
+        return false
+      // 前后放置时，Sampler 不允许移动到类型为 Sampler 的父级
+      if (dropNode.parent.data.elementType === 'SAMPLER' && (type === 'prev' || type === 'next')) return false
+    }
+  }
+
+  // 除以上规则不允许拖动排序，其余均允许
+  return true
+}
+
+/**
+ * windows剪切元素快捷键
+ */
+const handleCtrlKeyX = () => {
+  if (!isWindows.value) return
+  const data = eltreeRef.value.getCurrentNode()
+  if (data.elementType === 'COLLECTION') return
+  pendingPaste.value = { ...data, pasteType: 'CUT' }
+  ElMessage({ message: '已剪切到剪贴板', type: 'info', duration: 1 * 1000 })
+}
+
+/**
+ * windows复制元素快捷键
+ */
+const handleCtrlKeyC = () => {
+  if (!isWindows.value) return
+  const data = eltreeRef.value.getCurrentNode()
+  if (data.elementType === 'COLLECTION') return
+  pendingPaste.value = { ...data, pasteType: 'COPY' }
+  ElMessage({ message: '已复制到剪贴板', type: 'info', duration: 1 * 1000 })
+}
+
+/**
+ * windows粘贴元素快捷键
+ */
+const handleCtrlKeyV = () => {
+  if (!isWindows.value) return
+  const target = eltreeRef.value.getCurrentNode()
+  target &&
+    ElementService.pasteElement({
+      sourceNo: pendingPaste.value.elementNo,
+      targetNo: target.elementNo,
+      pasteType: pendingPaste.value.pasteType
+    }).then(() => {
+      // 清空剪贴板
+      if (pendingPaste.value.pasteType === 'CUT') pendingPaste.value = null
+      // 重新查询列表
+      queryElementsTree()
+      // 成功提示
+      ElMessage({ message: '剪贴成功', type: 'info', duration: 2 * 1000 })
+    })
+}
+
+/**
+ * macos复制元素快捷键
+ */
+const handleMetaKeyX = () => {
+  if (!isMacOS.value) return
+  const data = eltreeRef.value.getCurrentNode()
+  if (data.elementType === 'COLLECTION') return
+  pendingPaste.value = { ...data, pasteType: 'CUT' }
+  ElMessage({ message: '已剪切', type: 'info', duration: 1 * 1000 })
+}
+
+/**
+ * macos复制元素快捷键
+ */
+const handleMetaKeyC = () => {
+  if (!isMacOS.value) return
+  const data = eltreeRef.value.getCurrentNode()
+  if (data.elementType === 'COLLECTION') return
+  pendingPaste.value = { ...data, pasteType: 'COPY' }
+  ElMessage({ message: '已复制', type: 'info', duration: 1 * 1000 })
+}
+
+/**
+ * macos粘贴元素快捷键
+ */
+const handleMetaKeyV = () => {
+  if (!isMacOS.value) return
+  const target = eltreeRef.value.getCurrentNode()
+  target &&
+    ElementService.pasteElement({
+      sourceNo: pendingPaste.value.elementNo,
+      targetNo: target.elementNo,
+      pasteType: pendingPaste.value.pasteType
+    }).then(() => {
+      // 清空剪贴板
+      if (pendingPaste.value.pasteType === 'CUT') pendingPaste.value = null
+      // 成功提示
+      ElMessage({ message: '剪贴成功', type: 'info', duration: 2 * 1000 })
+      // 重新查询列表
+      queryElementsTree()
+    })
+}
 
 defineExpose({
   expandAll,
-  expandNode
+  expandNode,
+  queryElementsTree
 })
-</script>
-
-<script>
-export default {
-  name: 'ElementTree',
-
-  computed: {
-    isMacOS() {
-      return /macintosh|mac os x/i.test(navigator.userAgent)
-    },
-    isWindows() {
-      return /windows|win32/i.test(navigator.userAgent)
-    }
-  },
-
-  methods: {
-    /**
-     * el-tree handler
-     */
-    handleNodeClick(data) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: data.elementNo,
-        editorName: data.elementName,
-        editorComponent: data.elementClass,
-        editorMode: 'QUERY'
-      })
-    },
-
-    /**
-     * 拖拽成功完成时触发的事件
-     */
-    handleNodeDrop(draggingNode, dropNode, dropType) {
-      let targetParentNo = 0
-      let targetSortNo = 0
-
-      // 跨脚本拖曳
-      const over = draggingNode.data.rootNo !== dropNode.data.rootNo
-      // 移动的方向
-      let moveDirection = draggingNode.data.sortNo > dropNode.data.sortNo ? 'UP' : 'DOWN'
-      if (over) {
-        moveDirection = 'UP'
-      }
-
-      switch (dropType) {
-        case 'inner':
-          targetParentNo = dropNode.data.elementNo
-          targetSortNo = dropNode.childNodes.length
-          break
-        case 'before':
-          targetParentNo = dropNode.parent.data.elementNo
-          targetSortNo = moveDirection === 'UP' ? dropNode.data.sortNo : dropNode.data.sortNo - 1
-          break
-        case 'after':
-          targetParentNo = dropNode.parent.data.elementNo
-          targetSortNo = moveDirection === 'UP' ? dropNode.data.sortNo + 1 : dropNode.data.sortNo
-          break
-        default:
-          return
-      }
-
-      ElementService.moveElement({
-        sourceNo: draggingNode.data.elementNo,
-        targetRootNo: dropNode.data.rootNo,
-        targetParentNo: targetParentNo,
-        targetSortNo: targetSortNo
-      }).then(() => {
-        this.queryElementsTree()
-      })
-    },
-
-    /**
-     * 判断节点能否被拖拽
-     */
-    allowDrag(draggingNode) {
-      // Collection 不允许拖拽
-      if (draggingNode.data.elementType === 'COLLECTION') return false
-      return true
-    },
-
-    /**
-     * 拖拽时判定目标节点能否被放置
-     */
-    allowDrop(draggingNode, dropNode, type) {
-      // Element 只允许在 Collection 里插入，不允许在 Collection 前后放置
-      if (dropNode.data.elementType === 'COLLECTION' && (type === 'prev' || type === 'next')) return false
-
-      // 拖拽 Group
-      if (draggingNode.data.elementType === 'GROUP') {
-        // Group 只允许同级排序 或 在 Collection 里插入
-        if (!['COLLECTION', 'GROUP'].includes(dropNode.data.elementType)) return false
-        // Group 只允许在 Group 前后放置，不允许在 Group 里插入
-        if (dropNode.data.elementType === 'GROUP' && type === 'inner') return false
-      }
-
-      // 拖拽 Controller
-      if (draggingNode.data.elementType === 'CONTROLLER') {
-        // Controller 只允许在 Group 里插入，不允许在 Group 前后放置
-        if (dropNode.data.elementType === 'GROUP' && (type === 'prev' || type === 'next')) return false
-        // Controller 只允许在以下元素类型的前后放置，不允许在向里插入
-        if (
-          ['SAMPLER', 'CONFIG', 'TIMER', 'PRE_PROCESSOR', 'POST_PROCESSOR', 'ASSERTION', 'LISTENER'].includes(
-            dropNode.data.elementType
-          ) &&
-          type === 'inner'
-        )
-          return false
-        // Controller 只允许在类型为 GROUP 或 CONTROLLER 的父级下前后放置
-        if (!['GROUP', 'CONTROLLER'].includes(dropNode.parent.data.elementType) && (type === 'prev' || type === 'next'))
-          return false
-      }
-
-      // TestCollection
-      const dropRootNode = this.getRootNode(dropNode)
-      if (dropRootNode && dropRootNode.data.elementClass === 'TestCollection') {
-        // 拖拽 Sampler
-        if (draggingNode.data.elementType === 'SAMPLER') {
-          // Sampler 只允许在 Group 里插入，不允许在 Group 前后放置
-          if (dropNode.data.elementType === 'GROUP' && (type === 'prev' || type === 'next')) return false
-          // Sampler 只允许在以下元素类型的前后放置，不允许在向里插入
-          if (
-            ['SAMPLER', 'CONFIG', 'TIMER', 'PRE_PROCESSOR', 'POST_PROCESSOR', 'ASSERTION', 'LISTENER'].includes(
-              dropNode.data.elementType
-            ) &&
-            type === 'inner'
-          )
-            return false
-          // 前后放置时，Sampler 不允许移动到类型为 Sampler 的父级
-          if (dropNode.parent.data.elementType === 'SAMPLER' && (type === 'prev' || type === 'next')) return false
-        }
-      }
-
-      // 除以上规则不允许拖动排序，其余均允许
-      return true
-    },
-
-    /**
-     * windows剪切元素快捷键
-     */
-    handleCtrlKeyX() {
-      if (!this.isWindows) return
-      const data = this.$refs.tree.getCurrentNode()
-      if (data.elementType === 'COLLECTION') return
-      this.pendingPaste = { ...data, pasteType: 'CUT' }
-      this.$message({ message: '已剪切', type: 'info', duration: 1 * 1000 })
-    },
-
-    /**
-     * windows复制元素快捷键
-     */
-    handleCtrlKeyC() {
-      if (!this.isWindows) return
-      const data = this.$refs.tree.getCurrentNode()
-      if (data.elementType === 'COLLECTION') return
-      this.pendingPaste = { ...data, pasteType: 'COPY' }
-      this.$message({ message: '已复制', type: 'info', duration: 1 * 1000 })
-    },
-
-    /**
-     * windows粘贴元素快捷键
-     */
-    handleCtrlKeyV() {
-      if (!this.isWindows) return
-      const target = this.$refs.tree.getCurrentNode()
-      target &&
-        ElementService.pasteElement({
-          sourceNo: this.pendingPaste.elementNo,
-          targetNo: target.elementNo,
-          pasteType: this.pendingPaste.pasteType
-        }).then(() => {
-          // 清空剪贴板
-          if (this.pendingPaste.pasteType === 'CUT') this.pendingPaste = null
-          // 重新查询列表
-          this.queryElementsTree()
-          // 成功提示
-          this.$message({ message: '剪贴成功', type: 'info', duration: 1 * 1000 })
-        })
-    },
-
-    /**
-     * macos复制元素快捷键
-     */
-    handleMetaKeyX() {
-      if (!this.isMacOS) return
-      const data = this.$refs.tree.getCurrentNode()
-      if (data.elementType === 'COLLECTION') return
-      this.pendingPaste = { ...data, pasteType: 'CUT' }
-      this.$message({ message: '已剪切', type: 'info', duration: 1 * 1000 })
-    },
-
-    /**
-     * macos复制元素快捷键
-     */
-    handleMetaKeyC() {
-      if (!this.isMacOS) return
-      const data = this.$refs.tree.getCurrentNode()
-      if (data.elementType === 'COLLECTION') return
-      this.pendingPaste = { ...data, pasteType: 'COPY' }
-      this.$message({ message: '已复制', type: 'info', duration: 1 * 1000 })
-    },
-
-    /**
-     * macos粘贴元素快捷键
-     */
-    handleMetaKeyV() {
-      if (!this.isMacOS) return
-      const target = this.$refs.tree.getCurrentNode()
-      target &&
-        ElementService.pasteElement({
-          sourceNo: this.pendingPaste.elementNo,
-          targetNo: target.elementNo,
-          pasteType: this.pendingPaste.pasteType
-        }).then(() => {
-          // 清空剪贴板
-          if (this.pendingPaste.pasteType === 'CUT') this.pendingPaste = null
-          // 成功提示
-          this.$message({ message: '剪贴成功', type: 'info', duration: 1 * 1000 })
-          // 重新查询列表
-          this.queryElementsTree()
-        })
-    }
-  }
-}
 </script>
 
 <style lang="scss" scoped>

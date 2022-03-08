@@ -2,12 +2,12 @@
   <el-drawer direction="btt" size="50%" custom-class="pymeter-footer-log-drawer" :show-close="false">
     <template #title>
       <span class="drawer-title">
-        <span>执行日志</span>
+        <span class="title-name">执行日志</span>
         <el-button type="danger" :icon="Delete" circle plain @click="clean()" />
       </span>
     </template>
 
-    <MonacoEditor ref="logEditorRef" key="logCode" language="log" :read-only="true" />
+    <MonacoEditor ref="logEditorRef" language="log" :read-only="true" />
   </el-drawer>
 </template>
 
@@ -61,5 +61,12 @@ const clean = () => {
 
   padding: 10px 10px 0 10px;
   margin-bottom: 10px;
+}
+
+.title-name {
+  font-weight: bold;
+  font-size: 16px;
+  box-shadow: -4px 0 0 0 #f56c6c;
+  padding: 0 10px;
 }
 </style>

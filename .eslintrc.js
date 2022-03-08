@@ -7,16 +7,20 @@ module.exports = {
     node: true
   },
   globals: {
-    defineEmits: true,
     document: true,
-    jest: 'readonly',
-    localStorage: true,
     window: true,
+    localStorage: true,
+    defineEmits: true,
     defineProps: true,
     defineExpose: true
   },
   plugins: ['prettier', 'import'],
-  extends: ['eslint:recommended', 'plugin:vue/vue3-recommended', 'plugin:prettier/recommended'],
+  extends: [
+    'eslint:recommended',
+    'plugin:vue/vue3-recommended',
+    'plugin:prettier/recommended',
+    './.eslintrc-auto-import.json'
+  ],
   parser: 'vue-eslint-parser',
   parserOptions: {
     sourceType: 'module',
