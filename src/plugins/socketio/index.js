@@ -29,7 +29,7 @@ export default {
 
     if (debug) {
       socket.onAny((event, ...args) => {
-        console.debug(`event:[ ${event} ] args:[ ${args} ]`)
+        console.log(`event:[ ${event} ] args:[ ${args} ]`)
       })
     }
 

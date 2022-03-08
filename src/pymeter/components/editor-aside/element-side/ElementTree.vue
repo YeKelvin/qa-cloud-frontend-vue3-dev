@@ -28,112 +28,34 @@
       <span class="tree-item" @mouseenter="mouseenter(node)" @mouseleave="mouseleave()">
         <!-- 元素名称 -->
         <ElementTreeItemName :data="data" @dblclick="handleNodeDoubleClick(node)" />
-
         <!-- 元素操作菜单 -->
         <span v-show="hoveredNode === node" @click.stop>
-          <el-dropdown
-            trigger="click"
-            placement="bottom"
-            :show-timeout="50"
-            :hide-timeout="50"
-            @visible-change="visibleChange"
-          >
-            <!-- 菜单弹出按钮 -->
-            <el-button type="text" :icon="More" />
-            <!-- 菜单 -->
-            <template #dropdown>
-              <el-dropdown-menu>
-                <!-- Group -->
-                <template v-if="data.elementClass == 'TestCollection'">
-                  <el-dropdown-item @click="openNewGroupTab(node)">新增测试分组</el-dropdown-item>
-                  <el-dropdown-item @click="openNewSetupGroupTab(node)">新增前置分组</el-dropdown-item>
-                  <el-dropdown-item @click="openNewTeardownGroupTab(node)">新增后置分组</el-dropdown-item>
-                </template>
-
-                <template v-if="data.elementClass == 'TestSnippets'">
-                  <el-dropdown-item @click="openNewSetupGroupDebugerTab(node)">新增前置分组调试器</el-dropdown-item>
-                  <el-dropdown-item @click="openNewTeardownGroupDebugerTab(node)">新增后置分组调试器</el-dropdown-item>
-                </template>
-
-                <!-- Sampler -->
-                <template
-                  v-if="
-                    data.elementType == 'GROUP' ||
-                    data.elementType == 'CONTROLLER' ||
-                    data.elementClass == 'TestSnippets'
-                  "
-                >
-                  <el-dropdown-item :divided="data.elementClass == 'TestSnippets'" @click="openNewHttpSamplerTab(node)">
-                    新增HTTP请求
-                  </el-dropdown-item>
-                  <el-dropdown-item @click="openNewPythonSamplerTab(node)">新增Python请求</el-dropdown-item>
-                  <el-dropdown-item @click="openNewSnippetSamplerTab(node)">新增Snippet请求</el-dropdown-item>
-                </template>
-
-                <!-- PreProcessor -->
-                <template v-if="data.elementType == 'SAMPLER'">
-                  <el-dropdown-item @click="openNewPythonPreProcessorTab(node)">新增Python前置脚本</el-dropdown-item>
-                </template>
-
-                <!-- PostProcessor -->
-                <template v-if="data.elementType == 'SAMPLER'">
-                  <el-dropdown-item divided @click="openNewPythonPostProcessorTab(node)">
-                    新增Python后置脚本
-                  </el-dropdown-item>
-                </template>
-
-                <!-- Assertion -->
-                <template v-if="data.elementType == 'SAMPLER'">
-                  <el-dropdown-item divided @click="openNewPythonAssertionTab(node)">新增Python断言</el-dropdown-item>
-                </template>
-
-                <!-- Controller -->
-                <template
-                  v-if="
-                    data.elementType == 'GROUP' ||
-                    data.elementType == 'CONTROLLER' ||
-                    data.elementClass == 'TestSnippets'
-                  "
-                >
-                  <el-dropdown-item divided @click="openNewIfControllerTab(node)">新增if控制器</el-dropdown-item>
-                  <el-dropdown-item @click="openNewWhileControllerTab(node)">新增while控制器</el-dropdown-item>
-                  <el-dropdown-item @click="openNewForInControllerTab(node)">新增遍历控制器</el-dropdown-item>
-                  <el-dropdown-item @click="openNewLoopControllerTab(node)">新增循环控制器</el-dropdown-item>
-                  <el-dropdown-item @click="openNewRetryControllerTab(node)">新增重试控制器</el-dropdown-item>
-                  <el-dropdown-item @click="openNewTransactionControllerTab(node)">新增事务控制器</el-dropdown-item>
-                </template>
-
-                <!-- 复制元素按钮 -->
-                <template v-if="data.elementType == 'COLLECTION'">
-                  <el-dropdown-item divided @click="copyElementToWorkspace(data)">复制到空间</el-dropdown-item>
-                  <el-dropdown-item @click="moveElementToWorkspace(data)">移动到空间</el-dropdown-item>
-                </template>
-                <template v-else>
-                  <el-dropdown-item divided @click="duplicateElement(data)">复制</el-dropdown-item>
-                </template>
-
-                <!-- 状态变更按钮 -->
-                <el-dropdown-item v-if="!data.enabled" divided @click="enableElement(data)">启用</el-dropdown-item>
-                <el-dropdown-item v-else divided @click="disableElement(data)">禁用</el-dropdown-item>
-
-                <!-- 删除按钮 -->
-                <el-dropdown-item divided @click="removeElement(data)">删除</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+          <ElementTreeItemMenu :node="node" @visible-change="visibleChange" />
         </span>
       </span>
     </template>
   </el-tree>
 </template>
 
-<script lang="jsx" setup>
-import { mapState } from 'vuex'
-import { More } from '@element-plus/icons-vue'
+<script setup>
+import { ref, watch, onMounted } from 'vue'
+import { isEmpty } from 'lodash-es'
 import * as ElementService from '@/api/script/element'
 import useElTree from '@/composables/useElTree'
+import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 import ElementTreeItemName from './ElementTreeItemName.vue'
-import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceList.vue'
+import ElementTreeItemMenu from './ElementTreeItemMenu.vue'
+
+const props = defineProps({
+  collectionNumberList: { type: Array, default: () => [] }
+})
+watch(props.collectionNumberList, (val) => {
+  if (!val) return
+  queryElementsTree()
+})
+
+const elementList = ref([])
+const pendingPaste = ref(null)
 
 const {
   eltreeVNode,
@@ -149,34 +71,42 @@ const {
   expandNode
 } = useElTree()
 
+// 刷新脚本列表
+const { refreshElementTree } = usePyMeterState()
+watch(refreshElementTree, () => queryElementsTree())
+
+/**
+ * 查询脚本列表
+ */
+const queryElementsTree = () => {
+  if (isEmpty(props.collectionNumberList)) {
+    elementList.value = []
+    return
+  }
+  ElementService.queryElementsChildren({ elementNumberList: props.collectionNumberList }).then((response) => {
+    elementList.value = response.result
+    // 自动展开顶级节点
+    elementList.value.forEach((item) => {
+      expandedList.value.push(item.elementNo)
+    })
+  })
+}
+
+onMounted(() => {
+  if (!isEmpty(props.collectionNumberList)) queryElementsTree()
+})
+
 defineExpose({
   expandAll,
   expandNode
 })
 </script>
 
-<script lang="jsx">
+<script>
 export default {
   name: 'ElementTree',
-  props: {
-    collectionNumberList: { type: Array, default: () => [] }
-  },
-
-  data() {
-    return {
-      elementList: [],
-      pendingPaste: null
-    }
-  },
 
   computed: {
-    ...mapState('workspace', {
-      workspaceNo: (state) => state.workspaceNo,
-      workspaceList: (state) => state.workspaceList
-    }),
-    ...mapState('pymeter', {
-      refreshElementTree: (state) => state.refreshElementTree
-    }),
     isMacOS() {
       return /macintosh|mac os x/i.test(navigator.userAgent)
     },
@@ -185,307 +115,9 @@ export default {
     }
   },
 
-  watch: {
-    collectionNumberList(val) {
-      if (!val) return
-      this.queryElementsTree()
-    },
-    refreshElementTree() {
-      this.queryElementsTree()
-    }
-  },
-
-  mounted() {
-    if (this.collectionNumberList.length > 0) this.queryElementsTree()
-  },
-
   methods: {
     /**
-     * 打开新增 TestGroup 的标签页
-     */
-    openNewGroupTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_GROUP',
-        editorName: 'New Group',
-        editorComponent: 'TestGroup',
-        editorMode: 'CREATE',
-        metadata: {
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    /**
-     * 打开新增 SetupGroup 的标签页
-     */
-    openNewSetupGroupTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_SETUP_GROUP',
-        editorName: 'New Setup Group',
-        editorComponent: 'SetupGroup',
-        editorMode: 'CREATE',
-        metadata: {
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    openNewSetupGroupDebugerTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_SETUP_GROUP_DEBUGER',
-        editorName: 'New Setup Group Debuger',
-        editorComponent: 'SetupGroupDebuger',
-        editorMode: 'CREATE',
-        metadata: {
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    /**
-     * 打开新增 TeatdownGroup 的标签页
-     */
-    openNewTeardownGroupTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_TEARDOWN_GROUP',
-        editorName: 'New Teardown Group',
-        editorComponent: 'TeardownGroup',
-        editorMode: 'CREATE',
-        metadata: {
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    openNewTeardownGroupDebugerTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_TEARDOWN_GROUP_DEBUGER',
-        editorName: 'New Teardown Group Debuger',
-        editorComponent: 'TeardownGroupDebuger',
-        editorMode: 'CREATE',
-        metadata: {
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    /**
-     * 打开新增 HttpSampler 的标签页
-     */
-    openNewHttpSamplerTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_HTTP_SAMPLER',
-        editorName: 'New HTTP',
-        editorComponent: 'HTTPSampler',
-        editorMode: 'CREATE',
-        metadata: {
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    /**
-     * 打开新增 PythonSampler 的标签页
-     */
-    openNewPythonSamplerTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_PYTHON_SAMPLER',
-        editorName: 'New Python',
-        editorComponent: 'PythonSampler',
-        editorMode: 'CREATE',
-        metadata: {
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    /**
-     * 打开新增 SnippetSampler 的标签页
-     */
-    openNewSnippetSamplerTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_SNIPPET_SAMPLER',
-        editorName: 'New Snippet',
-        editorComponent: 'SnippetSampler',
-        editorMode: 'CREATE',
-        metadata: {
-          workspaceNo: this.workspaceNo,
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    /**
-     * 打开新增 PythonPreProcessor 的标签页
-     */
-    openNewPythonPreProcessorTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_PYTHON_PRE_PROCESSOR',
-        editorName: 'New Python Pre Processor',
-        editorComponent: 'PythonPreProcessor',
-        editorMode: 'CREATE',
-        metadata: {
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    /**
-     * 打开新增 PythonAssertion 的标签页
-     */
-    openNewPythonPostProcessorTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_PYTHON_POST_PROCESSOR',
-        editorName: 'New Python Post Processor',
-        editorComponent: 'PythonPostProcessor',
-        editorMode: 'CREATE',
-        metadata: {
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    /**
-     * 打开新增 PythonAssertion 的标签页
-     */
-    openNewPythonAssertionTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_PYTHON_ASSERTION',
-        editorName: 'New Python Assertion',
-        editorComponent: 'PythonAssertion',
-        editorMode: 'CREATE',
-        metadata: {
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    /**
-     * 打开新增 IfController 的标签页
-     */
-    openNewIfControllerTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_IF_CONTROLLER',
-        editorName: 'New If Controller',
-        editorComponent: 'IfController',
-        editorMode: 'CREATE',
-        metadata: {
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    /**
-     * 打开新增 ForinController 的标签页
-     */
-    openNewForInControllerTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_FOR_IN_CONTROLLER',
-        editorName: 'New For-In Controller',
-        editorComponent: 'ForInController',
-        editorMode: 'CREATE',
-        metadata: {
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    /**
-     * 打开新增 LoopController 的标签页
-     */
-    openNewLoopControllerTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_LOOP_CONTROLLER',
-        editorName: 'New Loop Controller',
-        editorComponent: 'LoopController',
-        editorMode: 'CREATE',
-        metadata: {
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    /**
-     * 打开新增 RetryController 的标签页
-     */
-    openNewRetryControllerTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_RETRY_CONTROLLER',
-        editorName: 'New Retry Controller',
-        editorComponent: 'RetryController',
-        editorMode: 'CREATE',
-        metadata: {
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    /**
-     * 打开新增 TransactionController 的标签页
-     */
-    openNewTransactionControllerTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_TRANSACTION_CONTROLLER',
-        editorName: 'New Transaction Controller',
-        editorComponent: 'TransactionController',
-        editorMode: 'CREATE',
-        metadata: {
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    /**
-     * 打开新增 WhileController 的标签页
-     */
-    openNewWhileControllerTab(node) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_WHILE_CONTROLLER',
-        editorName: 'New While Controller',
-        editorComponent: 'WhileController',
-        editorMode: 'CREATE',
-        metadata: {
-          rootNo: node.data.rootNo,
-          parentNo: node.data.elementNo
-        }
-      })
-    },
-
-    /**
-     * el-tree点击节点的回调
+     * el-tree handler
      */
     handleNodeClick(data) {
       this.$store.commit({
@@ -495,168 +127,6 @@ export default {
         editorComponent: data.elementClass,
         editorMode: 'QUERY'
       })
-    },
-
-    /**
-     * 查询脚本内容
-     */
-    queryElementsTree() {
-      if (this.collectionNumberList.length === 0) {
-        this.elementList = []
-        return
-      }
-      ElementService.queryElementsChildren({ elementNumberList: this.collectionNumberList }).then((response) => {
-        this.elementList = response.result
-        // 自动展开顶级节点
-        this.elementList.forEach((item) => {
-          this.expandedList.push(item.elementNo)
-        })
-      })
-    },
-
-    /**
-     * 复制元素
-     */
-    duplicateElement({ elementNo, elementName, elementType }) {
-      // 复制 group 时需要二次确认
-      if (elementType === 'GROUP') {
-        this.$confirm(null, {
-          type: 'warning',
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          message: (
-            <div>
-              <p>确认复制以下分组吗？</p>
-              <br />
-              <p style="white-space:normal; overflow:hidden; text-overflow:ellipsis;">{elementName}</p>
-            </div>
-          )
-        }).then(() => {
-          ElementService.duplicateElement({ elementNo: elementNo }).then(() => {
-            // 重新查询列表
-            this.queryElementsTree()
-            // 成功提示
-            this.$message({ message: '复制成功', type: 'info', duration: 1 * 1000 })
-          })
-        })
-        // 非 group 元素直接复制
-      } else {
-        ElementService.duplicateElement({ elementNo: elementNo }).then(() => {
-          // 重新查询列表
-          this.queryElementsTree()
-          // 成功提示
-          this.$message({ message: '复制成功', type: 'info', duration: 1 * 1000 })
-        })
-      }
-    },
-
-    /**
-     * 复制元素至指定空间
-     */
-    async copyElementToWorkspace({ elementNo }) {
-      let workspaceNo = null
-      // 弹出选择空间的对话框
-      const error = await this.$confirm(null, {
-        title: '请选择工作空间',
-        message: (
-          <WorkspaceList
-            key={elementNo}
-            data={this.workspaceList}
-            onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
-          />
-        ),
-        confirmButtonText: '确定',
-        cancelButtonText: '取消'
-      })
-        .then(() => false)
-        .catch(() => true)
-      if (error) return
-      // 复制元素到指定的空间
-      await ElementService.copyElementToWorkspace({ elementNo: elementNo, workspaceNo: workspaceNo })
-      // 成功提示
-      this.$message({ message: '复制成功', type: 'info', duration: 1 * 1000 })
-    },
-
-    /**
-     * 移动元素至指定空间
-     */
-    async moveElementToWorkspace({ elementNo }) {
-      let workspaceNo = null
-      // 弹出选择空间的对话框
-      const error = await this.$confirm(null, {
-        title: '请选择工作空间',
-        message: (
-          <WorkspaceList
-            key={elementNo}
-            data={this.workspaceList}
-            onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
-          />
-        ),
-        confirmButtonText: '确定',
-        cancelButtonText: '取消'
-      })
-        .then(() => false)
-        .catch(() => true)
-      if (error) return
-      // 移动元素到指定空间
-      await ElementService.moveElementToWorkspace({ elementNo: elementNo, workspaceNo: workspaceNo })
-      // 重新查询列表
-      this.queryElementsTree()
-      // 成功提示
-      this.$message({ message: '移动成功', type: 'info', duration: 1 * 1000 })
-    },
-
-    /**
-     * 启用元素
-     */
-    enableElement({ elementNo }) {
-      if (!elementNo) return
-      // 启用元素
-      ElementService.enableElement({ elementNo: elementNo }).then(() => {
-        // 重新查询列表
-        this.queryElementsTree()
-      })
-    },
-
-    /**
-     * 禁用元素
-     */
-    disableElement({ elementNo }) {
-      if (!elementNo) return
-      // 禁用元素
-      ElementService.disableElement({ elementNo: elementNo }).then(() => {
-        // 重新查询列表
-        this.queryElementsTree()
-      })
-    },
-
-    /**
-     * 删除元素
-     */
-    async removeElement({ elementNo, elementName }) {
-      // 二次确认
-      const error = await this.$confirm(null, {
-        title: '警告',
-        type: 'warning',
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        message: (
-          <div>
-            <p>确认删除以下元素吗？</p>
-            <br />
-            <p style="white-space:normal; overflow:hidden; text-overflow:ellipsis;">{elementName}</p>
-          </div>
-        )
-      })
-        .then(() => false)
-        .catch(() => true)
-      if (error) return
-      // 删除元素
-      await ElementService.removeElement({ elementNo: elementNo })
-      // 关闭tab
-      this.$store.commit({ type: 'pymeter/removeTab', editorNo: elementNo })
-      // 重新查询列表
-      this.queryElementsTree()
     },
 
     /**
@@ -862,13 +332,6 @@ export default {
   justify-content: space-between;
   flex: 1;
   padding-right: 8px;
-}
-
-.el-dropdown {
-  :deep(.el-button) {
-    -webkit-appearance: button;
-    padding: 5px;
-  }
 }
 
 :deep(.el-tree-node__content) {

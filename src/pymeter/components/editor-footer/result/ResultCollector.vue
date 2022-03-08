@@ -15,27 +15,29 @@
           :expand-on-click-node="false"
           @node-click="handleNodeClick"
         >
-          <span slot-scope="{ node, data }" style="display: inline-flex; align-items: center; width: 100%">
-            <!-- Group 名称 -->
-            <template v-if="node.level == 1">
-              <span style="display: inline-flex; align-items: center; justify-content: space-between; width: 100%">
-                <span style="display: inline-flex; align-items: center">
-                  <svg-icon icon-class="group" style="width: 1.2em; height: 1.2em" />
-                  <span class="element-title" style="margin-left: 5px">{{ node.label }}</span>
+          <template #default="{ node, data }">
+            <span style="display: inline-flex; align-items: center; width: 100%">
+              <!-- Group 名称 -->
+              <template v-if="node.level == 1">
+                <span style="display: inline-flex; align-items: center; justify-content: space-between; width: 100%">
+                  <span style="display: inline-flex; align-items: center">
+                    <SvgIcon icon-name="pymeter-group" style="width: 1.2em; height: 1.2em" />
+                    <span class="element-title" style="margin-left: 5px">{{ node.label }}</span>
+                  </span>
+                  <SvgIcon v-if="data.running" icon-name="pymeter-running" style="width: 1.5em; height: 1.5em" />
+                  <SvgIcon v-else-if="!data.running && data.success" icon-name="pymeter-successful-sampler" />
+                  <SvgIcon v-else icon-name="pymeter-failure-sampler" />
                 </span>
-                <svg-icon v-if="data.running" icon-class="running" style="width: 1.5em; height: 1.5em" />
-                <svg-icon v-else-if="!data.running && data.success" icon-class="successful-sampler" />
-                <svg-icon v-else icon-class="failure-sampler" />
-              </span>
-            </template>
-            <!-- Sampler 名称 -->
-            <template v-else>
-              <svg-icon v-if="data.success" icon-class="successful-sampler" />
-              <svg-icon v-else-if="!data.success && data.retrying" icon-class="warning-sampler" />
-              <svg-icon v-else icon-class="failure-sampler" />
-              <span class="element-title" style="margin-left: 5px">{{ node.label }}</span>
-            </template>
-          </span>
+              </template>
+              <!-- Sampler 名称 -->
+              <template v-else>
+                <SvgIcon v-if="data.success" icon-name="pymeter-successful-sampler" />
+                <SvgIcon v-else-if="!data.success && data.retrying" icon-name="pymeter-warning-sampler" />
+                <SvgIcon v-else icon-name="pymeter-failure-sampler" />
+                <span class="element-title" style="margin-left: 5px">{{ node.label }}</span>
+              </template>
+            </span>
+          </template>
         </el-tree>
       </el-scrollbar>
     </el-card>
@@ -49,7 +51,7 @@
         <el-tab-pane key="REQUEST" label="请求数据" name="REQUEST" />
         <el-tab-pane v-if="responseHeaders.length > 0" key="RESPONSE_HEADERS" label="响应头" name="RESPONSE_HEADERS" />
         <el-tab-pane key="RESPONSE" label="响应数据" name="RESPONSE" />
-        <el-tab-pane v-if="showingSampler.failedAssertion" key="ASSERTION" label="断言" name="ASSERTION" />
+        <el-tab-pane v-if="current.sampler.failedAssertion" key="ASSERTION" label="断言" name="ASSERTION" />
       </el-tabs>
 
       <!-- 请求简要 -->
@@ -74,7 +76,7 @@
 
       <!-- 请求体 -->
       <template v-if="showing && showRequestCode">
-        <MonacoEditor ref="requestEditor" key="requestCode" :read-only="true" language="json" />
+        <MonacoEditor ref="requestEditorRef" key="requestCode" :read-only="true" language="json" />
       </template>
 
       <!-- 响应头部 -->
@@ -89,148 +91,125 @@
 
       <!-- 响应体 -->
       <template v-if="showing && showResponseCode">
-        <MonacoEditor ref="responseEditor" key="responseCode" :read-only="true" language="json" />
+        <MonacoEditor ref="responseEditorRef" key="responseCode" :read-only="true" language="json" />
       </template>
 
       <!-- 失败断言 -->
       <template v-if="showing && showAssertionCode">
-        <MonacoEditor ref="assertionEditor" key="assertionCode" :read-only="true" language="python" />
+        <MonacoEditor ref="assertionEditorRef" key="assertionCode" :read-only="true" language="python" />
       </template>
     </el-card>
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, computed, nextTick } from 'vue'
+import { isEmpty } from 'lodash-es'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
-export default {
-  name: 'ResultCollector',
+defineProps({
+  groups: { type: Array, default: () => [] }
+})
 
-  components: { MonacoEditor },
+const activeTabName = ref('SUMMARY')
+const current = reactive({ sampler: {} })
+const requestEditorRef = ref()
+const responseEditorRef = ref()
+const assertionEditorRef = ref()
 
-  props: {
-    groups: { type: Array, default: () => [] }
-  },
+const showing = computed(() => !isEmpty(Object.keys(current.sampler)))
+const showSamplerSummary = computed(() => activeTabName.value === 'SUMMARY')
+const showRequestHeaders = computed(() => activeTabName.value === 'REQUEST_HEADERS')
+const showRequestCode = computed(() => activeTabName.value === 'REQUEST')
+const showResponseHeaders = computed(() => activeTabName.value === 'RESPONSE_HEADERS')
+const showResponseCode = computed(() => activeTabName.value === 'RESPONSE')
+const showAssertionCode = computed(() => activeTabName.value === 'ASSERTION')
+const samplerSummary = computed(() => {
+  return [
+    { name: '名称：', value: current.sampler.name || '-' },
+    { name: '描述：', value: current.sampler.remark || '-' },
+    { name: '请求地址：', value: current.sampler.url || '-' },
+    { name: '响应码：', value: current.sampler.responseCode || '-' },
+    { name: '响应信息：', value: current.sampler.responseMessage || '-' },
+    { name: '执行结果：', value: current.sampler.success ? '成功' : '失败' },
+    { name: '开始时间：', value: current.sampler.startTime || '-' },
+    { name: '结束时间：', value: current.sampler.endTime || '-' },
+    { name: '耗时：', value: `${current.sampler.elapsedTime}ms` || '-' }
+  ]
+})
+const requestHeaders = computed(() => {
+  if (!current.sampler.requestHeaders) return []
 
-  data() {
-    return {
-      activeTabName: 'SUMMARY',
-      showingSampler: {}
-    }
-  },
+  const data = []
+  Object.keys(current.sampler.requestHeaders).forEach((key) => {
+    data.push({
+      name: key,
+      value: current.sampler.requestHeaders[key]
+    })
+  })
+  return data
+})
+const responseHeaders = computed(() => {
+  if (!current.sampler.responseHeaders) return []
 
-  computed: {
-    showing() {
-      return Object.keys(this.showingSampler).length > 0
-    },
-    showSamplerSummary() {
-      return this.activeTabName === 'SUMMARY'
-    },
-    showRequestHeaders() {
-      return this.activeTabName === 'REQUEST_HEADERS'
-    },
-    showRequestCode() {
-      return this.activeTabName === 'REQUEST'
-    },
-    showResponseHeaders() {
-      return this.activeTabName === 'RESPONSE_HEADERS'
-    },
-    showResponseCode() {
-      return this.activeTabName === 'RESPONSE'
-    },
-    showAssertionCode() {
-      return this.activeTabName === 'ASSERTION'
-    },
-    samplerSummary() {
-      return [
-        { name: '名称：', value: this.showingSampler.name || '-' },
-        { name: '描述：', value: this.showingSampler.remark || '-' },
-        { name: '请求地址：', value: this.showingSampler.url || '-' },
-        { name: '响应码：', value: this.showingSampler.responseCode || '-' },
-        { name: '响应信息：', value: this.showingSampler.responseMessage || '-' },
-        { name: '执行结果：', value: this.showingSampler.success ? '成功' : '失败' },
-        { name: '开始时间：', value: this.showingSampler.startTime || '-' },
-        { name: '结束时间：', value: this.showingSampler.endTime || '-' },
-        { name: '耗时：', value: `${this.showingSampler.elapsedTime  }ms` || '-' }
-      ]
-    },
-    requestHeaders() {
-      if (!this.showingSampler.requestHeaders) return []
+  const data = []
+  Object.keys(current.sampler.responseHeaders).forEach((key) => {
+    data.push({
+      name: key,
+      value: current.sampler.responseHeaders[key]
+    })
+  })
+  return data
+})
 
-      const data = []
-      Object.keys(this.showingSampler.requestHeaders).forEach((key) => {
-        data.push({
-          name: key,
-          value: this.showingSampler.requestHeaders[key]
-        })
-      })
-      return data
-    },
-    responseHeaders() {
-      if (!this.showingSampler.responseHeaders) return []
+const handleNodeClick = (data, node) => {
+  if (node.level === 1) return
+  current.sampler = data
 
-      const data = []
-      Object.keys(this.showingSampler.responseHeaders).forEach((key) => {
-        data.push({
-          name: key,
-          value: this.showingSampler.responseHeaders[key]
-        })
-      })
-      return data
-    }
-  },
-
-  methods: {
-    handleNodeClick(data, node) {
-      if (node.level === 1) return
-      this.showingSampler = data
-
-      if (this.activeTabName === 'REQUEST') {
-        this.setRequestCode(data.request)
-        return
-      }
-      if (this.activeTabName === 'RESPONSE') {
-        this.setResponseCode(data.response)
-        return
-      }
-      if (this.activeTabName === 'ASSERTION') {
-        this.setFailedAssertionCode(data.failedAssertion?.message)
-        return
-      }
-    },
-    handleTabClick(tab) {
-      if (tab.name === 'REQUEST') {
-        this.setRequestCode(this.showingSampler.request)
-        return
-      }
-      if (tab.name === 'RESPONSE') {
-        this.setResponseCode(this.showingSampler.response)
-        return
-      }
-      if (tab.name === 'ASSERTION') {
-        this.setFailedAssertionCode(this.showingSampler.failedAssertion?.message)
-        return
-      }
-    },
-    setRequestCode(code) {
-      this.$nextTick(() => {
-        this.$refs.requestEditor && this.$refs.requestEditor.setValue(code)
-      })
-    },
-    setResponseCode(code) {
-      this.$nextTick(() => {
-        if (!this.$refs.responseEditor) return
-        this.$refs.responseEditor.setValue(code)
-        this.$refs.responseEditor.formatDocument()
-      })
-    },
-    setFailedAssertionCode(code) {
-      this.$nextTick(() => {
-        if (!code || code === '' || code.length === 0) return
-        this.$refs.assertionEditor && this.$refs.assertionEditor.setValue(code)
-      })
-    }
+  if (activeTabName.value === 'REQUEST') {
+    setRequestCode(data.request)
+    return
   }
+  if (activeTabName.value === 'RESPONSE') {
+    setResponseCode(data.response)
+    return
+  }
+  if (activeTabName.value === 'ASSERTION') {
+    setFailedAssertionCode(data.failedAssertion?.message)
+    return
+  }
+}
+const handleTabClick = (tab) => {
+  if (tab.name === 'REQUEST') {
+    setRequestCode(current.sampler.request)
+    return
+  }
+  if (tab.name === 'RESPONSE') {
+    setResponseCode(current.sampler.response)
+    return
+  }
+  if (tab.name === 'ASSERTION') {
+    setFailedAssertionCode(current.sampler.failedAssertion?.message)
+    return
+  }
+}
+const setRequestCode = (code) => {
+  nextTick(() => {
+    requestEditorRef.value && requestEditorRef.value.setValue(code)
+  })
+}
+const setResponseCode = (code) => {
+  nextTick(() => {
+    if (!responseEditorRef.value) return
+    responseEditorRef.value.setValue(code)
+    responseEditorRef.value.formatDocument()
+  })
+}
+const setFailedAssertionCode = (code) => {
+  nextTick(() => {
+    if (!code || code === '' || code.length === 0) return
+    assertionEditorRef.value && assertionEditorRef.value.setValue(code)
+  })
 }
 </script>
 

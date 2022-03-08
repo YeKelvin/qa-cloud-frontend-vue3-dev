@@ -24,8 +24,8 @@
           </span>
         </div>
         <!-- 成功或失败的图标  -->
-        <svg-icon v-if="collection.success" icon-class="pass" class="stauts-svg-icon" />
-        <svg-icon v-else icon-class="failure" class="stauts-svg-icon" />
+        <SvgIcon v-if="collection.success" icon-class="pass" class="stauts-svg-icon" />
+        <SvgIcon v-else icon-class="failure" class="stauts-svg-icon" />
       </div>
     </el-card>
   </div>

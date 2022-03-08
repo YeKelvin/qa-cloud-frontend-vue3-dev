@@ -14,7 +14,7 @@
       </div>
 
       <el-form-item prop="loginName">
-        <span class="svg-container"><svg-icon icon-name="login-user" /></span>
+        <span class="svg-container"><SvgIcon icon-name="login-user" /></span>
         <el-input
           ref="loginName"
           v-model="loginForm.loginName"
@@ -27,7 +27,7 @@
       </el-form-item>
 
       <el-form-item prop="password">
-        <span class="svg-container"><svg-icon icon-name="login-password" /></span>
+        <span class="svg-container"><SvgIcon icon-name="login-password" /></span>
         <el-input
           ref="password"
           :key="passwordType"
@@ -40,7 +40,7 @@
           @keyup.enter="handleLogin"
         />
         <span class="show-pwd" @click="showPwd">
-          <svg-icon :icon-name="passwordType === 'password' ? 'login-eye' : 'login-eye-open'" />
+          <SvgIcon :icon-name="passwordType === 'password' ? 'login-eye' : 'login-eye-open'" />
         </span>
       </el-form-item>
 
