@@ -95,7 +95,7 @@
         <http-form-table v-if="bodyMode == 'x-www-form-urlencoded'" :data="formItems" :edit-mode="editMode" />
 
         <!-- 代码编辑器 -->
-        <monaco-editor
+        <MonacoEditor
           v-if="bodyMode == 'raw' || bodyMode == 'custom'"
           ref="bodyCodeEditor"
           key="bodyCodeEditor"
@@ -170,7 +170,7 @@
             <el-tag size="small" style="margin-right: 10px">sampler</el-tag>
           </el-descriptions-item>
         </el-descriptions>
-        <monaco-editor ref="preCodeEditor" key="preCodeEditor" v-model="preCode" :read-only="queryMode" />
+        <MonacoEditor ref="preCodeEditor" key="preCodeEditor" v-model="preCode" :read-only="queryMode" />
       </div>
 
       <!-- 测试脚本 -->
@@ -191,7 +191,7 @@
             <el-tag size="small" style="margin-right: 10px">stop_test_now</el-tag>
           </el-descriptions-item>
         </el-descriptions>
-        <monaco-editor ref="testsCodeEditor" key="testsCodeEditor" v-model="testsCode" :read-only="queryMode" />
+        <MonacoEditor ref="testsCodeEditor" key="testsCodeEditor" v-model="testsCode" :read-only="queryMode" />
       </div>
 
       <!-- 操作按钮 -->

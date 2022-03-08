@@ -30,7 +30,7 @@
       </el-tab-pane>
       <!-- 请求体 -->
       <el-tab-pane key="DATA" label="请求数据" name="DATA">
-        <monaco-editor
+        <MonacoEditor
           ref="requestEditor"
           key="requestEditor"
           :read-only="true"
@@ -51,7 +51,7 @@
       </el-tab-pane>
       <!-- 响应体 -->
       <el-tab-pane key="DATA" label="响应数据" name="DATA">
-        <monaco-editor
+        <MonacoEditor
           ref="responseEditor"
           key="responseEditor"
           :read-only="true"
@@ -61,7 +61,7 @@
       </el-tab-pane>
       <!-- 断言 -->
       <el-tab-pane v-if="details.failedAssertion" key="ASSERTION" label="断言" name="ASSERTION">
-        <monaco-editor
+        <MonacoEditor
           ref="assertionEditor"
           key="assertionEditor"
           :read-only="true"
@@ -75,7 +75,7 @@
 
 <script>
 import * as ReportService from '@/api/script/report'
-import MonacoEditor from '@/components/MonacoEditor'
+import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
 export default {
   name: 'SamplerResultDetails',

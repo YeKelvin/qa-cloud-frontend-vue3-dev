@@ -1,123 +1,97 @@
 <template>
   <el-card shadow="hover">
     <el-badge is-dot :hidden="resultsReaded">
-      <el-button size="small" type="primary" plain @click="showResultDrawer = !showResultDrawer">响应结果</el-button>
+      <el-button type="primary" plain @click="showResultDrawer = !showResultDrawer">响应结果</el-button>
     </el-badge>
 
-    <el-button size="small" style="margin-left: 20px" type="primary" plain @click="showLogDrawer = !showLogDrawer">
-      运行日志
-    </el-button>
+    <el-button type="primary" plain @click="showLogDrawer = !showLogDrawer">运行日志</el-button>
 
     <ResultDrawer
-      v-model="results"
-      v-model:visible="showResultDrawer"
+      v-model="showResultDrawer"
+      v-model:data="results"
       @open="resultsReaded = true"
-      @closed="resultsReaded = true"
+      @close="resultsReaded = true"
     />
 
-    <LogDrawer v-model="logs" v-model:visible="showLogDrawer" />
+    <LogDrawer v-model="showLogDrawer" v-model:data="logs" />
   </el-card>
 </template>
 
 <script setup>
+import { ref, onBeforeMount, onBeforeUnmount } from 'vue'
+import { ElNotification } from 'element-plus'
 import ResultDrawer from './result/ResultDrawer.vue'
 import LogDrawer from './log/LogDrawer.vue'
-</script>
+import usePyMeterState from '@/pymeter/composables/usePyMeterState'
+import useSocket from '@/composables/useSocket'
+import useSocketIO from '@/composables/useSocketIO'
 
-<script>
-export default {
-  name: 'EditorFooter',
+const socket = useSocket()
+const socketio = useSocketIO()
 
-  data() {
-    return {
-      results: [],
-      resultsReaded: true,
-      logs: [],
-      logsReaded: true
+const results = ref([])
+const resultsReaded = ref(true)
+const logs = ref([])
+const logsReaded = ref(true)
+
+const { showResultDrawer, showLogDrawer } = usePyMeterState()
+
+onBeforeMount(() => {
+  socket.on('pymeter_result_summary', (data) => {
+    const result = results.value.find((result) => result.id === data.resultId)
+    if (result) {
+      Object.assign(result, data.result)
+    } else {
+      results.value.push(data.result)
     }
-  },
+  })
+  socket.on('pymeter_group_result', (data) => {
+    const result = results.value.find((result) => result.id === data.resultId)
+    if (!result) return
 
-  computed: {
-    showResultDrawer: {
-      get() {
-        return this.$store.state.pymeter.showResultDrawer
-      },
-      set(val) {
-        this.$store.commit('pymeter/setShowResultDrawer', val)
-      }
-    },
-    showLogDrawer: {
-      get() {
-        return this.$store.state.pymeter.showLogDrawer
-      },
-      set(val) {
-        this.$store.commit('pymeter/setShowLogDrawer', val)
-      }
+    const group = result.details.find((group) => group.id === data.groupId)
+    if (group) {
+      Object.assign(group, data.group)
+    } else {
+      result.details.push(data.group)
     }
-  },
+  })
+  socket.on('pymeter_sampler_result', (data) => {
+    const result = results.value.find((result) => result.id === data.resultId)
+    if (!result) return
 
-  beforeUnmount() {
-    this.sockets.unsubscribe('pymeter_result_summary')
-    this.sockets.unsubscribe('pymeter_group_result')
-    this.sockets.unsubscribe('pymeter_sampler_result')
-    this.sockets.unsubscribe('pymeter_message')
-    this.sockets.unsubscribe('pymeter_log')
-    this.sockets.unsubscribe('pymeter_completed')
-    this.sockets.unsubscribe('pymeter_error')
-    this.$socket.close()
-  },
+    const group = result.details.find((group) => group.id === data.groupId)
+    if (!group) return
 
-  methods: {},
+    group.children.push(data.sampler)
+    resultsReaded.value = false
+  })
+  socket.on('pymeter_message', (data) => {
+    ElNotification({ message: data, type: 'success', duration: 1 * 1000 })
+  })
+  socket.on('pymeter_log', (data) => {
+    logs.value.push(data)
+  })
+  socket.on('pymeter_completed', () => {
+    ElNotification({ message: '脚本执行完毕', type: 'success', duration: 2 * 1000 })
+    socketio.disconnect()
+  })
+  socket.on('pymeter_error', (data) => {
+    ElNotification({ message: data, type: 'error', duration: 2 * 1000 })
+    socketio.disconnect()
+  })
+})
 
-  sockets: {
-    pymeter_result_summary(data) {
-      const result = this.results.find((result) => result.id === data.resultId)
-      if (result) {
-        Object.assign(result, data.result)
-      } else {
-        this.results.push(data.result)
-      }
-    },
-    pymeter_group_result(data) {
-      const result = this.results.find((result) => result.id === data.resultId)
-      if (!result) return
-
-      const group = result.details.find((group) => group.id === data.groupId)
-      if (group) {
-        Object.assign(group, data.group)
-      } else {
-        result.details.push(data.group)
-      }
-    },
-    pymeter_sampler_result(data) {
-      const result = this.results.find((result) => result.id === data.resultId)
-      if (!result) return
-
-      const group = result.details.find((group) => group.id === data.groupId)
-      if (!group) return
-
-      group.children.push(data.sampler)
-      this.resultsReaded = false
-    },
-    pymeter_message(data) {
-      this.$notify({ message: data, type: 'success', duration: 1 * 1000 })
-    },
-    pymeter_log(data) {
-      this.logs.push(data)
-    },
-    pymeter_completed() {
-      this.$notify({ message: '脚本执行完毕', type: 'success', duration: 2 * 1000 })
-      this.$socket.close()
-    },
-    pymeter_error(data) {
-      this.$notify({ message: data, type: 'error', duration: 2 * 1000 })
-      this.$socket.close()
-    }
-    // this.$soketio.on('new-message', (data) => {
-    //   this.messages.push(data);
-    // })
-  }
-}
+onBeforeUnmount(() => {
+  socket.off('pymeter_result_summary')
+  socket.off('pymeter_group_result')
+  socket.off('pymeter_sampler_result')
+  socket.off('pymeter_message')
+  socket.off('pymeter_log')
+  socket.off('pymeter_completed')
+  socket.off('pymeter_error')
+  socketio.disconnect()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -136,5 +110,9 @@ export default {
   width: 12px;
   right: 8px;
   top: 2px;
+}
+
+.el-button {
+  margin-right: 20px;
 }
 </style>

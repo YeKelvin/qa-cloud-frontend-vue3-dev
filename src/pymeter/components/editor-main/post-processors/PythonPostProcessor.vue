@@ -33,7 +33,7 @@
       </el-form-item>
 
       <!-- 元素脚本 -->
-      <monaco-editor
+      <MonacoEditor
         ref="codeEditor"
         v-model="elementInfo.property.PythonPostProcessor__script"
         :read-only="queryMode"

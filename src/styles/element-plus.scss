@@ -1,0 +1,24 @@
+.pymeter-footer-log-drawer {
+  --el-drawer-padding-primary: none !important;
+
+  .el-drawer__header {
+    margin-bottom: 0 !important;
+  }
+
+  .el-drawer__body {
+    overflow: hidden !important;
+  }
+}
+
+.pymeter-footer-result-drawer {
+  --el-drawer-padding-primary: none !important;
+
+  .el-drawer__header {
+    margin-bottom: 0 !important;
+    padding: 0 !important;
+  }
+
+  .el-drawer__body {
+    overflow: hidden !important;
+  }
+}

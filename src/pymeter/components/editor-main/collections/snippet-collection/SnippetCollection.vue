@@ -117,7 +117,7 @@
     </el-dialog>
 
     <el-dialog center title="Json脚本" width="80%" v-model:visible="showJsonScript">
-      <monaco-editor ref="jsonEditor" language="json" style="height: 300px" :read-only="true" />
+      <MonacoEditor ref="jsonEditor" language="json" style="height: 300px" :read-only="true" />
     </el-dialog>
   </div>
 </template>

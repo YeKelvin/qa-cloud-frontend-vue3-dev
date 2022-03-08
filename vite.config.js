@@ -1,9 +1,8 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import jsx from '@vitejs/plugin-vue-jsx'
-// import legacy from '@vitejs/plugin-legacy'
 import SvgIcons from 'vite-plugin-svg-icons'
-// import AutoImport from 'unplugin-auto-import/vite'
+import AutoImport from 'unplugin-auto-import/vite'
 import path from 'path'
 
 export default () =>
@@ -21,10 +20,14 @@ export default () =>
     plugins: [
       vue(),
       jsx(),
-      // legacy({
-      //   targets: ['ie >= 11'],
-      //   additionalLegacyPolyfills: ['regenerator-runtime/runtime']
-      // }),
+      AutoImport({
+        imports: ['vue', 'vuex', 'vue-router'],
+        eslintrc: {
+          enabled: true,
+          filepath: './.eslintrc-auto-import.json',
+          globalsPropValue: true
+        }
+      }),
       SvgIcons({
         iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
         symbolId: 'icon-[dir]-[name]'

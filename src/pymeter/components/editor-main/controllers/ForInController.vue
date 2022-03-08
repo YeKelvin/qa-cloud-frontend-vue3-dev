@@ -55,7 +55,7 @@
       </el-form-item>
 
       <el-form-item v-else label="遍历代码：" prop="property.ForInController__statements">
-        <monaco-editor
+        <MonacoEditor
           ref="codeEditor"
           v-model="elementInfo.property.ForInController__statements"
           style="height:100px;"

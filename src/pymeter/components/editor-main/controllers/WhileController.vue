@@ -52,7 +52,7 @@
 
       <!-- while条件 -->
       <el-form-item label="while条件：" prop="property.WhileController__condition">
-        <monaco-editor ref="codeEditor" :read-only="queryMode" style="height:100px;" />
+        <MonacoEditor ref="codeEditor" :read-only="queryMode" style="height:100px;" />
       </el-form-item>
 
       <!-- 操作按钮 -->

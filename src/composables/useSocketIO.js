@@ -21,7 +21,7 @@ export default function useSocketIO() {
   /**
    * 连接
    */
-  const socketConnect = () => {
+  const connect = () => {
     setAuthorization()
     if (socket.disconnected) socket.open()
   }
@@ -29,14 +29,14 @@ export default function useSocketIO() {
   /**
    * 断开连接
    */
-  const socketDisconnect = () => {
+  const disconnect = () => {
     if (socket.connected) socket.close()
   }
 
   /**
    * 连接并返回 sid
    */
-  const getSID = (timeout = 2000) => {
+  const getId = (timeout = 2000) => {
     let timeoutId = null
     let intervalId = null
 
@@ -59,8 +59,8 @@ export default function useSocketIO() {
   }
 
   return {
-    socketConnect,
-    socketDisconnect,
-    getSID
+    connect,
+    disconnect,
+    getId
   }
 }

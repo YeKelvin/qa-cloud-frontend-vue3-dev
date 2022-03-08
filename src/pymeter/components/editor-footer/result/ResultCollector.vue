@@ -74,7 +74,7 @@
 
       <!-- 请求体 -->
       <template v-if="showing && showRequestCode">
-        <monaco-editor ref="requestEditor" key="requestCode" :read-only="true" language="json" />
+        <MonacoEditor ref="requestEditor" key="requestCode" :read-only="true" language="json" />
       </template>
 
       <!-- 响应头部 -->
@@ -89,19 +89,19 @@
 
       <!-- 响应体 -->
       <template v-if="showing && showResponseCode">
-        <monaco-editor ref="responseEditor" key="responseCode" :read-only="true" language="json" />
+        <MonacoEditor ref="responseEditor" key="responseCode" :read-only="true" language="json" />
       </template>
 
       <!-- 失败断言 -->
       <template v-if="showing && showAssertionCode">
-        <monaco-editor ref="assertionEditor" key="assertionCode" :read-only="true" language="python" />
+        <MonacoEditor ref="assertionEditor" key="assertionCode" :read-only="true" language="python" />
       </template>
     </el-card>
   </div>
 </template>
 
 <script>
-import MonacoEditor from '@/components/MonacoEditor'
+import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
 export default {
   name: 'ResultCollector',

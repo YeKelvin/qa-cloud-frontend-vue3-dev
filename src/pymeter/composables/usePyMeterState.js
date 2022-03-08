@@ -20,6 +20,23 @@ export default function usePyMeterState() {
   const selectedDatasetNumberList = computed(() => store.state.pymeter.selectedDatasetNumberList)
   const useCurrentValue = computed(() => store.state.pymeter.useCurrentValue)
 
+  const showResultDrawer = computed({
+    get() {
+      return store.state.pymeter.showResultDrawer
+    },
+    set(val) {
+      store.commit('pymeter/setShowResultDrawer', val)
+    }
+  })
+  const showLogDrawer = computed({
+    get() {
+      return store.state.pymeter.showLogDrawer
+    },
+    set(val) {
+      store.commit('pymeter/setShowLogDrawer', val)
+    }
+  })
+
   return {
     refreshElementTree,
     globalDatasetList,
@@ -28,6 +45,8 @@ export default function usePyMeterState() {
     datasetList,
     httpHeaderTemplateList,
     selectedDatasetNumberList,
-    useCurrentValue
+    useCurrentValue,
+    showResultDrawer,
+    showLogDrawer
   }
 }

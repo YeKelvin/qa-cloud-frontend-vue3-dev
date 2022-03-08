@@ -1,65 +1,54 @@
 <template>
-  <el-drawer
-    direction="btt"
-    size="50%"
-    :show-close="false"
-    v-bind="$attrs"
+  <el-drawer direction="btt" size="50%" custom-class="pymeter-footer-log-drawer" :show-close="false">
+    <template #title>
+      <span class="drawer-title">
+        <span>执行日志</span>
+        <el-button type="danger" :icon="Delete" circle plain @click="clean()" />
+      </span>
+    </template>
 
-  >
-    <span slot="title" class="drawer-title">
-      <span>执行日志</span>
-      <el-button type="danger" icon="el-icon-delete" size="small" circle plain @click="clean()" />
-    </span>
-
-    <monaco-editor ref="logEditor" key="logCode" language="log" :read-only="true" />
+    <MonacoEditor ref="logEditorRef" key="logCode" language="log" :read-only="true" />
   </el-drawer>
 </template>
 
-<script>
-import MonacoEditor from '@/components/MonacoEditor'
+<script setup>
+import { ref, computed, watch, useAttrs, nextTick } from 'vue'
+import { useStore } from 'vuex'
+import { Delete } from '@element-plus/icons-vue'
+import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
-export default {
+const emit = defineEmits(['update:data'])
+const props = defineProps({
+  data: Array
+})
+const attrs = useAttrs()
+const store = useStore()
+const logEditorRef = ref()
+const visible = ref(attrs.modelValue)
 
-  name: 'LogDrawer',
-
-  components: { MonacoEditor },
-
-  data() {
-    return {
-    }
+const logs = computed({
+  get() {
+    return props.data
   },
-
-  computed: {
-    logs: {
-      get() {
-        return this.$attrs.value
-      },
-      set(val) {
-        this.$emit('input', val)
-      }
-    }
-  },
-
-  watch: {
-    '$attrs.visible'(val) {
-      if (!val) return
-      this.$nextTick(() => {
-        this.$refs.logEditor && this.$refs.logEditor.setValue(this.logs.join(''))
-      })
-    },
-    logs(val) {
-      if (!this.$attrs.visible) return
-      this.$refs.logEditor && this.$refs.logEditor.setValue(val.join(''))
-    }
-  },
-
-  methods: {
-    clean() {
-      this.logs = []
-      this.$refs.logEditor && this.$refs.logEditor.setValue('')
-      this.$store.commit('pymeter/closeLogDrawer')
-    }
+  set(val) {
+    emit('update:data', val)
   }
+})
+watch(logs, () => {
+  if (!visible.value) return
+  logEditorRef.value && logEditorRef.value.setValue(logs.value.join(''))
+})
+watch(visible, () => {
+  if (!visible.value) return
+  nextTick(() => {
+    logEditorRef.value && logEditorRef.value.setValue(logs.value.join(''))
+  })
+})
+
+const clean = () => {
+  logs.value = []
+  logEditorRef.value && logEditorRef.value.setValue('')
+  store.commit('pymeter/closeLogDrawer')
 }
 </script>
 
@@ -72,10 +61,5 @@ export default {
 
   padding: 10px 10px 0 10px;
   margin-bottom: 10px;
-}
-
-:deep(.el-drawer__header) {
-  margin-bottom: 0;
-  padding: 0;
 }
 </style>

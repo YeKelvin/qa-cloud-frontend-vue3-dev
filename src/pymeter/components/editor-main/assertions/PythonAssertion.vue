@@ -39,7 +39,7 @@
       </el-form-item>
 
       <!-- 元素脚本 -->
-      <monaco-editor ref="codeEditor" v-model="elementInfo.property.PythonAssertion__script" :read-only="queryMode" />
+      <MonacoEditor ref="codeEditor" v-model="elementInfo.property.PythonAssertion__script" :read-only="queryMode" />
 
       <!-- 操作按钮 -->
       <el-form-item v-if="queryMode">

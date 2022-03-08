@@ -103,7 +103,7 @@
     </el-form>
 
     <el-dialog v-model="showJsonScript" center title="Json脚本" width="80%">
-      <monaco-editor ref="jsonEditor" language="json" style="height: 300px" :read-only="true" />
+      <MonacoEditor ref="jsonEditor" language="json" style="height: 300px" :read-only="true" />
     </el-dialog>
   </div>
 </template>
@@ -113,11 +113,13 @@ import { Check, Close, Edit, Pointer } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
 import editorProps from '@/pymeter/composables/editor.props'
 import useEditor from '@/pymeter/composables/useEditor'
+import useRunnableElement from '@/pymeter/composables/useRunnableElement'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
 const props = defineProps(editorProps)
 const { editorNo, editorMode, metadata, queryMode, modifyMode, createMode, editNow, setReadonly, updateTab, closeTab } =
   useEditor(props)
+const { executeGroup } = useRunnableElement(editorNo.value)
 </script>
 
 <script>
