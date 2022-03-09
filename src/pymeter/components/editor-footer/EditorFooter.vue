@@ -28,12 +28,10 @@ import useSocketIO from '@/composables/useSocketIO'
 
 const socket = useSocket()
 const socketio = useSocketIO()
-
 const results = ref([])
 const resultsReaded = ref(true)
 const logs = ref([])
 const logsReaded = ref(true)
-
 const { showResultDrawer, showLogDrawer } = usePyMeterState()
 
 onBeforeMount(() => {

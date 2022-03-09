@@ -29,46 +29,37 @@
 </template>
 
 <script setup>
+import { useStore } from 'vuex'
 import { Plus } from '@element-plus/icons-vue'
 import DatasetTree from './DatasetTree'
-</script>
 
-<script>
-export default {
-  name: 'DatasetSide',
-  data() {
-    return {
-      // 关键字
-      filterText: ''
-    }
-  },
+const store = useStore()
+const filterText = ref('')
 
-  methods: {
-    openNewEnvironmentTab() {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_ENVIRONMENT_DATASET',
-        editorName: 'New Environment',
-        editorComponent: 'VariableDataset',
-        editorMode: 'CREATE',
-        metadata: {
-          datasetType: 'ENVIRONMENT'
-        }
-      })
-    },
-    openNewCustomTab() {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_CUSTOM_DATASET',
-        editorName: 'New Custom',
-        editorComponent: 'VariableDataset',
-        editorMode: 'CREATE',
-        metadata: {
-          datasetType: 'CUSTOM'
-        }
-      })
+const openNewEnvironmentTab = () => {
+  store.commit({
+    type: 'pymeter/addTab',
+    editorNo: 'UNSAVED_ENVIRONMENT_DATASET',
+    editorName: 'New Environment',
+    editorComponent: 'VariableDataset',
+    editorMode: 'CREATE',
+    metadata: {
+      datasetType: 'ENVIRONMENT'
     }
-  }
+  })
+}
+
+const openNewCustomTab = () => {
+  store.commit({
+    type: 'pymeter/addTab',
+    editorNo: 'UNSAVED_CUSTOM_DATASET',
+    editorName: 'New Custom',
+    editorComponent: 'VariableDataset',
+    editorMode: 'CREATE',
+    metadata: {
+      datasetType: 'CUSTOM'
+    }
+  })
 }
 </script>
 

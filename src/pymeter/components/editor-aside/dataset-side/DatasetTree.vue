@@ -55,7 +55,7 @@ import * as VariablesService from '@/api/script/variables'
 import useElTree from '@/composables/useElTree'
 import useWorkspaceState from '@/composables/useWorkspaceState'
 import usePyMeterState from '@/pymeter/composables/usePyMeterState'
-import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceList.vue'
+import WorkspaceTree from '@/pymeter/components/editor-aside/common/WorkspaceTree.vue'
 
 const { eltreeRef, hoveredNode, mouseenter, mouseleave, visibleChange } = useElTree()
 const { datasetList } = usePyMeterState()
@@ -126,7 +126,7 @@ export default {
       const error = await this.$confirm(null, {
         title: '请选择工作空间',
         message: (
-          <WorkspaceList
+          <WorkspaceTree
             key={datasetNo}
             data={this.workspaceList}
             onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
@@ -153,7 +153,7 @@ export default {
       const error = await this.$confirm(null, {
         title: '请选择工作空间',
         message: (
-          <WorkspaceList
+          <WorkspaceTree
             key={datasetNo}
             data={this.workspaceList}
             onNodeClick={(data) => (workspaceNo = data.workspaceNo)}

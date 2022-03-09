@@ -18,31 +18,21 @@
 </template>
 
 <script setup>
+import { useStore } from 'vuex'
 import { Plus } from '@element-plus/icons-vue'
 import HttpheaderTemplateTree from './HttpheaderTemplateTree.vue'
-</script>
 
-<script>
-export default {
-  name: 'HttpHeadersAside',
-  data() {
-    return {
-      // 关键字
-      filterText: ''
-    }
-  },
+const store = useStore()
+const filterText = ref('')
 
-  methods: {
-    openNewTemplateTab() {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_HTTP_HEADERS_TEMPLATE',
-        editorName: 'New Template',
-        editorComponent: 'HttpHeadersTemplate',
-        editorMode: 'CREATE'
-      })
-    }
-  }
+const openNewTemplateTab = () => {
+  store.commit({
+    type: 'pymeter/addTab',
+    editorNo: 'UNSAVED_HTTP_HEADERS_TEMPLATE',
+    editorName: 'New Template',
+    editorComponent: 'HttpHeadersTemplate',
+    editorMode: 'CREATE'
+  })
 }
 </script>
 

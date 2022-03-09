@@ -78,7 +78,7 @@ import { More } from '@element-plus/icons-vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import * as ElementService from '@/api/script/element'
 import useWorkspaceState from '@/composables/useWorkspaceState'
-import WorkspaceList from '@/pymeter/components/editor-aside/common/WorkspaceList.vue'
+import WorkspaceTree from '@/pymeter/components/editor-aside/common/WorkspaceTree.vue'
 
 const props = defineProps({
   node: Object
@@ -422,7 +422,7 @@ const copyElementToWorkspace = async ({ elementNo }) => {
   const error = await ElMessageBox.confirm(null, {
     title: '请选择工作空间',
     message: (
-      <WorkspaceList
+      <WorkspaceTree
         key={elementNo}
         data={this.workspaceList}
         onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
@@ -449,7 +449,7 @@ const moveElementToWorkspace = async ({ elementNo }) => {
   const error = await ElMessageBox.confirm(null, {
     title: '请选择工作空间',
     message: (
-      <WorkspaceList
+      <WorkspaceTree
         key={elementNo}
         data={this.workspaceList}
         onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
