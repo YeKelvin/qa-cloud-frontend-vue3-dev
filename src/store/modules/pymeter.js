@@ -57,7 +57,9 @@ const mutations = {
    * 缓存组件实例，用于手动销毁 keep-alive 缓存
    */
   cacheInstance: (state, instance) => {
-    state.cachedInstance[instance.editorNo] = instance
+    console.log('instance=', instance)
+    console.log('cache=', instance.proxy.$parent.$parent.$.__v_cache)
+    state.cachedInstance[instance.proxy.editorNo] = instance
   },
 
   /**
