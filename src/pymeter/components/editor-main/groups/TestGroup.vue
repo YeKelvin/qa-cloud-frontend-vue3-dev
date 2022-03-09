@@ -78,8 +78,8 @@
           split-button
           trigger="click"
           type="danger"
+          placement="bottom"
           style="margin-left: 10px"
-          placement="bottom-start"
           @click="executeGroup(false)"
         >
           <el-icon><Pointer /></el-icon>
@@ -103,12 +103,14 @@
     </el-form>
 
     <el-dialog v-model="showJsonScript" center title="Json脚本" width="80%">
-      <MonacoEditor ref="jsonEditor" language="json" style="height: 300px" :read-only="true" />
+      <MonacoEditor ref="jsonEditorRef" language="json" style="height: 300px" :read-only="true" />
     </el-dialog>
   </div>
 </template>
 
 <script setup>
+import { isEmpty } from 'lodash-es'
+import { ElMessage } from 'element-plus'
 import { Check, Close, Edit, Pointer } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
 import editorProps from '@/pymeter/composables/editor.props'
@@ -116,196 +118,174 @@ import useEditor from '@/pymeter/composables/useEditor'
 import useRunnableElement from '@/pymeter/composables/useRunnableElement'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
-const props = defineProps(editorProps)
-const { editorNo, editorMode, metadata, queryMode, modifyMode, createMode, editNow, setReadonly, updateTab, closeTab } =
-  useEditor(props)
-const { executeGroup } = useRunnableElement(editorNo.value)
-</script>
-
-<script>
-export default {
-  name: 'GroupEditor',
-
-  data() {
-    const checkLoops = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('循环次数不能为空'))
-      }
-      const val = parseInt(value)
-      if (!Number.isInteger(val)) {
-        return callback(new Error('循环次数必须为整数'))
-      } else {
-        if (val < 1 || val > 999) {
-          return callback(new Error('循环次数仅支持[1-999]'))
-        } else {
-          return callback()
-        }
-      }
-    }
-    return {
-      elementNo: this.editorNo,
-      elementInfo: {
-        elementName: 'Group',
-        elementRemark: '',
-        elementType: 'GROUP',
-        elementClass: 'TestGroup',
-        property: {
-          TestGroup__on_sample_error: 'start_next_coroutine',
-          TestGroup__number_groups: '1',
-          TestGroup__start_interval: '',
-          TestGroup__main_controller: {
-            class: 'LoopController',
-            property: {
-              LoopController__loops: '1',
-              LoopController__continue_forever: false
-            }
-          }
-        }
-      },
-      elementFormRules: {
-        elementName: [{ required: true, message: '元素名称不能为空', trigger: 'blur' }],
-        'property.TestGroup__on_sample_error': [{ required: true, message: '失败时的处理不能为空', trigger: 'blur' }],
-        'property.TestGroup__number_groups': [{ required: true, message: '并发数不能为空', trigger: 'blur' }],
-        'property.TestGroup__main_controller.property.LoopController__loops': [
-          { validator: checkLoops, trigger: 'blur' }
-        ]
-      },
-      activeTabName: 'HTTP',
-      builtIn: [],
-      useHTTPSession: false,
-      httpSessionManager: {
-        elementName: 'BuiltIn HTTPSessionManager',
-        elementRemark: '',
-        elementType: 'CONFIG',
-        elementClass: 'HTTPSessionManager',
-        property: {
-          HTTPSessionManager__clear_each_iteration: 'false'
-        }
-      },
-      showJsonScript: false
-    }
-  },
-
-  computed: {
-    showHttpSettings() {
-      return this.activeTabName === 'HTTP'
-    },
-    hiddenConfigDot() {
-      if (this.useHTTPSession === false) {
-        return true
-      }
-      return false
-    }
-  },
-
-  mounted: function () {
-    // 查询或更新模式时先拉取元素信息
-    if (this.createMode) return
-    // 查询元素
-    ElementService.queryElementInfo({ elementNo: this.elementNo }).then((response) => {
-      this.elementInfo = response.result
-    })
-    // 查询内置元素
-    ElementService.queryElementBuiltins({ elementNo: this.elementNo }).then((response) => {
-      this.builtIn = response.result
-      this.builtIn &&
-        this.builtIn.forEach((item) => {
-          if (item.elementClass === 'HTTPSessionManager') {
-            this.useHTTPSession = item.enabled
-            Object.assign(this.httpSessionManager, item)
-          }
-        })
-    })
-  },
-
-  methods: {
-    /**
-     * 修改元素信息
-     */
-    async modifyGroupElement() {
-      // 表单校验
-      const error = await this.$refs.elformRef
-        .validate()
-        .then(() => false)
-        .catch(() => true)
-      if (error) {
-        this.$message({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
-        return
-      }
-      // 修改元素
-      await ElementService.modifyElement({ elementNo: this.elementNo, ...this.elementInfo })
-      // 更新或新增内置元素
-      await this.submitBuiltIns()
-      // 成功提示
-      this.$message({ message: '修改元素成功', type: 'info', duration: 2 * 1000 })
-      // 修改tab标题
-      this.$store.commit('pymeter/updateTab', { editorNo: this.elementNo, editorName: this.elementInfo.elementName })
-      // 重新查询脚本
-      this.$store.commit('pymeter/refreshElementTreeNow')
-      // 表单设置为只读
-      this.setReadonly()
-    },
-
-    /**
-     * 创建元素
-     */
-    async createGroupElement() {
-      // 表单校验
-      const error = await this.$refs.elformRef
-        .validate()
-        .then(() => false)
-        .catch(() => true)
-      if (error) {
-        this.$message({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
-        return
-      }
-      // 使用内置元素时，更新请求参数
-      if (this.useHTTPSession) {
-        this.elementInfo.builtIn = [this.httpSessionManager]
-      }
-      // 新增元素
-      await ElementService.createElementChildren({
-        rootNo: this.metadata.rootNo,
-        parentNo: this.metadata.parentNo,
-        children: [this.elementInfo]
-      })
-      // 成功提示
-      this.$message({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
-      // 关闭tab
-      this.$store.commit('pymeter/removeTab', { editorNo: 'UNSAVED_GROUP' })
-      // 重新查询脚本
-      this.$store.commit('pymeter/refreshElementTreeNow')
-    },
-
-    /**
-     * 更新或新增内置元素
-     */
-    async submitBuiltIns() {
-      if (this.useHTTPSession) {
-        // 使用 HTTP 会话
-        if (this.builtIn.length > 0) {
-          // 已经存在 HTTPSessionManager 时，直接修改
-          // 修改内置元素
-          await ElementService.modifyElementBuiltins({ children: this.builtIn })
-        } else {
-          // 新增内置元素
-          await ElementService.createElementBuiltins({
-            rootNo: this.metadata.rootNo,
-            parentNo: this.elementNo,
-            children: [this.httpSessionManager]
-          })
-        }
-      } else {
-        // 不使用 HTTP 会话
-        if (this.builtIn.length > 0) {
-          // 已经存在 HTTPSessionManager 时，禁用元素
-          const manager = this.builtIn.find((item) => item.elementClass === 'HTTPSessionManager')
-          manager && (await ElementService.disableElement({ elementNo: manager.elementNo }))
-        }
-      }
+const checkLoops = (_, value, callback) => {
+  if (!value) {
+    return callback(new Error('循环次数不能为空'))
+  }
+  const val = parseInt(value)
+  if (!Number.isInteger(val)) {
+    return callback(new Error('循环次数必须为整数'))
+  } else {
+    if (val < 1 || val > 999) {
+      return callback(new Error('循环次数仅支持[1-999]'))
+    } else {
+      return callback()
     }
   }
 }
+
+const props = defineProps(editorProps)
+const { queryMode, modifyMode, createMode, editNow, setReadonly, updateTabName, closeTab, refreshElementTree } =
+  useEditor(props)
+const elformRef = ref()
+const elementNo = ref(props.editorNo)
+const elementInfo = ref({
+  elementName: 'Group',
+  elementRemark: '',
+  elementType: 'GROUP',
+  elementClass: 'TestGroup',
+  property: {
+    TestGroup__on_sample_error: 'start_next_coroutine',
+    TestGroup__number_groups: '1',
+    TestGroup__start_interval: '',
+    TestGroup__main_controller: {
+      class: 'LoopController',
+      property: {
+        LoopController__loops: '1',
+        LoopController__continue_forever: false
+      }
+    }
+  }
+})
+const elementFormRules = reactive({
+  elementName: [{ required: true, message: '元素名称不能为空', trigger: 'blur' }],
+  'property.TestGroup__on_sample_error': [{ required: true, message: '失败时的处理不能为空', trigger: 'blur' }],
+  'property.TestGroup__number_groups': [{ required: true, message: '并发数不能为空', trigger: 'blur' }],
+  'property.TestGroup__main_controller.property.LoopController__loops': [{ validator: checkLoops, trigger: 'blur' }]
+})
+const activeTabName = ref('HTTP')
+const builtIn = ref([])
+const useHTTPSession = ref(false)
+const httpSessionManager = ref({
+  elementName: 'BuiltIn HTTPSessionManager',
+  elementRemark: '',
+  elementType: 'CONFIG',
+  elementClass: 'HTTPSessionManager',
+  property: {
+    HTTPSessionManager__clear_each_iteration: 'false'
+  }
+})
+const showJsonScript = ref(false)
+const showHttpSettings = computed(() => activeTabName.value === 'HTTP')
+const hiddenConfigDot = computed(() => useHTTPSession.value === false)
+
+onMounted(() => {
+  // 查询或更新模式时，先拉取元素信息
+  if (createMode.value) return
+  // 查询元素
+  ElementService.queryElementInfo({ elementNo: elementNo.value }).then((response) => {
+    elementInfo.value = response.result
+  })
+  // 查询内置元素
+  ElementService.queryElementBuiltins({ elementNo: elementNo.value }).then((response) => {
+    builtIn.value = response.result
+    builtIn.value &&
+      builtIn.value.forEach((item) => {
+        if (item.elementClass === 'HTTPSessionManager') {
+          Object.assign(httpSessionManager.value, item)
+          useHTTPSession.value = item.enabled
+        }
+      })
+  })
+})
+
+/**
+ * 修改元素信息
+ */
+const modifyGroupElement = async () => {
+  // 表单校验
+  const error = await elformRef.value
+    .validate()
+    .then(() => false)
+    .catch(() => true)
+  if (error) {
+    ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 修改元素
+  await ElementService.modifyElement({ elementNo: elementNo.value, ...elementInfo.value })
+  // 更新或新增内置元素
+  await submitBuiltIns()
+  // 成功提示
+  ElMessage({ message: '修改元素成功', type: 'info', duration: 2 * 1000 })
+  // 修改tab标题
+  updateTabName(elementInfo.value.elementName)
+  // 重新查询脚本列表
+  refreshElementTree()
+  // 表单设置为只读
+  setReadonly()
+}
+
+/**
+ * 新增元素
+ */
+const createGroupElement = async () => {
+  // 表单校验
+  const error = await elformRef.value
+    .validate()
+    .then(() => false)
+    .catch(() => true)
+  if (error) {
+    ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 使用内置元素时，更新请求参数
+  if (useHTTPSession.value) {
+    elementInfo.value.builtIn = [httpSessionManager.value]
+  }
+  // 新增元素
+  await ElementService.createElementChildren({
+    rootNo: props.metadata.rootNo,
+    parentNo: props.metadata.parentNo,
+    children: [elementInfo.value]
+  })
+  // 成功提示
+  ElMessage({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
+  // 关闭tab
+  closeTab()
+  // 重新查询脚本列表
+  refreshElementTree()
+}
+
+/**
+ * 更新或新增内置元素
+ */
+const submitBuiltIns = async () => {
+  if (useHTTPSession.value) {
+    // 使用 HTTP 会话
+    if (!isEmpty(builtIn.value)) {
+      // 已经存在 HTTPSessionManager 时，直接修改
+      // 修改内置元素
+      await ElementService.modifyElementBuiltins({ children: builtIn.value })
+    } else {
+      // 新增内置元素
+      await ElementService.createElementBuiltins({
+        rootNo: props.metadata.rootNo,
+        parentNo: elementNo.value,
+        children: [httpSessionManager.value]
+      })
+    }
+  } else {
+    // 不使用 HTTP 会话
+    if (!isEmpty(builtIn.value)) {
+      // 已经存在 HTTPSessionManager 时，禁用元素
+      const manager = builtIn.value.find((item) => item.elementClass === 'HTTPSessionManager')
+      manager && (await ElementService.disableElement({ elementNo: manager.elementNo }))
+    }
+  }
+}
+
+const { executeGroup } = useRunnableElement(props.editorNo)
 </script>
 
 <style lang="scss" scoped>

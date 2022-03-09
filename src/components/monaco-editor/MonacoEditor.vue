@@ -5,19 +5,23 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import monaco from './monaco.base'
 import monacoOptions from './monaco.options'
 
+const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
-  modelValue: { type: String },
   fontSize: { type: Number, default: 14 },
   language: { type: String, required: true },
   readOnly: { type: Boolean, default: false },
   theme: { type: String, default: 'vs' }
 })
-const emit = defineEmits(['update:modelValue'])
 const editorRef = ref()
+
+watch(
+  () => props.readOnly,
+  (val) => instance.updateOptions({ readOnly: val })
+)
 
 let instance
 onMounted(() => {
@@ -37,6 +41,92 @@ onMounted(() => {
 })
 onUnmounted(() => {
   instance && instance.dispose()
+})
+
+/**
+ * 插入内容
+ */
+const insert = (val) => {
+  const position = instance.getPosition()
+  instance.executeEdits('', [
+    {
+      range: {
+        startLineNumber: position.lineNumber,
+        startColumn: position.column,
+        endLineNumber: position.lineNumber,
+        endColumn: position.column
+      },
+      text: val,
+      forceMoveMarkers: true
+    }
+  ])
+}
+
+/**
+ * 设置编辑器内容
+ */
+const setValue = (val) => {
+  instance.setValue(val)
+}
+
+/**
+ * 获取编辑器内容
+ */
+const getValue = () => {
+  return instance.getValue()
+}
+
+/**
+ * 获取选中的内容
+ */
+const getSelection = () => {
+  return instance.getSelection()
+}
+
+/**
+ * 获取光标定位
+ */
+const getCursorPosition = () => {
+  const { column, lineNumber } = instance.getPosition()
+  return { column: column, lineNumber: lineNumber }
+}
+
+/**
+ * 设置光标定位
+ */
+const setCursorPosition = ({ column, lineNumber }) => {
+  instance.setPosition({ column: column, lineNumber: lineNumber })
+}
+
+/**
+ * 激活编辑器
+ */
+const focus = () => {
+  instance.focus()
+}
+
+/**
+ * 格式化代码
+ */
+const formatDocument = () => {
+  if (props.readOnly) {
+    instance.updateOptions({ readOnly: false })
+  }
+  instance
+    .getAction('editor.action.formatDocument')
+    .run()
+    .then(() => instance.updateOptions({ readOnly: props.readOnly }))
+}
+
+defineExpose({
+  insert,
+  setValue,
+  getValue,
+  getSelection,
+  getCursorPosition,
+  setCursorPosition,
+  focus,
+  formatDocument
 })
 </script>
 

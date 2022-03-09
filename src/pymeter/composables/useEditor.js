@@ -27,7 +27,7 @@ export default function useEditor(props) {
   /**
    * 更新 tab
    */
-  const updateTab = (name) => {
+  const updateTabName = (name) => {
     store.commit({
       type: 'pymeter/updateTab',
       editorNo: editorNo.value,
@@ -42,6 +42,20 @@ export default function useEditor(props) {
     store.commit({ type: 'pymeter/removeTab', editorNo: editorNo.value })
   }
 
+  /**
+   * 重新查询集合列表
+   */
+  const refreshCollections = () => {
+    store.commit('pymeter/refreshCollectionsNow')
+  }
+
+  /**
+   * 重新查询脚本列表
+   */
+  const refreshElementTree = () => {
+    store.commit('pymeter/refreshElementTreeNow')
+  }
+
   // pymeter组件创建后缓存其实例，用于关闭组件时销毁keep-alive缓存
   onMounted(() => store.commit('pymeter/cacheInstance', getCurrentInstance()))
 
@@ -54,7 +68,9 @@ export default function useEditor(props) {
     createMode,
     editNow,
     setReadonly,
-    updateTab,
-    closeTab
+    updateTabName,
+    closeTab,
+    refreshCollections,
+    refreshElementTree
   }
 }

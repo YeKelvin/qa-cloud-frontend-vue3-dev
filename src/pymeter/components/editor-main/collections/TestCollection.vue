@@ -1,7 +1,7 @@
 <template>
   <div class="pymeter-component-container">
     <el-form
-      ref="elformVNode"
+      ref="elformRef"
       label-position="right"
       label-width="100px"
       style="width: 100%"
@@ -48,8 +48,8 @@
           split-button
           trigger="click"
           type="danger"
+          placement="bottom"
           style="margin-left: 10px"
-          placement="bottom-start"
           @click="executeCollection()"
         >
           <el-icon><Pointer /></el-icon>
@@ -72,170 +72,129 @@
     </el-form>
 
     <el-dialog v-model="showJsonScript" center title="Json脚本" width="80%">
-      <MonacoEditor ref="jsonEditor" language="json" style="height: 300px" :read-only="true" />
+      <MonacoEditor ref="jsonEditorRef" language="json" style="height: 400px" :read-only="true" />
     </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { mapState } from 'vuex'
+import { isEmpty } from 'lodash-es'
+import { ElMessage } from 'element-plus'
 import { Check, Close, Edit, Pointer } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
 import * as ExecutionService from '@/api/script/execution'
 import editorProps from '@/pymeter/composables/editor.props'
 import useEditor from '@/pymeter/composables/useEditor'
+import useWorkspaceState from '@/composables/useWorkspaceState'
+import usePyMeterState from '@/pymeter/composables/usePyMeterState'
+import useRunnableElement from '@/pymeter/composables/useRunnableElement'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
 const props = defineProps(editorProps)
-const { editorNo, editorMode, metadata, queryMode, modifyMode, createMode, editNow, setReadonly, updateTab, closeTab } =
+const store = useStore()
+const { queryMode, modifyMode, createMode, editNow, setReadonly, updateTabName, closeTab, refreshCollections } =
   useEditor(props)
-</script>
-
-<script>
-export default {
-  name: 'TestCollection',
-  data() {
-    return {
-      elementNo: this.editorNo,
-      elementInfo: {
-        elementName: 'Collection',
-        elementRemark: '',
-        elementType: 'COLLECTION',
-        elementClass: 'TestCollection',
-        property: {
-          TestCollection__serialize_groups: 'true',
-          TestCollection__delay: '0'
-        }
-      },
-      elementFormRules: {
-        elementName: [{ required: true, message: '元素名称不能为空', trigger: 'blur' }]
-      },
-      showJsonScript: false
-    }
-  },
-
-  computed: {
-    ...mapState('workspace', {
-      workspaceNo: (state) => state.workspaceNo
-    }),
-    ...mapState('pymeter', {
-      selectedDatasetNumberList: (state) => state.selectedDatasetNumberList,
-      useCurrentValue: (state) => state.useCurrentValue
-    })
-  },
-
-  mounted: function () {
-    // 查询或更新模式时先拉取元素信息
-    if (this.createMode) return
-    ElementService.queryElementInfo({ elementNo: this.elementNo }).then((response) => {
-      this.elementInfo = response.result
-    })
-  },
-
-  methods: {
-    /**
-     * 修改元素信息
-     */
-    async modifyCollectionElement() {
-      // 表单校验
-      const error = await this.$refs.elformVNode
-        .validate()
-        .then(() => false)
-        .catch(() => true)
-      if (error) {
-        this.$message({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
-        return
-      }
-      // 修改元素
-      await ElementService.modifyElement({ elementNo: this.elementNo, ...this.elementInfo })
-      // 成功提示
-      this.$message({ message: '修改元素成功', type: 'info', duration: 2 * 1000 })
-      // 修改tab标题
-      this.$store.commit('pymeter/updateTab', { editorNo: this.elementNo, editorName: this.elementInfo.elementName })
-      // 重新查询脚本列表
-      this.$store.commit('pymeter/refreshCollectionsNow')
-      // 表单设置为只读
-      this.setReadonly()
-    },
-
-    /**
-     * 创建元素
-     * TODO: workspaceNo非空判断，为空时弹出workspace选择列表
-     */
-    async createCollectionElement() {
-      // 表单校验
-      const error = await this.$refs.elformVNode
-        .validate()
-        .then(() => false)
-        .catch(() => true)
-      if (error) {
-        this.$message({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
-        return
-      }
-      // 新增元素
-      await ElementService.createElement({ workspaceNo: this.workspaceNo, ...this.elementInfo })
-      // 成功提示
-      this.$message({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
-      // 关闭tab
-      this.$store.commit('pymeter/removeTab', { editorNo: 'UNSAVED_COLLECTION' })
-      // 重新查询脚本列表
-      this.$store.commit('pymeter/refreshCollectionsNow')
-    },
-
-    /**
-     * 根据 collectionNo 执行脚本
-     */
-    async executeCollection() {
-      try {
-        // 没有选择变量集时给出提示
-        if (this.selectedDatasetNumberList.length === 0) {
-          await this.$confirm('当前没有选择[环境/变量]，确定执行吗？', '警告', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          })
-        }
-        // 连接 socket
-        this.socketConnect()
-        // 等待获取 sid，后再执行脚本
-        const sid = await this.getSID()
-        // 后端异步执行脚本
-        await ExecutionService.executeCollection({
-          collectionNo: this.elementNo,
-          socketId: sid,
-          variableDataSet: {
-            useCurrentValue: this.useCurrentValue,
-            numberList: this.selectedDatasetNumberList
-          }
-        })
-        // 打开结果面板
-        this.$store.commit('pymeter/openResultDrawer')
-      } catch {
-        // 异常时断开 socket 连接
-        this.socketDisconnect()
-      }
-    },
-
-    /**
-     * 查看 Json 脚本
-     */
-    queryCollectionJson() {
-      ExecutionService.queryCollectionJson({
-        collectionNo: this.elementNo,
-        dataSetNumberList: this.selectedDatasetNumberList,
-        useCurrentValue: this.useCurrentValue
-      }).then((response) => {
-        this.showJsonScript = true
-        this.$nextTick(() => {
-          this.$refs.jsonEditor.setValue(JSON.stringify(response.result))
-          setTimeout(() => {
-            this.$refs.jsonEditor.formatDocument()
-          }, 200)
-        })
-      })
-    }
+const { workspaceNo } = useWorkspaceState()
+const { selectedDatasetNumberList, useCurrentValue } = usePyMeterState()
+const elformRef = ref()
+const elementNo = ref(props.editorNo)
+const elementInfo = ref({
+  elementName: 'Collection',
+  elementRemark: '',
+  elementType: 'COLLECTION',
+  elementClass: 'TestCollection',
+  property: {
+    TestCollection__serialize_groups: 'true',
+    TestCollection__delay: '0'
   }
+})
+const elementFormRules = reactive({
+  elementName: [{ required: true, message: '元素名称不能为空', trigger: 'blur' }]
+})
+const showJsonScript = ref(false)
+const jsonEditorRef = ref()
+
+onMounted(() => {
+  // 查询或更新模式时，先拉取元素信息
+  if (createMode.value) return
+  ElementService.queryElementInfo({ elementNo: elementNo.value }).then((response) => {
+    elementInfo.value = response.result
+  })
+})
+
+/**
+ * 修改元素
+ */
+const modifyCollectionElement = async () => {
+  // 表单校验
+  const error = await elformRef.value
+    .validate()
+    .then(() => false)
+    .catch(() => true)
+  if (error) {
+    ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 修改元素
+  await ElementService.modifyElement({ elementNo: elementNo.value, ...elementInfo.value })
+  // 成功提示
+  ElMessage({ message: '修改元素成功', type: 'info', duration: 2 * 1000 })
+  // 修改tab标题
+  updateTabName(elementInfo.value.elementName)
+  // 重新查询集合列表
+  refreshCollections()
+  // 表单设置为只读
+  setReadonly()
 }
+
+/**
+ * 新增元素
+ */
+const createCollectionElement = async () => {
+  // 工作空间非空校验
+  if (isEmpty(workspaceNo.value)) {
+    ElMessage({ message: '请先选择工作空间', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 表单校验
+  const error = await elformRef.value
+    .validate()
+    .then(() => false)
+    .catch(() => true)
+  if (error) {
+    ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 新增元素
+  await ElementService.createElement({ workspaceNo: workspaceNo.value, ...elementInfo.value })
+  // 成功提示
+  ElMessage({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
+  // 关闭tab
+  closeTab()
+  // 重新查询集合列表
+  refreshCollections()
+}
+
+/**
+ * 查看 Json 脚本
+ */
+const queryCollectionJson = () => {
+  ExecutionService.queryCollectionJson({
+    collectionNo: elementNo.value,
+    dataSetNumberList: selectedDatasetNumberList.value,
+    useCurrentValue: useCurrentValue.value
+  }).then((response) => {
+    showJsonScript.value = true
+    nextTick(() => {
+      jsonEditorRef.value.setValue(JSON.stringify(response.result))
+      setTimeout(() => {
+        jsonEditorRef.value.formatDocument()
+      }, 200)
+    })
+  })
+}
+
+const { executeCollection } = useRunnableElement(elementNo.value)
 </script>
 
 <style lang="scss" scoped></style>

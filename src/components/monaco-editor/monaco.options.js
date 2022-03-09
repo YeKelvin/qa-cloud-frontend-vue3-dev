@@ -13,7 +13,7 @@ const DEFAULT_OPTIONS = {
   'bracketPairColorization.enabled': true,
   // 光标样式
   cursorStyle: 'line',
-  // 开启右键菜单那
+  // 右键菜单
   contextmenu: false,
   // 允许拖拽
   dragAndDrop: true,
@@ -26,8 +26,8 @@ const DEFAULT_OPTIONS = {
   fixedOverflowWidgets: true,
   highlightActiveIndentGuide: true,
   // 显示行号的位数
-  lineNumbersMinChars: 3,
-  // 启用字形边距的渲染，默认为false
+  lineNumbersMinChars: 4,
+  // 启用字形边距的渲染，默认 false
   glyphMargin: true,
   // 括号高亮
   guides: { bracketPairs: 'active' },
@@ -37,16 +37,16 @@ const DEFAULT_OPTIONS = {
   matchBrackets: 'always',
   // 快速建议显示
   quickSuggestions: true,
-  // 快速建议显示延迟（ms），默认为500ms
-  quickSuggestionsDelay: 200,
+  // 快速建议显示延迟（ms），默认 500ms
+  quickSuggestionsDelay: 250,
   // 滚动条大小
   scrollbar: {
     verticalScrollbarSize: 6,
     horizontalScrollbarSize: 6
   },
-  // 单击行号时是否应选择相应的行为，默认为true
+  // 单击行号时是否应选择相应的行为，默认 true
   selectOnLineNumbers: true,
-  // 使用圆角边框渲染编辑器选择，默认为true
+  // 使用圆角边框渲染编辑器选择，默认 true
   roundedSelection: false,
   renderFinalNewline: true,
   renderIndentGuides: true,

@@ -64,8 +64,7 @@ import useEditor from '@/pymeter/composables/useEditor'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
 const props = defineProps(editorProps)
-const { editorNo, editorMode, metadata, queryMode, modifyMode, createMode, editNow, setReadonly, updateTab, closeTab } =
-  useEditor(props)
+const { queryMode, modifyMode, createMode, editNow, setReadonly, updateTab, closeTab } = useEditor(props)
 </script>
 
 <script>
