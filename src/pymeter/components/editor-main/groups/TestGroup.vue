@@ -285,7 +285,7 @@ const submitBuiltIns = async () => {
   }
 }
 
-const { executeGroup } = useRunnableElement(props.editorNo)
+const { executeGroup } = useRunnableElement(elementNo.value)
 </script>
 
 <style lang="scss" scoped>

@@ -1,7 +1,7 @@
 <template>
   <div class="pymeter-component-container">
     <el-form
-      ref="elformVNode"
+      ref="elformRef"
       label-position="right"
       label-width="100px"
       style="width: 100%"
@@ -33,7 +33,7 @@
 
       <!-- 元素脚本 -->
       <MonacoEditor
-        ref="codeEditor"
+        ref="codeEditorRef"
         v-model="elementInfo.property.PythonSampler__script"
         language="python"
         :read-only="queryMode"
@@ -57,6 +57,7 @@
 </template>
 
 <script setup>
+import { ElMessage } from 'element-plus'
 import { Check, Close, Edit } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
 import editorProps from '@/pymeter/composables/editor.props'
@@ -64,92 +65,83 @@ import useEditor from '@/pymeter/composables/useEditor'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
 const props = defineProps(editorProps)
-const { queryMode, modifyMode, createMode, editNow, setReadonly, updateTab, closeTab } = useEditor(props)
-</script>
-
-<script>
-export default {
-  name: 'PythonSampler',
-  data() {
-    return {
-      elementNo: this.editorNo,
-      elementInfo: {
-        elementName: 'Python Sampler',
-        elementRemark: '',
-        elementType: 'SAMPLER',
-        elementClass: 'PythonSampler',
-        property: {
-          PythonSampler__script: ''
-        }
-      },
-      elementFormRules: {
-        elementName: [{ required: true, message: '元素名称不能为空', trigger: 'blur' }]
-      }
-    }
-  },
-
-  mounted: function () {
-    // 查询或更新模式时先拉取元素信息
-    if (this.createMode) return
-    ElementService.queryElementInfo({ elementNo: this.elementNo }).then((response) => {
-      this.elementInfo = response.result
-      this.$refs.codeEditor.setValue(response.result.property.PythonSampler__script)
-    })
-  },
-
-  methods: {
-    /**
-     * 修改元素信息
-     */
-    async modifySamplerElement() {
-      // 表单校验
-      const error = await this.$refs.elformVNode
-        .validate()
-        .then(() => false)
-        .catch(() => true)
-      if (error) {
-        this.$message({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
-        return
-      }
-      // 修改元素
-      await ElementService.modifyElement({ elementNo: this.elementNo, ...this.elementInfo })
-      // 成功提示
-      this.$message({ message: '修改元素成功', type: 'info', duration: 2 * 1000 })
-      // 修改tab标题
-      this.$store.commit('pymeter/updateTab', { editorNo: this.elementNo, editorName: this.elementInfo.elementName })
-      // 重新查询脚本列表
-      this.$store.commit('pymeter/refreshElementTreeNow')
-      // 表单设置为只读
-      this.setReadonly()
-    },
-
-    /**
-     * 创建元素
-     */
-    async createSamplerElement() {
-      // 表单校验
-      const error = await this.$refs.elformVNode
-        .validate()
-        .then(() => false)
-        .catch(() => true)
-      if (error) {
-        this.$message({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
-        return
-      }
-      // 新增元素
-      await ElementService.createElementChildren({
-        rootNo: this.metadata.rootNo,
-        parentNo: this.metadata.parentNo,
-        children: [this.elementInfo]
-      })
-      //  成功提示
-      this.$message({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
-      // 关闭tab
-      this.$store.commit('pymeter/removeTab', { editorNo: 'UNSAVED_PYTHON_SAMPLER' })
-      // 重新查询脚本列表
-      this.$store.commit('pymeter/refreshElementTreeNow')
-    }
+const { queryMode, modifyMode, createMode, editNow, setReadonly, updateTabName, closeTab, refreshElementTree } =
+  useEditor(props)
+const elformRef = ref()
+const elementNo = ref(props.editorNo)
+const elementInfo = ref({
+  elementName: 'Python Sampler',
+  elementRemark: '',
+  elementType: 'SAMPLER',
+  elementClass: 'PythonSampler',
+  property: {
+    PythonSampler__script: ''
   }
+})
+const elementFormRules = reactive({
+  elementName: [{ required: true, message: '元素名称不能为空', trigger: 'blur' }]
+})
+const codeEditorRef = ref()
+
+onMounted(() => {
+  // 查询或更新模式时，先拉取元素信息
+  if (createMode.value) return
+  ElementService.queryElementInfo({ elementNo: elementNo.value }).then((response) => {
+    elementInfo.value = response.result
+    codeEditorRef.value.setValue(response.result.property.PythonSampler__script)
+  })
+})
+
+/**
+ * 修改元素信息
+ */
+const modifySamplerElement = async () => {
+  // 表单校验
+  const error = await elformRef.value
+    .validate()
+    .then(() => false)
+    .catch(() => true)
+  if (error) {
+    ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 修改元素
+  await ElementService.modifyElement({ elementNo: elementNo.value, ...elementInfo.value })
+  // 成功提示
+  ElMessage({ message: '修改元素成功', type: 'info', duration: 2 * 1000 })
+  // 修改tab标题
+  updateTabName(elementInfo.value.elementName)
+  // 重新查询脚本列表
+  refreshElementTree()
+  // 表单设置为只读
+  setReadonly()
+}
+
+/**
+ * 创建元素
+ */
+const createSamplerElement = async () => {
+  // 表单校验
+  const error = await elformRef.value
+    .validate()
+    .then(() => false)
+    .catch(() => true)
+  if (error) {
+    ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 新增元素
+  await ElementService.createElementChildren({
+    rootNo: props.metadata.rootNo,
+    parentNo: props.metadata.parentNo,
+    children: [elementInfo.value]
+  })
+  //  成功提示
+  ElMessage({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
+  // 关闭tab
+  closeTab()
+  // 重新查询脚本列表
+  refreshElementTree()
 }
 </script>
 
