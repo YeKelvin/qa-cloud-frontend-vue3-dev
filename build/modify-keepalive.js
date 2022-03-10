@@ -1,3 +1,4 @@
+// https://github.com/vuejs/core/pull/4339#issuecomment-1061855701
 const fs = require('fs')
 const path = require('path')
 const vue_bundler_file = path.resolve(

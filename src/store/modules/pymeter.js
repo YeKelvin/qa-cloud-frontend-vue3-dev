@@ -1,16 +1,41 @@
 import store from '@/store'
+import { isEmpty } from 'lodash-es'
 import * as VariablesService from '@/api/script/variables'
 import * as HttpHeadersService from '@/api/script/headers'
 
+/**
+ * 移除 keepalive 缓存
+ */
+function removeCache(keepAlive, cacheKey) {
+  const keepAliveComponent = keepAlive.$
+  const cacheMap = keepAliveComponent.__v_cache
+  const cachedVnode = cacheMap.get(cacheKey)
+  if (cachedVnode) {
+    const COMPONENT_SHOULD_KEEP_ALIVE = 1 << 8
+    const COMPONENT_KEPT_ALIVE = 1 << 9
+    let shapeFlag = cachedVnode.shapeFlag
+    if (shapeFlag & COMPONENT_SHOULD_KEEP_ALIVE) {
+      shapeFlag -= COMPONENT_SHOULD_KEEP_ALIVE
+    }
+    if (shapeFlag & COMPONENT_KEPT_ALIVE) {
+      shapeFlag -= COMPONENT_KEPT_ALIVE
+    }
+    cachedVnode.shapeFlag = shapeFlag
+    const keepAliveRenderer = keepAliveComponent.proxy.renderer
+    keepAliveRenderer.um(cachedVnode, keepAliveComponent, keepAliveComponent.suspense, false, false)
+    cacheMap.delete(cacheKey)
+  }
+}
+
 const state = {
+  // keepAlive实例
+  keepAlive: null,
+
   // 编辑器 tab 列表
   tabs: [],
 
   // 当前 tab 的编号（elementNo）
   activeTabNo: '',
-
-  // 组件实例缓存
-  cachedInstance: {},
 
   // 是否刷新集合列表
   refreshCollections: 0,
@@ -46,7 +71,14 @@ const state = {
 
 const mutations = {
   /**
-   * 设置当前选择的 tabName
+   * 设置 keepalive 实例
+   */
+  setKeepAlive: (state, vnode) => {
+    state.keepAlive = vnode
+  },
+
+  /**
+   * 设置当前选择的 tab 编号
    * @param {String} data  elementNo
    */
   setActiveTabNo: (state, data) => {
@@ -54,16 +86,7 @@ const mutations = {
   },
 
   /**
-   * 缓存组件实例，用于手动销毁 keep-alive 缓存
-   */
-  cacheInstance: (state, instance) => {
-    console.log('instance=', instance)
-    console.log('cache=', instance.proxy.$parent.$parent.$.__v_cache)
-    state.cachedInstance[instance.proxy.editorNo] = instance
-  },
-
-  /**
-   * 添加tab
+   * 添加 tab
    */
   addTab: (state, { editorNo, editorName, editorComponent, editorMode, metadata }) => {
     const tabs = [...state.tabs]
@@ -91,7 +114,7 @@ const mutations = {
   },
 
   /**
-   * 关闭 tab 并清除 keep-alive 缓存
+   * 关闭 tab 并移除 keep-alive 缓存
    */
   removeTab: (state, { editorNo }) => {
     const tabs = [...state.tabs]
@@ -110,27 +133,8 @@ const mutations = {
     }
     state.tabs = tabs.filter((tab) => tab.editorNo !== editorNo)
 
-    // 手动删除 keep-alive 缓存
-    const instance = state.cachedInstance[editorNo]
-    if (!instance) return
-
-    const keepaliveComponent = instance?.$vnode?.parent?.componentInstance?.$vnode?.componentInstance
-    if (!keepaliveComponent) return
-
-    const cache = keepaliveComponent.cache
-    const keys = keepaliveComponent.keys
-    if (cache[editorNo]) {
-      if (keys.length) {
-        const index = keys.indexOf(editorNo)
-        if (index > -1) {
-          keys.splice(index, 1)
-        }
-      }
-      delete cache[editorNo]
-    }
-
-    instance.$destroy()
-    delete state.cachedInstance[editorNo]
+    // 手动移除 keep-alive 缓存
+    removeCache(state.keepAlive, editorNo)
   },
 
   /**
@@ -258,7 +262,7 @@ const actions = {
    */
   disableOtherUnselectedEnvironmentDataset({ state }) {
     // 没有选中任何变量集时，开放所有环境变量集
-    if (state.selectedDatasetNumberList.length === 0) {
+    if (isEmpty(state.selectedDatasetNumberList)) {
       state.environmentDatasetList.forEach((env) => {
         env.disabled = false
       })

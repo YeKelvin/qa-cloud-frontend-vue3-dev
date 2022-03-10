@@ -1,14 +1,10 @@
-import { ref, toRefs, computed, onMounted, getCurrentInstance } from 'vue'
-import { useStore } from 'vuex'
-
 export default function useEditor(props) {
   const { editorNo, editorMode, metadata } = toRefs(props)
   const editMode = ref(editorMode.value)
-  const store = useStore()
-
   const queryMode = computed(() => editMode.value === 'QUERY')
   const modifyMode = computed(() => editMode.value === 'MODIFY')
   const createMode = computed(() => editMode.value === 'CREATE')
+  const store = useStore()
 
   /**
    * 开启编辑模式
@@ -55,9 +51,6 @@ export default function useEditor(props) {
   const refreshElementTree = () => {
     store.commit('pymeter/refreshElementTreeNow')
   }
-
-  // pymeter组件创建后缓存其实例，用于关闭组件时销毁keep-alive缓存
-  onMounted(() => store.commit('pymeter/cacheInstance', getCurrentInstance()))
 
   return {
     editorNo,

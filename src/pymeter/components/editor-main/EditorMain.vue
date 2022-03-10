@@ -10,7 +10,7 @@
 
     <!-- pymeter 组件 -->
     <el-scrollbar id="editor-main-scrollbar" style="width: 100%; height: 100%" wrap-style="overflow-x:auto;">
-      <keep-alive>
+      <keep-alive ref="keepAlive">
         <component
           :is="editors[activeTab.editorComponent]"
           :key="activeTab.editorNo"
@@ -27,70 +27,59 @@
 </template>
 
 <script setup>
-import { mapState } from 'vuex'
-import { markRaw, defineAsyncComponent } from 'vue'
 import Topbar from './topbar/Topbar.vue'
-</script>
 
-<script>
-export default {
-  name: 'EditorMain',
-  data() {
-    return {
-      editors: {
-        TestCollection: markRaw(defineAsyncComponent(() => import('./collections/TestCollection.vue'))),
-        // TestSnippets: SnippetsEditor,
-        TestGroup: markRaw(defineAsyncComponent(() => import('./groups/TestGroup.vue'))),
-        SetupGroup: markRaw(defineAsyncComponent(() => import('./groups/SetupGroup.vue'))),
-        TeardownGroup: markRaw(defineAsyncComponent(() => import('./groups/TeardownGroup.vue'))),
-        SetupGroupDebuger: markRaw(defineAsyncComponent(() => import('./groups/SetupGroupDebuger.vue'))),
-        TeardownGroupDebuger: markRaw(defineAsyncComponent(() => import('./groups/TeardownGroupDebuger.vue'))),
-        // HTTPSampler: HTTPSamplerEditor,
-        PythonSampler: markRaw(defineAsyncComponent(() => import('./samplers/PythonSampler.vue')))
-        // SnippetSampler: SnippetSamplerEditor,
-        // PythonPreProcessor: PythonPreProcessorEditor,
-        // PythonPostProcessor: PythonPostProcessorEditor,
-        // PythonAssertion: PythonAssertionEditor,
-        // IfController: IfControllerEditor,
-        // ForInController: ForInControllerEditor,
-        // LoopController: LoopControllerEditor,
-        // RetryController: RetryControllerEditor,
-        // TransactionController: TransactionControllerEditor,
-        // WhileController: WhileControllerEditor,
-        // VariableDataset: VariableDatasetEditor,
-        // HttpHeadersTemplate: HttpHeadersTemplateEditor,
-        // ConstantTimer: ConstantTimerEditor
-      }
-    }
+const editors = reactive({
+  TestCollection: markRaw(defineAsyncComponent(() => import('./collections/TestCollection.vue'))),
+  // TestSnippets: SnippetsEditor,
+  TestGroup: markRaw(defineAsyncComponent(() => import('./groups/TestGroup.vue'))),
+  SetupGroup: markRaw(defineAsyncComponent(() => import('./groups/SetupGroup.vue'))),
+  TeardownGroup: markRaw(defineAsyncComponent(() => import('./groups/TeardownGroup.vue'))),
+  SetupGroupDebuger: markRaw(defineAsyncComponent(() => import('./groups/SetupGroupDebuger.vue'))),
+  TeardownGroupDebuger: markRaw(defineAsyncComponent(() => import('./groups/TeardownGroupDebuger.vue'))),
+  // HTTPSampler: HTTPSamplerEditor,
+  PythonSampler: markRaw(defineAsyncComponent(() => import('./samplers/PythonSampler.vue')))
+  // SnippetSampler: SnippetSamplerEditor,
+  // PythonPreProcessor: PythonPreProcessorEditor,
+  // PythonPostProcessor: PythonPostProcessorEditor,
+  // PythonAssertion: PythonAssertionEditor,
+  // IfController: IfControllerEditor,
+  // ForInController: ForInControllerEditor,
+  // LoopController: LoopControllerEditor,
+  // RetryController: RetryControllerEditor,
+  // TransactionController: TransactionControllerEditor,
+  // WhileController: WhileControllerEditor,
+  // VariableDataset: VariableDatasetEditor,
+  // HttpHeadersTemplate: HttpHeadersTemplateEditor,
+  // ConstantTimer: ConstantTimerEditor
+})
+
+const store = useStore()
+const keepAlive = ref()
+const tabs = computed(() => store.state.pymeter.tabs)
+const activeTabNo = computed({
+  get() {
+    return store.state.pymeter.activeTabNo
   },
-
-  computed: {
-    ...mapState('pymeter', {
-      tabs: (state) => state.tabs
-    }),
-    activeTabNo: {
-      get() {
-        return this.$store.state.pymeter.activeTabNo
-      },
-      set(val) {
-        this.$store.commit('pymeter/setActiveTabNo', val)
-      }
-    },
-    activeTab() {
-      let tab = this.tabs.filter((tab) => tab.editorNo === this.activeTabNo)[0]
-      if (!tab) tab = { editorComponent: '' }
-      return tab
-    }
-  },
-
-  methods: {
-    /**
-     * 关闭tab的回调
-     */
-    handleTabRemove(tabNo) {
-      this.$store.commit({ type: 'pymeter/removeTab', editorNo: tabNo })
-    }
+  set(val) {
+    store.commit('pymeter/setActiveTabNo', val)
   }
+})
+const activeTab = computed(() => {
+  let tab = tabs.value.filter((tab) => tab.editorNo === activeTabNo.value)[0]
+  if (!tab) tab = { editorComponent: '' }
+  return tab
+})
+
+onMounted(() => {
+  store.commit('pymeter/setKeepAlive', keepAlive.value)
+})
+
+/**
+ * el-tab handler
+ */
+const handleTabRemove = (tabNo) => {
+  store.commit({ type: 'pymeter/removeTab', editorNo: tabNo })
 }
 </script>
 
