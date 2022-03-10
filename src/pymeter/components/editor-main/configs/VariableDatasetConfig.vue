@@ -4,9 +4,9 @@
     <div class="header-container">
       <!-- 变量集名称 -->
       <el-form
-        ref="form"
+        ref="elformRef"
         label-position="right"
-        label-width="auto"
+        label-width="100px"
         style="flex-grow: 1; margin-right: 10px"
         inline-message
         :model="datasetForm"
@@ -321,8 +321,8 @@ export default {
         // 批量更新变量
         await VariablesService.modifyVariables({
           datasetNo: this.datasetNo,
-          datasetName: this.metadata.datasetName,
-          datasetDesc: this.metadata.datasetDesc,
+          datasetName: this.datasetForm.datasetName,
+          datasetDesc: this.datasetForm.datasetDesc,
           variableList: this.rows
         })
 

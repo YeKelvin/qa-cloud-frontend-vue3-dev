@@ -4,11 +4,10 @@
     <div class="header-container">
       <!-- 模板名称 -->
       <el-form
-        ref="form"
+        ref="elformRef"
         label-position="right"
-        label-width="auto"
+        label-width="100px"
         style="flex-grow: 1; margin-right: 10px"
-        size="small"
         inline-message
         :model="templateForm"
         :rules="templateFormRules"
@@ -309,8 +308,8 @@ export default {
         // 批量更新请求头
         await HttpHeadersService.modifyHttpHeaders({
           templateNo: this.templateNo,
-          templateName: this.metadata.templateName,
-          templateDesc: this.metadata.templateDesc,
+          templateName: this.templateForm.templateName,
+          templateDesc: this.templateForm.templateDesc,
           headerList: [...this.rows]
         })
 
