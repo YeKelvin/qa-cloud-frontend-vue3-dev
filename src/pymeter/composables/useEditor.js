@@ -1,5 +1,5 @@
 export default function useEditor(props) {
-  const { editorNo, editorMode, metadata } = toRefs(props)
+  const { editorNo, editorMode } = toRefs(props)
   const editMode = ref(editorMode.value)
   const queryMode = computed(() => editMode.value === 'QUERY')
   const modifyMode = computed(() => editMode.value === 'MODIFY')
@@ -53,9 +53,6 @@ export default function useEditor(props) {
   }
 
   return {
-    editorNo,
-    editorMode,
-    metadata,
     queryMode,
     modifyMode,
     createMode,

@@ -59,6 +59,7 @@ const DEFAULT_OPTIONS = {
   tabCompletion: 'on',
   // 缩进大小
   tabIndex: 4,
+  unicodeHighlight: { ambiguousCharacters: false },
   // 在制表位后插入和删除空格
   useTabStops: false,
   // 折行显示

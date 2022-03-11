@@ -108,7 +108,11 @@ const handleNodeClick = (data) => {
     editorNo: data.elementNo,
     editorName: data.elementName,
     editorComponent: data.elementClass,
-    editorMode: 'QUERY'
+    editorMode: 'QUERY',
+    metadata: {
+      rootNo: data.rootNo,
+      parentNo: data.elementNo
+    }
   })
 }
 

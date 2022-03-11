@@ -61,7 +61,7 @@
         <!-- 是否在每次迭代开始前重新打开一个新的 HTTP 会话 -->
         <el-form-item label="迭代时刷新会话：">
           <el-switch
-            v-model="httpSessionManager.property.HTTPSessionManager__clear_each_iteration"
+            v-model="clearEachIteration"
             active-color="#13ce66"
             active-value="true"
             inactive-value="false"
@@ -163,9 +163,6 @@ const elementFormRules = reactive({
   'property.TestGroup__number_groups': [{ required: true, message: '并发数不能为空', trigger: 'blur' }],
   'property.TestGroup__main_controller.property.LoopController__loops': [{ validator: checkLoops, trigger: 'blur' }]
 })
-const activeTabName = ref('HTTP')
-const builtIn = ref([])
-const useHTTPSession = ref(false)
 const httpSessionManager = ref({
   elementName: 'BuiltIn HTTPSessionManager',
   elementRemark: '',
@@ -175,9 +172,20 @@ const httpSessionManager = ref({
     HTTPSessionManager__clear_each_iteration: 'false'
   }
 })
-const showJsonScript = ref(false)
+const activeTabName = ref('HTTP')
+const useHTTPSession = ref(false)
+const clearEachIteration = computed({
+  get() {
+    return useHTTPSession.value && httpSessionManager.value.property.HTTPSessionManager__clear_each_iteration
+  },
+  set(val) {
+    httpSessionManager.value.property.HTTPSessionManager__clear_each_iteration = val
+  }
+})
+const builtIn = ref([])
 const showHttpSettings = computed(() => activeTabName.value === 'HTTP')
 const hiddenConfigDot = computed(() => useHTTPSession.value === false)
+const showJsonScript = ref(false)
 
 onMounted(() => {
   // 查询或更新模式时，先拉取元素信息
@@ -215,7 +223,7 @@ const modifyGroupElement = async () => {
   // 修改元素
   await ElementService.modifyElement({ elementNo: elementNo.value, ...elementInfo.value })
   // 更新或新增内置元素
-  await submitBuiltIns()
+  await modifyBuiltIns()
   // 成功提示
   ElMessage({ message: '修改元素成功', type: 'info', duration: 2 * 1000 })
   // 修改tab标题
@@ -260,13 +268,13 @@ const createGroupElement = async () => {
 /**
  * 更新或新增内置元素
  */
-const submitBuiltIns = async () => {
+const modifyBuiltIns = async () => {
   if (useHTTPSession.value) {
     // 使用 HTTP 会话
     if (!isEmpty(builtIn.value)) {
       // 已经存在 HTTPSessionManager 时，直接修改
       // 修改内置元素
-      await ElementService.modifyElementBuiltins({ children: builtIn.value })
+      await ElementService.modifyElementBuiltins(builtIn.value)
     } else {
       // 新增内置元素
       await ElementService.createElementBuiltins({

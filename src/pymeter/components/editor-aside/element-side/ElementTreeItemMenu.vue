@@ -72,8 +72,6 @@
 </template>
 
 <script lang="jsx" setup>
-import { computed } from 'vue'
-import { useStore } from 'vuex'
 import { More } from '@element-plus/icons-vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import * as ElementService from '@/api/script/element'
@@ -93,6 +91,7 @@ const isShowSampler = ({ data }) => {
 const isShowController = ({ data }) => {
   return data.elementType == 'GROUP' || data.elementType == 'CONTROLLER' || data.elementClass == 'TestSnippets'
 }
+
 /**
  * 打开新增 TestGroup 的标签页
  */
