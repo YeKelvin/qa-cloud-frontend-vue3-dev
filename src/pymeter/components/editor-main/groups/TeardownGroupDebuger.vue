@@ -54,115 +54,102 @@
 </template>
 
 <script setup>
+import { ElMessage } from 'element-plus'
 import { Check, Close, Edit } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
 import editorProps from '@/pymeter/composables/editor.props'
 import useEditor from '@/pymeter/composables/useEditor'
 
 const props = defineProps(editorProps)
-const { editorNo, editorMode, metadata, queryMode, modifyMode, createMode, editNow, setReadonly, updateTab, closeTab } =
+const { queryMode, modifyMode, createMode, editNow, setReadonly, updateTabName, closeTab, refreshElementTree } =
   useEditor(props)
-</script>
-
-<script>
-export default {
-  name: 'TeardownGroupDebuger',
-
-  data() {
-    return {
-      elementNo: this.editorNo,
-      elementInfo: {
-        elementName: 'TearDown Group Debuger',
-        elementRemark: '',
-        elementType: 'GROUP',
-        elementClass: 'TeardownGroupDebuger',
-        property: {
-          TearDownGroup__on_sample_error: 'start_next_coroutine',
-          TearDownGroup__number_groups: '1',
-          TearDownGroup__start_interval: '',
-          TearDownGroup__main_controller: {
-            class: 'LoopController',
-            property: {
-              LoopController__loops: '1',
-              LoopController__continue_forever: false
-            }
-          }
-        }
-      },
-      elementFormRules: {
-        elementName: [{ required: true, message: '元素名称不能为空', trigger: 'blur' }],
-        'property.TearDownGroup__on_sample_error': [
-          { required: true, message: '失败时的处理不能为空', trigger: 'blur' }
-        ],
-        'property.TearDownGroup__number_groups': [{ required: true, message: '并发数不能为空', trigger: 'blur' }],
-        'property.TearDownGroup__main_controller.property.LoopController__loops': [
-          { required: true, message: '循环次数不能为空', trigger: 'blur' }
-        ]
+const elformRef = ref()
+const elementNo = ref(props.editorNo)
+const elementInfo = ref({
+  elementName: 'TearDown Group Debuger',
+  elementRemark: '',
+  elementType: 'GROUP',
+  elementClass: 'TeardownGroupDebuger',
+  property: {
+    TearDownGroup__on_sample_error: 'start_next_coroutine',
+    TearDownGroup__number_groups: '1',
+    TearDownGroup__start_interval: '',
+    TearDownGroup__main_controller: {
+      class: 'LoopController',
+      property: {
+        LoopController__loops: '1',
+        LoopController__continue_forever: false
       }
-    }
-  },
-
-  mounted: function () {
-    // 查询或更新模式时先拉取元素信息
-    if (this.createMode) return
-    ElementService.queryElementInfo({ elementNo: this.elementNo }).then((response) => {
-      this.elementInfo = response.result
-    })
-  },
-
-  methods: {
-    /**
-     * 修改元素信息
-     */
-    async modifyGroupElement() {
-      // 表单校验
-      const error = await this.$refs.elformRef
-        .validate()
-        .then(() => false)
-        .catch(() => true)
-      if (error) {
-        this.$message({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
-        return
-      }
-      // 修改元素
-      await ElementService.modifyElement({ elementNo: this.elementNo, ...this.elementInfo })
-      //  成功提示
-      this.$message({ message: '修改元素成功', type: 'info', duration: 2 * 1000 })
-      // 修改tab标题
-      this.$store.commit('pymeter/updateTab', { editorNo: this.elementNo, editorName: this.elementInfo.elementName })
-      // 重新查询脚本
-      this.$store.commit('pymeter/refreshElementTreeNow')
-      // 表单设置为只读
-      this.setReadonly()
-    },
-
-    /**
-     * 创建元素
-     */
-    async createGroupElement() {
-      // 表单校验
-      const error = await this.$refs.elformRef
-        .validate()
-        .then(() => false)
-        .catch(() => true)
-      if (error) {
-        this.$message({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
-        return
-      }
-      // 新增元素
-      await ElementService.createElementChildren({
-        rootNo: this.metadata.rootNo,
-        parentNo: this.metadata.parentNo,
-        children: [this.elementInfo]
-      })
-      //  成功提示
-      this.$message({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
-      // 关闭tab
-      this.$store.commit('pymeter/removeTab', { editorNo: 'UNSAVED_TEARDOWN_GROUP_DEBUGER' })
-      // 重新查询脚本
-      this.$store.commit('pymeter/refreshElementTreeNow')
     }
   }
+})
+const elementFormRules = reactive({
+  elementName: [{ required: true, message: '元素名称不能为空', trigger: 'blur' }],
+  'property.TearDownGroup__on_sample_error': [{ required: true, message: '失败时的处理不能为空', trigger: 'blur' }],
+  'property.TearDownGroup__number_groups': [{ required: true, message: '并发数不能为空', trigger: 'blur' }],
+  'property.TearDownGroup__main_controller.property.LoopController__loops': [
+    { required: true, message: '循环次数不能为空', trigger: 'blur' }
+  ]
+})
+
+onMounted(() => {
+  // 查询或更新模式时，先拉取元素信息
+  if (createMode.value) return
+  ElementService.queryElementInfo({ elementNo: elementNo.value }).then((response) => {
+    elementInfo.value = response.result
+  })
+})
+
+/**
+ * 修改元素信息
+ */
+const modifyGroupElement = async () => {
+  // 表单校验
+  const error = await elformRef.value
+    .validate()
+    .then(() => false)
+    .catch(() => true)
+  if (error) {
+    ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 修改元素
+  await ElementService.modifyElement({ elementNo: elementNo.value, ...elementInfo.value })
+  //  成功提示
+  ElMessage({ message: '修改元素成功', type: 'info', duration: 2 * 1000 })
+  // 修改tab标题
+  updateTabName(elementInfo.value.elementName)
+  // 重新查询脚本列表
+  refreshElementTree()
+  // 表单设置为只读
+  setReadonly()
+}
+
+/**
+ * 创建元素
+ */
+const createGroupElement = async () => {
+  // 表单校验
+  const error = await elformRef.value
+    .validate()
+    .then(() => false)
+    .catch(() => true)
+  if (error) {
+    ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 新增元素
+  await ElementService.createElementChildren({
+    rootNo: props.metadata.rootNo,
+    parentNo: props.metadata.parentNo,
+    children: [elementInfo.value]
+  })
+  //  成功提示
+  ElMessage({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
+  // 关闭tab
+  closeTab()
+  // 重新查询脚本列表
+  refreshElementTree()
 }
 </script>
 

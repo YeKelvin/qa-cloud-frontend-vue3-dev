@@ -126,7 +126,7 @@ const elementFormRules = reactive({
 const showJsonScript = ref(false)
 
 onMounted(() => {
-  // 查询或更新模式时先拉取元素信息
+  // 查询或更新模式时，先拉取元素信息
   if (createMode.value) return
   ElementService.queryElementInfo({ elementNo: elementNo.value }).then((response) => {
     elementInfo.value = response.result
