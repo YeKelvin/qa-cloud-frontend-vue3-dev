@@ -16,13 +16,13 @@
           @node-click="handleNodeClick"
         >
           <template #default="{ node, data }">
-            <span style="display: inline-flex; align-items: center; width: 100%">
+            <span class="tree-item">
               <!-- Group 名称 -->
               <template v-if="node.level == 1">
-                <span style="display: inline-flex; align-items: center; justify-content: space-between; width: 100%">
+                <span class="group-name-wrapper">
                   <span style="display: inline-flex; align-items: center">
                     <SvgIcon icon-name="pymeter-group" style="width: 1.2em; height: 1.2em" />
-                    <span class="element-title" style="margin-left: 5px">{{ node.label }}</span>
+                    <span class="element-name" style="margin-left: 5px">{{ node.label }}</span>
                   </span>
                   <SvgIcon v-if="data.running" icon-name="pymeter-running" style="width: 1.5em; height: 1.5em" />
                   <SvgIcon v-else-if="!data.running && data.success" icon-name="pymeter-successful-sampler" />
@@ -34,7 +34,7 @@
                 <SvgIcon v-if="data.success" icon-name="pymeter-successful-sampler" />
                 <SvgIcon v-else-if="!data.success && data.retrying" icon-name="pymeter-warning-sampler" />
                 <SvgIcon v-else icon-name="pymeter-failure-sampler" />
-                <span class="element-title" style="margin-left: 5px">{{ node.label }}</span>
+                <span class="element-name" style="margin-left: 5px">{{ node.label }}</span>
               </template>
             </span>
           </template>
@@ -76,7 +76,7 @@
 
       <!-- 请求体 -->
       <template v-if="showing && showRequestCode">
-        <MonacoEditor ref="requestEditorRef" key="requestCode" :read-only="true" language="json" />
+        <MonacoEditor ref="requestEditorRef" language="json" :read-only="true" />
       </template>
 
       <!-- 响应头部 -->
@@ -91,19 +91,18 @@
 
       <!-- 响应体 -->
       <template v-if="showing && showResponseCode">
-        <MonacoEditor ref="responseEditorRef" key="responseCode" :read-only="true" language="json" />
+        <MonacoEditor ref="responseEditorRef" language="json" :read-only="true" />
       </template>
 
       <!-- 失败断言 -->
       <template v-if="showing && showAssertionCode">
-        <MonacoEditor ref="assertionEditorRef" key="assertionCode" :read-only="true" language="python" />
+        <MonacoEditor ref="assertionEditorRef" language="python" :read-only="true" />
       </template>
     </el-card>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, computed, nextTick } from 'vue'
 import { isEmpty } from 'lodash-es'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
@@ -180,15 +179,15 @@ const handleNodeClick = (data, node) => {
   }
 }
 const handleTabClick = (tab) => {
-  if (tab.name === 'REQUEST') {
+  if (tab.paneName === 'REQUEST') {
     setRequestCode(current.sampler.request)
     return
   }
-  if (tab.name === 'RESPONSE') {
+  if (tab.paneName === 'RESPONSE') {
     setResponseCode(current.sampler.response)
     return
   }
-  if (tab.name === 'ASSERTION') {
+  if (tab.paneName === 'ASSERTION') {
     setFailedAssertionCode(current.sampler.failedAssertion?.message)
     return
   }
@@ -207,7 +206,7 @@ const setResponseCode = (code) => {
 }
 const setFailedAssertionCode = (code) => {
   nextTick(() => {
-    if (!code || code === '' || code.length === 0) return
+    if (isEmpty(code)) return
     assertionEditorRef.value && assertionEditorRef.value.setValue(code)
   })
 }
@@ -223,16 +222,20 @@ const setFailedAssertionCode = (code) => {
   padding-top: 0;
 }
 
-:deep(.el-card__body) {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-
+.tree-item {
+  display: inline-flex;
+  align-items: center;
   width: 100%;
-  height: 100%;
 }
 
-.element-title {
+.group-name-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.element-name {
   user-select: none;
   white-space: normal;
   overflow: hidden;
@@ -243,6 +246,15 @@ const setFailedAssertionCode = (code) => {
   padding: 0 20px;
   height: 20px;
   line-height: 20px;
+}
+
+:deep(.el-card__body) {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  width: 100%;
+  height: 100%;
 }
 
 :deep(.el-tabs__header) {

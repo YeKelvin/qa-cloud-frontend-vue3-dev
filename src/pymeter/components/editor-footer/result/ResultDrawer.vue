@@ -58,32 +58,51 @@ const tabs = computed({
     emit('update:data', val)
   }
 })
-watch(tabs, () => {
-  if (isEmpty(tabs.value)) return
-  // 停止 loading
-  loading.value = false
-  // 激活最新的 tab
-  const result = tabs.value[tabs.value.length - 1]
-  activeTabNo.value = result.id
-  activeDetails.value = result.details
-})
+watch(
+  tabs,
+  () => {
+    if (isEmpty(tabs.value)) return
+    // 停止 loading
+    loading.value = false
+    // 激活最新的 tab
+    const result = tabs.value[tabs.value.length - 1]
+    activeTabNo.value = result.id
+    activeDetails.value = result.details
+  },
+  { deep: true }
+)
 
-const handleTabClick = (tab) => {
-  const result = tabs.value.find((result) => result.id === tab.name)
-  activeDetails.value = result.details
-}
-const handleTabRemove = (tabName) => {
-  const index = tabs.value.findIndex((result) => result.id === tabName)
-  if (index > -1) tabs.value.splice(index, 1)
-}
-const clean = () => {
-  tabs.value = []
-  store.commit('pymeter/closeResultDrawer')
-}
+/**
+ * 第一个结果给 loading 效果
+ */
 const setFirstLoading = () => {
   if (!socket.id) return
   if (!isEmpty(tabs)) return
   loading.value = true
+}
+
+/**
+ * 清空结果
+ */
+const clean = () => {
+  tabs.value = []
+  store.commit('pymeter/closeResultDrawer')
+}
+
+/**
+ * el-tab handler
+ */
+const handleTabClick = (tab) => {
+  const result = tabs.value.find((result) => result.id === tab.name)
+  activeDetails.value = result.details
+}
+
+/**
+ * el-tab handler
+ */
+const handleTabRemove = (tabName) => {
+  const index = tabs.value.findIndex((result) => result.id === tabName)
+  if (index > -1) tabs.value.splice(index, 1)
 }
 </script>
 

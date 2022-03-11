@@ -12,8 +12,6 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, useAttrs, nextTick } from 'vue'
-import { useStore } from 'vuex'
 import { Delete } from '@element-plus/icons-vue'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
@@ -24,7 +22,7 @@ const props = defineProps({
 const attrs = useAttrs()
 const store = useStore()
 const logEditorRef = ref()
-const visible = ref(attrs.modelValue)
+const visible = computed(() => attrs.modelValue)
 
 const logs = computed({
   get() {
@@ -34,10 +32,14 @@ const logs = computed({
     emit('update:data', val)
   }
 })
-watch(logs, () => {
-  if (!visible.value) return
-  logEditorRef.value && logEditorRef.value.setValue(logs.value.join(''))
-})
+watch(
+  logs,
+  () => {
+    if (!visible.value) return
+    logEditorRef.value && logEditorRef.value.setValue(logs.value.join(''))
+  },
+  { deep: true }
+)
 watch(visible, () => {
   if (!visible.value) return
   nextTick(() => {
@@ -45,6 +47,9 @@ watch(visible, () => {
   })
 })
 
+/**
+ * 清空日志
+ */
 const clean = () => {
   logs.value = []
   logEditorRef.value && logEditorRef.value.setValue('')
