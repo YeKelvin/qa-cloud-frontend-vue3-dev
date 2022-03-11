@@ -272,7 +272,7 @@ const modifyBuiltIns = async () => {
   if (useHTTPSession.value) {
     // 使用 HTTP 会话
     if (!isEmpty(builtIn.value)) {
-      // 已经存在 HTTPSessionManager 时，启用并直接修改
+      // 已经存在 HTTPSessionManager 时，判断是否已禁用，禁用则重新启用
       const manager = builtIn.value.find((item) => item.elementClass === 'HTTPSessionManager')
       if (!manager.enabled) {
         manager && (await ElementService.enableElement({ elementNo: manager.elementNo }))
