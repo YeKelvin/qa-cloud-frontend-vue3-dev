@@ -14,7 +14,6 @@ import './permission'
 
 // element-ui
 import ElementPlus, { ElMessage } from 'element-plus'
-import zh_cn from 'element-plus/es/locale/lang/zh-cn'
 import 'element-plus/dist/index.css'
 
 // svg-icon
@@ -36,7 +35,7 @@ const app = createApp(App)
 app.use(Store)
 app.use(SocketIO)
 app.use(Router)
-app.use(ElementPlus, { size: 'default', locale: zh_cn })
+app.use(ElementPlus, { size: 'default' })
 // 全局注册组件
 app.component('SvgIcon', SvgIcon)
 // 全局注册指令
