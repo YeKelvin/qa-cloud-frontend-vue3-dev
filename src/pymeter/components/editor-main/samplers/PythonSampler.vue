@@ -118,7 +118,7 @@ const modifySamplerElement = async () => {
 }
 
 /**
- * 新增元素
+ * 创建元素
  */
 const createSamplerElement = async () => {
   // 表单校验

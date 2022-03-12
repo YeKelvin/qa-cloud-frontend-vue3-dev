@@ -31,18 +31,18 @@ import Topbar from './topbar/Topbar.vue'
 
 const editors = reactive({
   TestCollection: markRaw(defineAsyncComponent(() => import('./collections/TestCollection.vue'))),
-  // TestSnippets: SnippetsEditor,
+  TestSnippets: markRaw(defineAsyncComponent(() => import('./collections/snippet-collection/SnippetCollection.vue'))),
   TestGroup: markRaw(defineAsyncComponent(() => import('./groups/TestGroup.vue'))),
   SetupGroup: markRaw(defineAsyncComponent(() => import('./groups/SetupGroup.vue'))),
   TeardownGroup: markRaw(defineAsyncComponent(() => import('./groups/TeardownGroup.vue'))),
   SetupGroupDebuger: markRaw(defineAsyncComponent(() => import('./groups/SetupGroupDebuger.vue'))),
   TeardownGroupDebuger: markRaw(defineAsyncComponent(() => import('./groups/TeardownGroupDebuger.vue'))),
   // HTTPSampler: HTTPSamplerEditor,
-  PythonSampler: markRaw(defineAsyncComponent(() => import('./samplers/PythonSampler.vue')))
+  PythonSampler: markRaw(defineAsyncComponent(() => import('./samplers/PythonSampler.vue'))),
   // SnippetSampler: SnippetSamplerEditor,
-  // PythonPreProcessor: PythonPreProcessorEditor,
-  // PythonPostProcessor: PythonPostProcessorEditor,
-  // PythonAssertion: PythonAssertionEditor,
+  PythonPreProcessor: markRaw(defineAsyncComponent(() => import('./pre-processors/PythonPreProcessor.vue'))),
+  PythonPostProcessor: markRaw(defineAsyncComponent(() => import('./post-processors/PythonPostProcessor.vue'))),
+  PythonAssertion: markRaw(defineAsyncComponent(() => import('./assertions/PythonAssertion.vue'))),
   // IfController: IfControllerEditor,
   // ForInController: ForInControllerEditor,
   // LoopController: LoopControllerEditor,
@@ -51,7 +51,7 @@ const editors = reactive({
   // WhileController: WhileControllerEditor,
   // VariableDataset: VariableDatasetEditor,
   // HttpHeadersTemplate: HttpHeadersTemplateEditor,
-  // ConstantTimer: ConstantTimerEditor
+  ConstantTimer: markRaw(defineAsyncComponent(() => import('./timers/ConstantTimer.vue')))
 })
 
 const store = useStore()

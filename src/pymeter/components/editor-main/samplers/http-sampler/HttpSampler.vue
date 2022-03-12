@@ -554,7 +554,7 @@ export default {
     },
 
     /**
-     * 修改元素信息
+     * 修改元素
      */
     async modifySamplerElement() {
       // 校验表单字段

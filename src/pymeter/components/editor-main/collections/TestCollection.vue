@@ -147,7 +147,7 @@ const modifyCollectionElement = async () => {
 }
 
 /**
- * 新增元素
+ * 创建元素
  */
 const createCollectionElement = async () => {
   // 工作空间非空校验

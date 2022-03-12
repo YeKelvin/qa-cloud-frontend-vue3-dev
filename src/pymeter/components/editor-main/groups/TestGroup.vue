@@ -235,7 +235,7 @@ const modifyGroupElement = async () => {
 }
 
 /**
- * 新增元素
+ * 创建元素
  */
 const createGroupElement = async () => {
   // 表单校验
