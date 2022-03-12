@@ -97,7 +97,7 @@
 
       <template #default>
         <ArgumentTable :data="argumentsData" />
-        <div style="padding: 10px">备注：片段参数不支持函数</div>
+        <el-tag type="danger" style="padding: 10px">备注：片段参数不支持函数</el-tag>
       </template>
 
       <template #footer>
