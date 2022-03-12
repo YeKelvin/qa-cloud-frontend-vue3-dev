@@ -69,7 +69,7 @@
       <el-table-column fixed="right" align="center" width="80" min-width="80">
         <!-- 操作列表格头，新增请求头按钮 -->
         <template #header>
-          <el-button type="text" icon="el-icon-plus" :disabled="!queryMode" @click="newAndEditHeader">添加</el-button>
+          <el-button type="text" :icon="Plus" :disabled="!queryMode" @click="newAndEditHeader">添加</el-button>
         </template>
         <!-- 操作按钮 -->
         <template #default="{ $index, row }">
@@ -85,13 +85,13 @@
             <!-- 提交单行编辑按钮 -->
             <el-button v-if="row.editing" type="text" :icon="Check" @click="submitSingleHeader(row)" />
             <!-- 删除请求头按钮 -->
-            <el-button v-if="!row.editing" type="text" icon="el-icon-delete" @click="removeHeader($index, row)" />
+            <el-button v-if="!row.editing" type="text" :icon="Delete" @click="removeHeader($index, row)" />
           </template>
         </template>
       </el-table-column>
     </el-table>
     <!-- 底部添加按钮 -->
-    <el-button v-show="queryMode" type="text" icon="el-icon-plus" @click="newAndEditHeader">添加</el-button>
+    <el-button v-show="queryMode" type="text" :icon="Plus" @click="newAndEditHeader">添加</el-button>
   </div>
 </template>
 

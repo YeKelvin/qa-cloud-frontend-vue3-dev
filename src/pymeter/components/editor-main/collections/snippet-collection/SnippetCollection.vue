@@ -37,7 +37,7 @@
 
       <!-- 参数设置 -->
       <div v-if="showParametersTab">
-        <SnippetCollectionParameterTable :data="parametersData" :edit-mode="editMode" />
+        <ParameterTable :data="parametersData" :edit-mode="editMode" />
       </div>
 
       <!-- HTTP 设置 -->
@@ -95,28 +95,29 @@
         <span style="color: #606266; font-family: inherit">设置片段参数</span>
       </template>
 
-      <SnippetCollectionArgumentTable :data="argumentsData" />
-      <div style="padding: 10px">备注：片段参数不支持函数</div>
+      <template #default>
+        <ArgumentTable :data="argumentsData" />
+        <div style="padding: 10px">备注：片段参数不支持函数</div>
+      </template>
+
       <template #footer>
-        <span>
-          <el-button size="small" :icon="Close" @click="showArgumentsDialog = false">取 消</el-button>
-          <el-dropdown
-            split-button
-            trigger="click"
-            type="danger"
-            style="margin-left: 10px"
-            placement="bottom"
-            @click="executeCollection()"
-          >
-            <el-icon><Pointer /></el-icon>
-            <span style="margin-left: 5px">运 行</span>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item @click="querySnippetsJson()">查看JSON</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-        </span>
+        <el-dropdown
+          split-button
+          trigger="click"
+          type="danger"
+          style="margin-right: 10px"
+          placement="bottom"
+          @click="executeCollection()"
+        >
+          <el-icon><Pointer /></el-icon>
+          <span style="margin-left: 5px">运 行</span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="querySnippetsJson()">查看JSON</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+        <el-button :icon="Close" @click="showArgumentsDialog = false">取 消</el-button>
       </template>
     </el-dialog>
 
@@ -139,12 +140,21 @@ import useWorkspaceState from '@/composables/useWorkspaceState'
 import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 import useRunnableElement from '@/pymeter/composables/useRunnableElement'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
-import SnippetCollectionArgumentTable from './SnippetCollectionArgumentTable.vue' // 实参
-import SnippetCollectionParameterTable from './SnippetCollectionParameterTable.vue' // 形参
+import ArgumentTable from './SnippetCollectionArgumentTable.vue' // 实参
+import ParameterTable from './SnippetCollectionParameterTable.vue' // 形参
 
 const props = defineProps(editorProps)
-const { queryMode, modifyMode, createMode, editNow, setReadonly, updateTabName, closeTab, refreshCollections } =
-  useEditor(props)
+const {
+  editMode,
+  queryMode,
+  modifyMode,
+  createMode,
+  editNow,
+  setReadonly,
+  updateTabName,
+  closeTab,
+  refreshCollections
+} = useEditor(props)
 const { workspaceNo } = useWorkspaceState()
 const { selectedDatasetNumberList, useCurrentValue } = usePyMeterState()
 const elformRef = ref()

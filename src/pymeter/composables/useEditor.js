@@ -53,6 +53,7 @@ export default function useEditor(props) {
   }
 
   return {
+    editMode,
     queryMode,
     modifyMode,
     createMode,

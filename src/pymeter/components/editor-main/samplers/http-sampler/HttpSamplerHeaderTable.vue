@@ -4,9 +4,7 @@
     <el-table stripe style="width: 100%; margin-bottom: 10px" v-bind="$attrs">
       <!-- 空表格 -->
       <el-empty slot="empty" :image-size="80">
-        <el-button slot="description" type="text" icon="el-icon-plus" :disabled="queryMode" @click="newHeader">
-          添加
-        </el-button>
+        <el-button slot="description" type="text" :icon="Plus" :disabled="queryMode" @click="newHeader">添加</el-button>
       </el-empty>
 
       <!-- 是否启用 -->
@@ -32,12 +30,11 @@
 
       <!-- 操作列 -->
       <el-table-column fixed="right" align="center" width="50" min-width="10">
-        <!-- eslint-disable-next-line -->
-      <template slot="header" slot-scope="scope">
-          <el-button type="text" icon="el-icon-plus" :disabled="queryMode" @click="newHeader" />
+        <template v-slot:header="scope" >
+          <el-button type="text" :icon="Plus" :disabled="queryMode" @click="newHeader" />
         </template>
         <template #default="scope">
-          <el-button type="text" icon="el-icon-delete" :disabled="queryMode" @click="removeHeader(scope.$index)" />
+          <el-button type="text" :icon="Delete" :disabled="queryMode" @click="removeHeader(scope.$index)" />
         </template>
       </el-table-column>
     </el-table>
