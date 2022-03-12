@@ -21,15 +21,15 @@
       <!-- 操作按钮 -->
       <span>
         <template v-if="queryMode">
-          <el-button type="text" icon="el-icon-edit" @click="editNow">批量编辑</el-button>
-          <el-button type="text" icon="el-icon-close" @click="closeTab">关闭</el-button>
+          <el-button type="text" :icon="Edit" @click="editNow">批量编辑</el-button>
+          <el-button type="text" :icon="Close" @click="closeTab">关闭</el-button>
         </template>
         <template v-else-if="!createMode">
-          <el-button type="text" icon="el-icon-check" @click="saveHeaders">保存</el-button>
-          <el-button type="text" icon="el-icon-close" @click="cancelEdit">取消</el-button>
+          <el-button type="text" :icon="Check" @click="saveHeaders">保存</el-button>
+          <el-button type="text" :icon="Close" @click="cancelEdit">取消</el-button>
         </template>
         <template v-else>
-          <el-button type="text" icon="el-icon-check" @click="createHeaders">提交</el-button>
+          <el-button type="text" :icon="Check" @click="createHeaders">提交</el-button>
         </template>
       </span>
     </div>
@@ -75,15 +75,15 @@
         <template #default="{ $index, row }">
           <!-- 编辑或新增模式下可用的按钮 -->
           <!-- 删除请求头按钮 -->
-          <el-button v-if="!queryMode" type="text" icon="el-icon-close" @click="cancelHeader($index, row)" />
+          <el-button v-if="!queryMode" type="text" :icon="Close" @click="cancelHeader($index, row)" />
           <!-- 查询模式下可用的按钮 -->
           <template v-if="queryMode">
             <!-- 编辑单行请求头按钮 -->
-            <el-button v-if="!row.editing" type="text" icon="el-icon-edit" @click="$set(row, 'editing', true)" />
+            <el-button v-if="!row.editing" type="text" :icon="Edit" @click="$set(row, 'editing', true)" />
             <!-- 取消单行编辑按钮 -->
-            <el-button v-if="row.editing" type="text" icon="el-icon-close" @click="queryHeaders()" />
+            <el-button v-if="row.editing" type="text" :icon="Close" @click="queryHeaders()" />
             <!-- 提交单行编辑按钮 -->
-            <el-button v-if="row.editing" type="text" icon="el-icon-check" @click="submitSingleHeader(row)" />
+            <el-button v-if="row.editing" type="text" :icon="Check" @click="submitSingleHeader(row)" />
             <!-- 删除请求头按钮 -->
             <el-button v-if="!row.editing" type="text" icon="el-icon-delete" @click="removeHeader($index, row)" />
           </template>

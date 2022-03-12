@@ -196,16 +196,16 @@
 
       <!-- 操作按钮 -->
       <el-form-item v-if="queryMode">
-        <el-button icon="el-icon-edit" type="primary" @click="editNow">编 辑</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Edit" type="primary" @click="editNow">编 辑</el-button>
+        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
       </el-form-item>
       <el-form-item v-else-if="modifyMode">
-        <el-button icon="el-icon-check" type="danger" @click="modifySamplerElement">保 存</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Check" type="danger" @click="modifySamplerElement">保 存</el-button>
+        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
       </el-form-item>
       <el-form-item v-else-if="createMode">
-        <el-button icon="el-icon-check" type="primary" @click="createSamplerElement">保 存</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Check" type="primary" @click="createSamplerElement">保 存</el-button>
+        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -585,7 +585,7 @@ export default {
       this.$store.commit('pymeter/updateTab', { editorNo: this.elementNo, editorName: this.elementInfo.elementName })
       // 重新查询脚本
       this.$store.commit('pymeter/refreshElementTreeNow')
-      // 表单设置为只读
+      // 设置为只读模式
       this.setReadonly()
     },
 

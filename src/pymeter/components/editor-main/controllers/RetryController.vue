@@ -4,13 +4,12 @@
       ref="elementForm"
       label-position="right"
       label-width="auto"
-      style="width:100%"
+      style="width: 100%"
       size="small"
       inline-message
       :model="elementInfo"
       :rules="elementFormRules"
     >
-
       <!-- 元素名称 -->
       <el-form-item label="名称：" prop="elementName">
         <el-input v-model="elementInfo.elementName" placeholder="元素名称" clearable :readonly="queryMode" />
@@ -24,7 +23,7 @@
       <!-- 重试次数 -->
       <el-form-item label="重试次数：" prop="property.RetryController__retries">
         <el-input v-model="elementInfo.property.RetryController__retries" maxlength="2" clearable :readonly="queryMode">
-          <template slot="append">次</template>
+          <template #append>次</template>
         </el-input>
       </el-form-item>
 
@@ -36,7 +35,7 @@
           clearable
           :readonly="queryMode"
         >
-          <template slot="append">ms</template>
+          <template #append>ms</template>
         </el-input>
       </el-form-item>
 
@@ -52,16 +51,16 @@
 
       <!-- 操作按钮 -->
       <el-form-item v-if="queryMode">
-        <el-button icon="el-icon-edit" type="primary" @click="editNow">编 辑</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Edit" type="primary" @click="editNow">编 辑</el-button>
+        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
       </el-form-item>
       <el-form-item v-else-if="modifyMode">
-        <el-button icon="el-icon-check" type="danger" @click="modifyControllerElement">保 存</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Check" type="danger" @click="modifyControllerElement">保 存</el-button>
+        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
       </el-form-item>
       <el-form-item v-else-if="createMode">
-        <el-button icon="el-icon-check" type="primary" @click="createControllerElement">保 存</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Check" type="primary" @click="createControllerElement">保 存</el-button>
+        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -91,19 +90,18 @@ export default {
         }
       },
       elementFormRules: {
-        'elementName': [{ required: true, message: '元素名称不能为空', trigger: 'blur' }],
+        elementName: [{ required: true, message: '元素名称不能为空', trigger: 'blur' }],
         'property.RetryController__retries': [{ required: true, message: '重试次数不能为空', trigger: 'blur' }]
       }
     }
   },
 
-  mounted: function() {
+  mounted: function () {
     // 查询或更新模式时先拉取元素信息
     if (this.queryMode || this.modifyMode) {
-      Element.queryElementInfo({ elementNo: this.elementNo })
-        .then(response => {
-          this.elementInfo = response.result
-        })
+      Element.queryElementInfo({ elementNo: this.elementNo }).then((response) => {
+        this.elementInfo = response.result
+      })
     }
   },
 
@@ -122,7 +120,7 @@ export default {
       this.$store.commit('pymeter/updateTab', { editorNo: this.elementNo, editorName: this.elementInfo.elementName })
       // 重新查询脚本
       this.$store.commit('pymeter/refreshElementTreeNow')
-      // 表单设置为只读
+      // 设置为只读模式
       this.setReadonly()
     },
 

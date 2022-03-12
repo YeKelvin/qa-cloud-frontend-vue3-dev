@@ -113,12 +113,12 @@ const modifySamplerElement = async () => {
   updateTabName(elementInfo.value.elementName)
   // 重新查询脚本列表
   refreshElementTree()
-  // 表单设置为只读
+  // 设置为只读模式
   setReadonly()
 }
 
 /**
- * 创建元素
+ * 新增元素
  */
 const createSamplerElement = async () => {
   // 表单校验

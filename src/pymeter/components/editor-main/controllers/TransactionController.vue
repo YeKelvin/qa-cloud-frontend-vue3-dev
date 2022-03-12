@@ -10,7 +10,6 @@
       :model="elementInfo"
       :rules="elementFormRules"
     >
-
       <!-- 元素名称 -->
       <el-form-item label="名称：" prop="elementName">
         <el-input v-model="elementInfo.elementName" placeholder="元素名称" clearable :readonly="queryMode" />
@@ -23,16 +22,16 @@
 
       <!-- 操作按钮 -->
       <el-form-item v-if="queryMode">
-        <el-button icon="el-icon-edit" type="primary" @click="editNow">编 辑</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Edit" type="primary" @click="editNow">编 辑</el-button>
+        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
       </el-form-item>
       <el-form-item v-else-if="modifyMode">
-        <el-button icon="el-icon-check" type="danger" @click="modifyControllerElement">保 存</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Check" type="danger" @click="modifyControllerElement">保 存</el-button>
+        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
       </el-form-item>
       <el-form-item v-else-if="createMode">
-        <el-button icon="el-icon-check" type="primary" @click="createControllerElement">保 存</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Check" type="primary" @click="createControllerElement">保 存</el-button>
+        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -55,8 +54,7 @@ export default {
         elementRemark: '',
         elementType: 'CONTROLLER',
         elementClass: 'TransactionController',
-        property: {
-        }
+        property: {}
       },
       elementFormRules: {
         elementName: [{ required: true, message: '元素名称不能为空', trigger: 'blur' }]
@@ -64,13 +62,12 @@ export default {
     }
   },
 
-  mounted: function() {
+  mounted: function () {
     // 查询或更新模式时先拉取元素信息
     if (this.queryMode || this.modifyMode) {
-      ElementService.queryElementInfo({ elementNo: this.elementNo })
-        .then(response => {
-          this.elementInfo = response.result
-        })
+      ElementService.queryElementInfo({ elementNo: this.elementNo }).then((response) => {
+        this.elementInfo = response.result
+      })
     }
   },
 
@@ -89,7 +86,7 @@ export default {
       this.$store.commit('pymeter/updateTab', { editorNo: this.elementNo, editorName: this.elementInfo.elementName })
       // 重新查询测试集合列表
       this.$store.commit('pymeter/refreshElementTreeNow')
-      // 表单设置为只读
+      // 设置为只读模式
       this.setReadonly()
     },
 
@@ -117,5 +114,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

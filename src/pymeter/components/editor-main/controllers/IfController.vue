@@ -22,24 +22,23 @@
 
       <!-- if条件 -->
       <el-form-item label="if条件：" prop="property.IfController__condition">
-        <MonacoEditor ref="codeEditor" :read-only="queryMode" style="height:100px;" />
+        <MonacoEditor ref="codeEditor" :read-only="queryMode" style="height: 100px" />
       </el-form-item>
 
       <!-- 操作按钮 -->
       <el-form-item v-if="queryMode">
-        <el-button icon="el-icon-edit" type="primary" @click="editNow">编 辑</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Edit" type="primary" @click="editNow">编 辑</el-button>
+        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
       </el-form-item>
       <el-form-item v-else-if="modifyMode">
-        <el-button icon="el-icon-check" type="danger" @click="modifyControllerElement">保 存</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Check" type="danger" @click="modifyControllerElement">保 存</el-button>
+        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
       </el-form-item>
       <el-form-item v-else-if="createMode">
-        <el-button icon="el-icon-check" type="primary" @click="createControllerElement">保 存</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Check" type="primary" @click="createControllerElement">保 存</el-button>
+        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
       </el-form-item>
     </el-form>
-
   </div>
 </template>
 
@@ -48,7 +47,6 @@ import * as ElementService from '@/api/script/element'
 import EditorMixin from '@/pymeter/components/mixins/editor-mixin'
 
 export default {
-
   name: 'IfControllerEditor',
 
   mixins: [EditorMixin],
@@ -72,14 +70,13 @@ export default {
     }
   },
 
-  mounted: function() {
+  mounted: function () {
     // 查询或更新模式时先拉取元素信息
     if (this.queryMode || this.modifyMode) {
-      ElementService.queryElementInfo({ elementNo: this.elementNo })
-        .then(response => {
-          this.elementInfo = response.result
-          this.$refs.codeEditor.setValue(response.result.property.IfController__condition)
-        })
+      ElementService.queryElementInfo({ elementNo: this.elementNo }).then((response) => {
+        this.elementInfo = response.result
+        this.$refs.codeEditor.setValue(response.result.property.IfController__condition)
+      })
     }
   },
 
@@ -107,7 +104,7 @@ export default {
       this.$store.commit('pymeter/updateTab', { editorNo: this.elementNo, editorName: this.elementInfo.elementName })
       // 重新查询脚本
       this.$store.commit('pymeter/refreshElementTreeNow')
-      // 表单设置为只读
+      // 设置为只读模式
       this.setReadonly()
     },
 

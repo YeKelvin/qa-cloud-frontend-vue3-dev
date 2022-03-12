@@ -25,7 +25,7 @@
         <el-select
           v-model="elementInfo.property.snippetNo"
           placeholder="脚本片段"
-          style="width:100%;"
+          style="width: 100%"
           :disabled="queryMode"
         >
           <el-option
@@ -37,7 +37,7 @@
         </el-select>
       </el-form-item>
 
-      <el-tag v-if="showWarning" type="danger" style="margin-bottom:10px;">
+      <el-tag v-if="showWarning" type="danger" style="margin-bottom: 10px">
         重要提醒：片段参数定义已发生变更，请重新编辑
       </el-tag>
 
@@ -53,19 +53,18 @@
 
       <!-- 操作按钮 -->
       <el-form-item v-if="queryMode">
-        <el-button icon="el-icon-edit" type="primary" @click="editNow">编 辑</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Edit" type="primary" @click="editNow">编 辑</el-button>
+        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
       </el-form-item>
       <el-form-item v-else-if="modifyMode">
-        <el-button icon="el-icon-check" type="danger" @click="modifySamplerElement">保 存</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Check" type="danger" @click="modifySamplerElement">保 存</el-button>
+        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
       </el-form-item>
       <el-form-item v-else-if="createMode">
-        <el-button icon="el-icon-check" type="primary" @click="createSamplerElement">保 存</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Check" type="primary" @click="createSamplerElement">保 存</el-button>
+        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
       </el-form-item>
     </el-form>
-
   </div>
 </template>
 
@@ -76,7 +75,6 @@ import EditorMixin from '@/pymeter/components/mixins/editor-mixin'
 import SnippetSamplerParamsTable from './snippet-sampler-params-table'
 
 export default {
-
   name: 'SnippetSamplerEditor',
 
   components: { SnippetSamplerParamsTable },
@@ -108,7 +106,9 @@ export default {
   },
 
   computed: {
-    showParams() { return this.activeTabName === 'PARAMS' }
+    showParams() {
+      return this.activeTabName === 'PARAMS'
+    }
   },
 
   watch: {
@@ -119,17 +119,16 @@ export default {
     }
   },
 
-  mounted: function() {
+  mounted: function () {
     this.querySnippets()
     // 查询或更新模式时先拉取元素信息
     if (this.queryMode || this.modifyMode) {
-      ElementService.queryElementInfo({ elementNo: this.elementNo })
-        .then(response => {
-          this.elementInfo = response.result
-          if (!this.elementInfo.property.arguments) {
-            this.elementInfo.property.arguments = []
-          }
-        })
+      ElementService.queryElementInfo({ elementNo: this.elementNo }).then((response) => {
+        this.elementInfo = response.result
+        if (!this.elementInfo.property.arguments) {
+          this.elementInfo.property.arguments = []
+        }
+      })
     }
   },
 
@@ -139,49 +138,49 @@ export default {
      */
     querySnippets() {
       ElementService.queryElementAll({
-        workspaceNo: this.metadata.workspaceNo, elementType: 'COLLECTION', elementClass: 'TestSnippets'
+        workspaceNo: this.metadata.workspaceNo,
+        elementType: 'COLLECTION',
+        elementClass: 'TestSnippets'
+      }).then((response) => {
+        this.snippets = response.result
       })
-        .then(response => {
-          this.snippets = response.result
-        })
     },
 
     /**
      * 根据元素编号查询片段详情
      */
     querySnippet(snippetNo) {
-      ElementService.queryElementInfo({ elementNo: snippetNo })
-        .then(response => {
-          // 将片段参数定义添加至表格
-          response.result.property.arguments.forEach(item => {
-            this.definedArgumentsData.push({
-              name: item.name,
-              value: item.default,
-              desc: item.desc,
-              default: item.default
-            })
+      ElementService.queryElementInfo({ elementNo: snippetNo }).then((response) => {
+        // 将片段参数定义添加至表格
+        response.result.property.arguments.forEach((item) => {
+          this.definedArgumentsData.push({
+            name: item.name,
+            value: item.default,
+            desc: item.desc,
+            default: item.default
           })
-          // 非新增模式下，将请求参数合并至表格中，如果请求参数不在片段参数定义中，则丢弃
-          if (!this.createMode) {
-            this.definedArgumentsData.forEach(item => {
-              const arg = this.elementInfo.property.arguments.find(i => i.name === item.name)
-              if (arg) {
-                item.value = arg.value
-              }
-            })
-          }
-          // 将请求参数合并至表格中，如果片段参数定义（对称差集）有变更，则给出提示
-          if (this.queryMode) {
-            if (this.definedArgumentsData.length !== this.elementInfo.property.arguments.length) {
-              this.showWarning = true
-            }
-            const leftDiff = this.$_.differenceBy(this.definedArgumentsData, this.elementInfo.property.arguments, 'name')
-            const rightDiff = this.$_.differenceBy(this.elementInfo.property.arguments, this.definedArgumentsData, 'name')
-            if (leftDiff.length > 0 || rightDiff.length > 0) {
-              this.showWarning = true
-            }
-          }
         })
+        // 非新增模式下，将请求参数合并至表格中，如果请求参数不在片段参数定义中，则丢弃
+        if (!this.createMode) {
+          this.definedArgumentsData.forEach((item) => {
+            const arg = this.elementInfo.property.arguments.find((i) => i.name === item.name)
+            if (arg) {
+              item.value = arg.value
+            }
+          })
+        }
+        // 将请求参数合并至表格中，如果片段参数定义（对称差集）有变更，则给出提示
+        if (this.queryMode) {
+          if (this.definedArgumentsData.length !== this.elementInfo.property.arguments.length) {
+            this.showWarning = true
+          }
+          const leftDiff = this.$_.differenceBy(this.definedArgumentsData, this.elementInfo.property.arguments, 'name')
+          const rightDiff = this.$_.differenceBy(this.elementInfo.property.arguments, this.definedArgumentsData, 'name')
+          if (leftDiff.length > 0 || rightDiff.length > 0) {
+            this.showWarning = true
+          }
+        }
+      })
     },
 
     /**
@@ -204,7 +203,7 @@ export default {
       this.$store.commit('pymeter/refreshElementTreeNow')
       // 隐藏警告
       this.showWarning = false
-      // 表单设置为只读
+      // 设置为只读模式
       this.setReadonly()
     },
 
@@ -234,15 +233,16 @@ export default {
 
     // 更新元素属性
     updateElementProperty() {
-      this.elementInfo.property.arguments = this.definedArgumentsData.map(
-        item => ({ name: item.name, value: item.value })
-      )
+      this.elementInfo.property.arguments = this.definedArgumentsData.map((item) => ({
+        name: item.name,
+        value: item.value
+      }))
     },
 
     // 校验参数值是否为空
     checkParamValue() {
       let pass = true
-      this.elementInfo.property.arguments.forEach(item => {
+      this.elementInfo.property.arguments.forEach((item) => {
         if (StringUtil.isBlank(item.value)) {
           pass = false
           return
@@ -255,5 +255,4 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

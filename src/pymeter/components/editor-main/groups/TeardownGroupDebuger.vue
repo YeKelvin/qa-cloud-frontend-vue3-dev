@@ -121,7 +121,7 @@ const modifyGroupElement = async () => {
   updateTabName(elementInfo.value.elementName)
   // 重新查询脚本列表
   refreshElementTree()
-  // 表单设置为只读
+  // 设置为只读模式
   setReadonly()
 }
 

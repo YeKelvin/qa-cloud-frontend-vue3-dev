@@ -50,7 +50,7 @@
           type="danger"
           placement="bottom"
           style="margin-left: 10px"
-          @click="executeCollection()"
+          @click="executeTestCollection()"
         >
           <el-icon><Pointer /></el-icon>
           <span style="margin-left: 5px">运 行</span>
@@ -71,7 +71,7 @@
       </el-form-item>
     </el-form>
 
-    <el-dialog v-model="showJsonScript" center title="Json脚本" width="80%">
+    <el-dialog v-model="showJsonScriptDialog" center title="Json脚本" width="80%">
       <MonacoEditor ref="jsonEditorRef" language="json" style="height: 400px" :read-only="true" />
     </el-dialog>
   </div>
@@ -91,7 +91,6 @@ import useRunnableElement from '@/pymeter/composables/useRunnableElement'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
 const props = defineProps(editorProps)
-const store = useStore()
 const { queryMode, modifyMode, createMode, editNow, setReadonly, updateTabName, closeTab, refreshCollections } =
   useEditor(props)
 const { workspaceNo } = useWorkspaceState()
@@ -111,7 +110,7 @@ const elementInfo = ref({
 const elementFormRules = reactive({
   elementName: [{ required: true, message: '元素名称不能为空', trigger: 'blur' }]
 })
-const showJsonScript = ref(false)
+const showJsonScriptDialog = ref(false)
 const jsonEditorRef = ref()
 
 onMounted(() => {
@@ -143,7 +142,7 @@ const modifyCollectionElement = async () => {
   updateTabName(elementInfo.value.elementName)
   // 重新查询集合列表
   refreshCollections()
-  // 表单设置为只读
+  // 设置为只读模式
   setReadonly()
 }
 
@@ -184,7 +183,7 @@ const queryCollectionJson = () => {
     dataSetNumberList: selectedDatasetNumberList.value,
     useCurrentValue: useCurrentValue.value
   }).then((response) => {
-    showJsonScript.value = true
+    showJsonScriptDialog.value = true
     nextTick(() => {
       jsonEditorRef.value.setValue(JSON.stringify(response.result))
       setTimeout(() => {
@@ -194,7 +193,7 @@ const queryCollectionJson = () => {
   })
 }
 
-const { executeCollection } = useRunnableElement(elementNo.value)
+const { executeTestCollection } = useRunnableElement(elementNo.value)
 </script>
 
 <style lang="scss" scoped></style>

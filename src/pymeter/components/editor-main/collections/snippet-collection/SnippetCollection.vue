@@ -1,11 +1,10 @@
 <template>
   <div class="pymeter-component-container">
     <el-form
-      ref="elementForm"
+      ref="elformRef"
       label-position="right"
-      label-width="auto"
+      label-width="100px"
       style="width: 100%"
-      size="small"
       inline-message
       :model="elementInfo"
       :rules="elementFormRules"
@@ -22,21 +21,27 @@
 
       <!-- 设置类 Tabs -->
       <el-tabs v-model="activeTabName">
-        <el-tab-pane name="PARAMS">
-          <el-badge slot="label" :hidden="argumentsData.length == 0" type="success" is-dot>参数定义</el-badge>
+        <el-tab-pane name="PARAMETERS">
+          <template #label>
+            <el-badge :hidden="isEmpty(parametersData)" type="success" is-dot>参数定义</el-badge>
+          </template>
         </el-tab-pane>
-        <el-tab-pane name="HTTP">
-          <el-badge slot="label" :hidden="hiddenConfigDot" type="success" is-dot>HTTP配置</el-badge>
+        <el-tab-pane name="HTTP_SETTINGS">
+          <template #label>
+            <el-badge :hidden="elementInfo.property.useHTTPSession === 'false'" type="success" is-dot>
+              HTTP配置
+            </el-badge>
+          </template>
         </el-tab-pane>
       </el-tabs>
 
       <!-- 参数设置 -->
-      <div v-if="showParams">
-        <snippets-params-table :data="argumentsData" :edit-mode="editMode" />
+      <div v-if="showParametersTab">
+        <SnippetCollectionParameterTable :data="parametersData" :edit-mode="editMode" />
       </div>
 
       <!-- HTTP 设置 -->
-      <div v-if="showHttpSettings">
+      <div v-if="showHttpSettingsTab">
         <!-- 是否使用 HTTP 会话 -->
         <el-form-item label="使用会话：">
           <el-switch
@@ -51,10 +56,10 @@
 
       <!-- 操作按钮 -->
       <el-form-item v-if="queryMode">
-        <el-button icon="el-icon-edit" type="primary" @click="editNow">编 辑</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
-        <template v-if="runtimeArgumentsData.length > 0">
-          <el-button icon="el-icon-thumb" type="danger" @click="showRuntimeArguments = true">运 行</el-button>
+        <el-button :icon="Edit" type="primary" @click="editNow()">编 辑</el-button>
+        <el-button :icon="Close" @click="closeTab()">关 闭</el-button>
+        <template v-if="!isEmpty(argumentsData)">
+          <el-button :icon="Pointer" type="danger" @click="showArgumentsDialog = true">运 行</el-button>
         </template>
         <template v-else>
           <el-dropdown
@@ -62,268 +67,243 @@
             trigger="click"
             type="danger"
             style="margin-left: 10px"
-            placement="bottom-start"
-            @click="executeCollection()"
+            placement="bottom"
+            @click="executeSnippetCollection()"
           >
-            <i class="el-icon-thumb" />
+            <el-icon><Pointer /></el-icon>
             <span style="margin-left: 5px">运 行</span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item @click="querySnippetsJson()">查看JSON</el-dropdown-item>
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item @click="querySnippetsJson()">查看JSON</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </template>
       </el-form-item>
       <el-form-item v-else-if="modifyMode">
-        <el-button icon="el-icon-check" type="danger" @click="modifyCollectionElement">保 存</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Check" type="danger" @click="modifyCollectionElement()">保 存</el-button>
+        <el-button :icon="Close" @click="closeTab()">关 闭</el-button>
       </el-form-item>
       <el-form-item v-else-if="createMode">
-        <el-button icon="el-icon-check" type="primary" @click="createCollectionElement">保 存</el-button>
-        <el-button icon="el-icon-close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Check" type="primary" @click="createCollectionElement()">保 存</el-button>
+        <el-button :icon="Close" @click="closeTab()">关 闭</el-button>
       </el-form-item>
     </el-form>
 
-    <el-dialog width="60%" center v-model:visible="showRuntimeArguments">
-      <span slot="title" style="color: #606266; font-family: inherit">设置运行参数</span>
-      <snippets-runtime-variables-table :data="runtimeArgumentsData" />
-      <div style="padding: 10px">备注：运行参数不支持函数</div>
-      <span slot="footer">
-        <el-button size="small" icon="el-icon-close" @click="showRuntimeArguments = false">取 消</el-button>
-        <el-dropdown
-          split-button
-          trigger="click"
-          type="danger"
-          style="margin-left: 10px"
-          placement="bottom-start"
-          @click="
-            showRuntimeArguments = false
-            executeCollection()
-          "
-        >
-          <i class="el-icon-thumb" />
-          <span style="margin-left: 5px">运 行</span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item
-              @click="
-                showRuntimeArguments = false
-                querySnippetsJson()
-              "
-            >
-              查看JSON
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-      </span>
+    <el-dialog v-model="showArgumentsDialog" width="60%" center>
+      <template #title>
+        <span style="color: #606266; font-family: inherit">设置片段参数</span>
+      </template>
+
+      <SnippetCollectionArgumentTable :data="argumentsData" />
+      <div style="padding: 10px">备注：片段参数不支持函数</div>
+      <template #footer>
+        <span>
+          <el-button size="small" :icon="Close" @click="showArgumentsDialog = false">取 消</el-button>
+          <el-dropdown
+            split-button
+            trigger="click"
+            type="danger"
+            style="margin-left: 10px"
+            placement="bottom"
+            @click="executeCollection()"
+          >
+            <el-icon><Pointer /></el-icon>
+            <span style="margin-left: 5px">运 行</span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item @click="querySnippetsJson()">查看JSON</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </span>
+      </template>
     </el-dialog>
 
-    <el-dialog center title="Json脚本" width="80%" v-model:visible="showJsonScript">
-      <MonacoEditor ref="jsonEditor" language="json" style="height: 300px" :read-only="true" />
+    <el-dialog v-model="showJsonScriptDialog" title="Json脚本" width="80%" center>
+      <MonacoEditor ref="jsonEditorRef" language="json" style="height: 400px" :read-only="true" />
     </el-dialog>
   </div>
 </template>
 
-<script>
-import { mapState } from 'vuex'
-import * as StringUtil from '@/utils/string-util'
+<script setup>
+import { ElMessage } from 'element-plus'
+import { Check, Close, Edit, Pointer } from '@element-plus/icons-vue'
+import { isEmpty } from 'lodash-es'
+import { isBlank, isBlankAll } from '@/utils/string-util'
 import * as ElementService from '@/api/script/element'
 import * as ExecutionService from '@/api/script/execution'
-import EditorMixin from '@/pymeter/components/mixins/editor-mixin'
-import SocketIOMixin from '@/mixins/socketio-mixin'
-import SnippetsParamsTable from './snippets-params-table'
-import SnippetsRuntimeVariablesTable from './snippets-runtime-variables-table'
+import editorProps from '@/pymeter/composables/editor.props'
+import useEditor from '@/pymeter/composables/useEditor'
+import useWorkspaceState from '@/composables/useWorkspaceState'
+import usePyMeterState from '@/pymeter/composables/usePyMeterState'
+import useRunnableElement from '@/pymeter/composables/useRunnableElement'
+import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
+import SnippetCollectionArgumentTable from './SnippetCollectionArgumentTable.vue' // 实参
+import SnippetCollectionParameterTable from './SnippetCollectionParameterTable.vue' // 形参
 
-export default {
-  name: 'SnippetCollection',
-
-  components: { SnippetsParamsTable, SnippetsRuntimeVariablesTable },
-
-  mixins: [EditorMixin, SocketIOMixin],
-
-  data() {
-    return {
-      elementNo: this.editorNo,
-      elementInfo: {
-        elementName: 'Snippet',
-        elementRemark: '',
-        elementType: 'COLLECTION',
-        elementClass: 'TestSnippets',
-        property: {
-          arguments: [],
-          useHTTPSession: 'false'
-        }
-      },
-      elementFormRules: {
-        elementName: [{ required: true, message: '元素名称不能为空', trigger: 'blur' }]
-      },
-      activeTabName: 'PARAMS',
-      argumentsData: [],
-      showRuntimeArguments: false,
-      runtimeArgumentsData: [],
-      showJsonScript: false
-    }
-  },
-
-  computed: {
-    ...mapState('workspace', {
-      workspaceNo: (state) => state.workspaceNo
-    }),
-    ...mapState('pymeter', {
-      selectedDatasetNumberList: (state) => state.selectedDatasetNumberList,
-      useCurrentValue: (state) => state.useCurrentValue
-    }),
-    showParams() {
-      return this.activeTabName === 'PARAMS'
-    },
-    showHttpSettings() {
-      return this.activeTabName === 'HTTP'
-    },
-    hiddenConfigDot() {
-      if (this.elementInfo.property.useHTTPSession === 'false') {
-        return true
-      }
-      return false
-    },
-    additionalVariables() {
-      if (this.runtimeArgumentsData.length === 0) return {}
-      const vars = {}
-      this.runtimeArgumentsData.forEach((item) => {
-        vars[item.name] = item.default
-      })
-      return vars
-    }
-  },
-
-  mounted: function () {
-    // 查询或更新模式时先拉取元素信息
-    if (this.queryMode || this.modifyMode) {
-      ElementService.queryElementInfo({ elementNo: this.elementNo }).then((response) => {
-        this.elementInfo = response.result
-        this.argumentsData = response.result.property.arguments
-        this.runtimeArgumentsData = response.result.property.arguments
-      })
-    }
-  },
-
-  methods: {
-    /**
-     * 修改元素信息
-     */
-    async modifyCollectionElement() {
-      // 校验表单字段
-      if (!(await this.checkForm('elementForm'))) return
-      // 更新元素属性
-      this.updateElementProperty()
-      // 校验参数名称不能为空
-      if (!this.checkParamName()) return
-      // 修改元素
-      await ElementService.modifyElement({ elementNo: this.elementNo, ...this.elementInfo })
-      // 成功提示
-      this.$message({ message: '修改元素成功', type: 'info', duration: 2 * 1000 })
-      // 修改tab标题
-      this.$store.commit('pymeter/updateTab', { editorNo: this.elementNo, editorName: this.elementInfo.elementName })
-      // 重新查询测试集合列表
-      this.$store.commit('pymeter/refreshCollectionsNow')
-      // 表单设置为只读
-      this.setReadonly()
-    },
-
-    /**
-     * 创建元素
-     * TODO: workspaceNo非空判断，为空时弹出workspace选择列表
-     */
-    async createCollectionElement() {
-      // 校验表单字段
-      if (!(await this.checkForm('elementForm'))) return
-      // 更新元素属性
-      this.updateElementProperty()
-      // 校验参数名称不能为空
-      if (!this.checkParamName()) return
-      // 新增元素
-      await ElementService.createElement({ workspaceNo: this.workspaceNo, ...this.elementInfo })
-      // 成功提示
-      this.$message({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
-      // 关闭tab
-      this.$store.commit('pymeter/removeTab', { editorNo: 'UNSAVED_SNIPPET' })
-      // 重新查询测试集合列表
-      this.$store.commit('pymeter/refreshCollectionsNow')
-    },
-
-    // 更新元素属性
-    updateElementProperty() {
-      this.elementInfo.property.arguments = this.argumentsData.filter(
-        (item) => !StringUtil.isBlankAll(item.name, item.default, item.desc)
-      )
-    },
-
-    // 校验参数名称是否为空
-    checkParamName() {
-      let pass = true
-      this.elementInfo.property.arguments.forEach((item) => {
-        if (StringUtil.isBlank(item.name)) {
-          pass = false
-          return
-        }
-      })
-      if (!pass) this.$message({ message: '参数名称不能为空', type: 'error' })
-      return pass
-    },
-
-    /**
-     * 根据 collectionNo 执行脚本
-     */
-    async executeCollection() {
-      try {
-        // 没有选择变量集时给出提示
-        if (this.selectedDatasetNumberList.length === 0) {
-          await this.$confirm('当前没有选择[环境/变量]，确定执行吗？', '警告', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          })
-        }
-        // 连接 socket
-        this.socketConnect()
-        // 等待获取 sid，后再执行脚本
-        const sid = await this.getSID()
-        // 后端异步执行脚本
-        await ExecutionService.executeSnippets({
-          collectionNo: this.elementNo,
-          socketId: sid,
-          variableDataSet: {
-            useCurrentValue: this.useCurrentValue,
-            numberList: this.selectedDatasetNumberList
-          },
-          variables: this.additionalVariables
-        })
-        // 打开结果面板
-        this.$store.commit('pymeter/openResultDrawer')
-      } catch {
-        // 异常时断开 socket 连接
-        this.socketDisconnect()
-      }
-    },
-
-    /**
-     * 查看 Json 脚本
-     */
-    querySnippetsJson() {
-      ExecutionService.querySnippetsJson({
-        collectionNo: this.elementNo,
-        dataSetNumberList: this.selectedDatasetNumberList,
-        useCurrentValue: this.useCurrentValue,
-        variables: this.additionalVariables
-      }).then((response) => {
-        this.showJsonScript = true
-        this.$nextTick(() => {
-          this.$refs.jsonEditor.setValue(JSON.stringify(response.result))
-          setTimeout(() => {
-            this.$refs.jsonEditor.formatDocument()
-          }, 200)
-        })
-      })
-    }
+const props = defineProps(editorProps)
+const { queryMode, modifyMode, createMode, editNow, setReadonly, updateTabName, closeTab, refreshCollections } =
+  useEditor(props)
+const { workspaceNo } = useWorkspaceState()
+const { selectedDatasetNumberList, useCurrentValue } = usePyMeterState()
+const elformRef = ref()
+const elementNo = ref(props.editorNo)
+const elementInfo = ref({
+  elementName: 'Snippet',
+  elementRemark: '',
+  elementType: 'COLLECTION',
+  elementClass: 'TestSnippets',
+  property: {
+    arguments: [],
+    useHTTPSession: 'false'
   }
+})
+const elementFormRules = reactive({
+  elementName: [{ required: true, message: '元素名称不能为空', trigger: 'blur' }]
+})
+const activeTabName = ref('PARAMETERS')
+const parametersData = ref([]) // 形参
+const argumentsData = ref([]) // 实参
+const showArgumentsDialog = ref(false)
+const showJsonScriptDialog = ref(false)
+const jsonEditorRef = ref()
+const showParametersTab = computed(() => activeTabName.value === 'PARAMETERS')
+const showHttpSettingsTab = computed(() => activeTabName.value === 'HTTP_SETTINGS')
+const additionalVariables = computed(() => {
+  if (argumentsData.value.length === 0) return {}
+  const vars = {}
+  argumentsData.value.forEach((item) => {
+    vars[item.name] = item.default
+  })
+  return vars
+})
+
+onMounted(() => {
+  // 查询或更新模式时，先拉取元素信息
+  if (createMode.value) return
+  ElementService.queryElementInfo({ elementNo: elementNo.value }).then((response) => {
+    elementInfo.value = response.result
+    parametersData.value = response.result.property.arguments
+    argumentsData.value = response.result.property.arguments
+  })
+})
+
+/**
+ * 修改元素信息
+ */
+const modifyCollectionElement = async () => {
+  // 表单校验
+  const error = await elformRef.value
+    .validate()
+    .then(() => false)
+    .catch(() => true)
+  if (error) {
+    ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 更新元素属性
+  updateElementProperty()
+  // 校验参数名称不能为空
+  if (!checkParameter()) return
+  // 修改元素
+  await ElementService.modifyElement({ elementNo: elementNo.value, ...elementInfo.value })
+  // 成功提示
+  ElMessage({ message: '修改元素成功', type: 'info', duration: 2 * 1000 })
+  // 修改tab标题
+  updateTabName(elementInfo.value.elementName)
+  // 重新查询集合列表
+  refreshCollections()
+  // 设置为只读模式
+  setReadonly()
 }
+
+/**
+ * 创建元素
+ */
+const createCollectionElement = async () => {
+  // 工作空间非空校验
+  if (isEmpty(workspaceNo.value)) {
+    ElMessage({ message: '请先选择工作空间', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 表单校验
+  const error = await elformRef.value
+    .validate()
+    .then(() => false)
+    .catch(() => true)
+  if (error) {
+    ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 更新元素属性
+  updateElementProperty()
+  // 校验参数名称不能为空
+  if (!checkParameter()) return
+  // 新增元素
+  await ElementService.createElement({ workspaceNo: workspaceNo.value, ...elementInfo.value })
+  // 成功提示
+  ElMessage({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
+  // 关闭tab
+  closeTab()
+  // 重新查询集合列表
+  refreshCollections()
+}
+
+/**
+ * 更新元素属性
+ */
+const updateElementProperty = () => {
+  elementInfo.value.property.arguments = parametersData.value.filter(
+    (item) => !isBlankAll(item.name, item.default, item.desc)
+  )
+}
+
+/**
+ * 校验参数名称是否为空
+ */
+const checkParameter = () => {
+  let pass = true
+  elementInfo.value.property.arguments.forEach((item) => {
+    if (isBlank(item.name)) {
+      pass = false
+      return
+    }
+  })
+  if (!pass) ElMessage({ message: '参数名称不能为空', type: 'error' })
+  return pass
+}
+
+/**
+ * 根据 collectionNo 执行脚本
+ */
+const executeCollection = async () => {
+  showArgumentsDialog.value = false
+  await executeSnippetCollection(additionalVariables.value)
+}
+
+/**
+ * 查看 Json 脚本
+ */
+const querySnippetsJson = () => {
+  showArgumentsDialog.value = false
+  ExecutionService.querySnippetsJson({
+    collectionNo: elementNo.value,
+    dataSetNumberList: selectedDatasetNumberList.value,
+    useCurrentValue: useCurrentValue.value,
+    variables: additionalVariables.value
+  }).then((response) => {
+    showJsonScriptDialog.value = true
+    nextTick(() => {
+      jsonEditorRef.value.setValue(JSON.stringify(response.result))
+      setTimeout(() => {
+        jsonEditorRef.value.formatDocument()
+      }, 200)
+    })
+  })
+}
+
+const { executeSnippetCollection } = useRunnableElement(elementNo.value)
 </script>
 
 <style lang="scss" scoped>

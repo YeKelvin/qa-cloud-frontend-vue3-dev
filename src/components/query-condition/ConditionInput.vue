@@ -17,8 +17,8 @@ export default {
       get() {
         return this.$attrs.modelValue
       },
-      set(newVal) {
-        this.$emit('update:modelValue', newVal)
+      set(val) {
+        this.$emit('update:modelValue', val)
       }
     }
   }

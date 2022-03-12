@@ -52,13 +52,13 @@
           type="danger"
           style="margin-left: 10px"
           placement="bottom"
-          @click="executeGroup(false)"
+          @click="executeTestGroup(false)"
         >
           <el-icon><Pointer /></el-icon>
           <span style="margin-left: 5px">运 行</span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="executeGroup(true)">独立运行</el-dropdown-item>
+              <el-dropdown-item @click="executeTestGroup(true)">独立运行</el-dropdown-item>
               <el-dropdown-item @click="queryGroupJson()">查看JSON</el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -74,7 +74,7 @@
       </el-form-item>
     </el-form>
 
-    <el-dialog v-model="showJsonScript" center title="Json脚本" width="80%">
+    <el-dialog v-model="showJsonScriptDialog" center title="Json脚本" width="80%">
       <MonacoEditor ref="jsonEditor" language="json" style="height: 300px" :read-only="true" />
     </el-dialog>
   </div>
@@ -86,6 +86,7 @@ import { Check, Close, Edit, Pointer } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
 import editorProps from '@/pymeter/composables/editor.props'
 import useEditor from '@/pymeter/composables/useEditor'
+import useRunnableElement from '@/pymeter/composables/useRunnableElement'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
 const props = defineProps(editorProps)
@@ -119,7 +120,7 @@ const elementFormRules = reactive({
     { required: true, message: '循环次数不能为空', trigger: 'blur' }
   ]
 })
-const showJsonScript = ref(false)
+const showJsonScriptDialog = ref(false)
 
 onMounted(() => {
   // 查询或更新模式时，先拉取元素信息
@@ -150,7 +151,7 @@ const modifyGroupElement = async () => {
   updateTabName(elementInfo.value.elementName)
   // 重新查询脚本列表
   refreshElementTree()
-  // 表单设置为只读
+  // 设置为只读模式
   setReadonly()
 }
 
@@ -180,6 +181,8 @@ const createGroupElement = async () => {
   // 重新查询脚本列表
   refreshElementTree()
 }
+
+const { executeTestGroup } = useRunnableElement(elementNo.value)
 </script>
 
 <style lang="scss" scoped></style>

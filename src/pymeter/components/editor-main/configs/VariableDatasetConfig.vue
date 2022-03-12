@@ -21,15 +21,15 @@
       <!-- 操作按钮 -->
       <span>
         <template v-if="queryMode">
-          <el-button type="text" icon="el-icon-edit" @click="editNow">批量编辑</el-button>
-          <el-button type="text" icon="el-icon-close" @click="closeTab">关闭</el-button>
+          <el-button type="text" :icon="Edit" @click="editNow">批量编辑</el-button>
+          <el-button type="text" :icon="Close" @click="closeTab">关闭</el-button>
         </template>
         <template v-else-if="!createMode">
-          <el-button type="text" icon="el-icon-check" @click="saveVariables">保存</el-button>
-          <el-button type="text" icon="el-icon-close" @click="cancelEdit">取消</el-button>
+          <el-button type="text" :icon="Check" @click="saveVariables">保存</el-button>
+          <el-button type="text" :icon="Close" @click="cancelEdit">取消</el-button>
         </template>
         <template v-else>
-          <el-button type="text" icon="el-icon-check" @click="createVariables">提交</el-button>
+          <el-button type="text" :icon="Check" @click="createVariables">提交</el-button>
         </template>
       </span>
     </div>
@@ -85,15 +85,15 @@
         <template #default="{ $index, row }">
           <!-- 编辑或新增模式下可用的按钮 -->
           <!-- 删除变量按钮 -->
-          <el-button v-if="!queryMode" type="text" icon="el-icon-close" @click="cancelVariable($index, row)" />
+          <el-button v-if="!queryMode" type="text" :icon="Close" @click="cancelVariable($index, row)" />
           <!-- 查询模式下可用的按钮 -->
           <template v-if="queryMode">
             <!-- 编辑单行变量按钮 -->
-            <el-button v-if="!row.editing" type="text" icon="el-icon-edit" @click="$set(row, 'editing', true)" />
+            <el-button v-if="!row.editing" type="text" :icon="Edit" @click="$set(row, 'editing', true)" />
             <!-- 取消单行编辑按钮 -->
-            <el-button v-if="row.editing" type="text" icon="el-icon-close" @click="queryVariables()" />
+            <el-button v-if="row.editing" type="text" :icon="Close" @click="queryVariables()" />
             <!-- 提交单行编辑按钮 -->
-            <el-button v-if="row.editing" type="text" icon="el-icon-check" @click="submitSingleVariable(row)" />
+            <el-button v-if="row.editing" type="text" :icon="Check" @click="submitSingleVariable(row)" />
             <!-- 删除变量按钮 -->
             <el-button v-if="!row.editing" type="text" icon="el-icon-delete" @click="removeVariable($index, row)" />
           </template>

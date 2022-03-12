@@ -27,8 +27,8 @@ const DEFAULT_OPTIONS = {
   highlightActiveIndentGuide: true,
   // 显示行号的位数
   lineNumbersMinChars: 4,
-  // 启用字形边距的渲染，默认 false
-  glyphMargin: true,
+  // 开启行号边距，默认 false
+  glyphMargin: false,
   // 括号高亮
   guides: { bracketPairs: 'active' },
   // 小地图
@@ -39,6 +39,12 @@ const DEFAULT_OPTIONS = {
   quickSuggestions: true,
   // 快速建议显示延迟（ms），默认 500ms
   quickSuggestionsDelay: 250,
+  // 使用圆角边框渲染编辑器选择，默认 true
+  roundedSelection: false,
+  renderFinalNewline: true,
+  renderIndentGuides: true,
+  renderLineHighlight: 'all',
+  renderWhitespace: 'all',
   // 滚动条大小
   scrollbar: {
     verticalScrollbarSize: 6,
@@ -46,13 +52,8 @@ const DEFAULT_OPTIONS = {
   },
   // 单击行号时是否应选择相应的行为，默认 true
   selectOnLineNumbers: true,
-  // 使用圆角边框渲染编辑器选择，默认 true
-  roundedSelection: false,
-  renderFinalNewline: true,
-  renderIndentGuides: true,
-  renderLineHighlight: 'all',
-  renderWhitespace: 'all',
   selectionHighlight: true,
+  'semanticHighlighting.enabled': true,
   smoothScrolling: true,
   snippetSuggestions: 'top',
   suggestSelection: 'first',

@@ -2,33 +2,28 @@
   <el-table style="width: 100%" stripe v-bind="$attrs">
     <!-- 参数名称 -->
     <el-table-column label="参数名称" width="auto">
-      <span slot-scope="scope">{{ scope.row.name }}</span>
+      <template #default="scope">
+        <span>{{ scope.row.name }}</span>
+      </template>
     </el-table-column>
 
     <!-- 参数值 -->
     <el-table-column label="参数值" width="auto">
-      <el-input
-        v-model="scope.row.default"
-        slot-scope="scope"
-        type="textarea"
-        rows="1"
-        autosize
-        :placeholder="scope.row.default"
-      />
+      <template #default="scope">
+        <el-input v-model="scope.row.default" type="textarea" rows="1" autosize :placeholder="scope.row.default" />
+      </template>
     </el-table-column>
 
     <!-- 参数描述 -->
     <el-table-column label="描述" width="auto">
-      <span slot-scope="scope">{{ scope.row.desc }}</span>
+      <template #default="scope">
+        <span>{{ scope.row.desc }}</span>
+      </template>
     </el-table-column>
   </el-table>
 </template>
 
-<script>
-export default {
-  name: 'SnippetsRuntimeVariablesTable'
-}
-</script>
+<script setup></script>
 
 <style lang="scss" scoped>
 .el-table {

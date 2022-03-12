@@ -30,7 +30,7 @@
     <!-- 操作列 -->
     <el-table-column v-if="!queryMode" fixed="right" align="center" width="50" min-width="10">
       <!-- eslint-disable-next-line -->
-      <template slot="header" slot-scope="scope">
+      <template #header>
         <el-button type="text" icon="el-icon-plus" :disabled="queryMode" @click="newParam" />
       </template>
       <template #default="scope">
@@ -41,10 +41,10 @@
 </template>
 
 <script>
-import * as StringUtil from '@/utils/string-util'
+import { isBlankAll } from '@/utils/string-util'
 
 export default {
-  name: 'SnippetsParamsTable',
+  name: 'SnippetCollectionParameterTable',
 
   inheritAttrs: false,
 
@@ -90,7 +90,7 @@ export default {
       this.$attrs.data.splice(index, 1)
     },
     isBlankRow(param) {
-      return StringUtil.isBlankAll(param.name, param.default, param.desc)
+      return isBlankAll(param.name, param.default, param.desc)
     },
     isNotBlankRow(param) {
       return !this.isBlankRow(param)
