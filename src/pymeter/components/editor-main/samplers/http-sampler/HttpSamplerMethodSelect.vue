@@ -1,6 +1,6 @@
 <template>
   <!-- http请求方法列表 -->
-  <el-select v-model="localValue" v-bind="$attrs" style="width: 110px">
+  <el-select v-model="localModelValue" style="width: 110px">
     <el-option label="GET" value="GET" />
     <el-option label="POST" value="POST" />
     <el-option label="PUT" value="PUT" />
@@ -15,17 +15,14 @@
 
 <script>
 export default {
-  name: 'HttpMethodSelect',
-
-  inheritAttrs: false,
-
+  emits: ['update:modelValue'],
   computed: {
-    localValue: {
+    localModelValue: {
       get() {
-        return this.$attrs.value
+        return this.$attrs.modelValue
       },
       set(val) {
-        this.$emit('input', val)
+        this.$emit('update:modelValue', val)
       }
     }
   }

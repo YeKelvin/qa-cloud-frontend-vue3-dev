@@ -52,27 +52,27 @@
 
       <!-- 操作按钮 -->
       <el-form-item v-if="queryMode">
-        <el-button :icon="Edit" type="primary" @click="editNow">编 辑</el-button>
-        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Edit" type="primary" @click="editNow()">编 辑</el-button>
+        <el-button :icon="Close" @click="closeTab()">关 闭</el-button>
       </el-form-item>
       <el-form-item v-else-if="modifyMode">
-        <el-button :icon="Check" type="danger" @click="modifySamplerElement">保 存</el-button>
-        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Check" type="danger" @click="modifySamplerElement()">保 存</el-button>
+        <el-button :icon="Close" @click="closeTab()">关 闭</el-button>
       </el-form-item>
       <el-form-item v-else-if="createMode">
-        <el-button :icon="Check" type="primary" @click="createSamplerElement">保 存</el-button>
-        <el-button :icon="Close" @click="closeTab">关 闭</el-button>
+        <el-button :icon="Check" type="primary" @click="createSamplerElement()">保 存</el-button>
+        <el-button :icon="Close" @click="closeTab()">关 闭</el-button>
       </el-form-item>
     </el-form>
   </div>
 </template>
 
 <script setup>
-import { differenceBy } from 'lodash-es'
+import { differenceBy as _differenceBy } from 'lodash-es'
 import { ElMessage } from 'element-plus'
 import { Check, Close, Edit } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
-import * as StringUtil from '@/utils/string-util'
+import { isBlank } from '@/utils/string-util'
 import editorProps from '@/pymeter/composables/editor.props'
 import useEditor from '@/pymeter/composables/useEditor'
 import ArgumentTable from './SnippetSamplerArgumentTable.vue'
@@ -161,8 +161,8 @@ const querySnippet = (snippetNo) => {
       if (definedArgumentsData.value.length !== elementInfo.value.property.arguments.length) {
         showWarning.value = true
       }
-      const leftDiff = differenceBy(definedArgumentsData.value, elementInfo.value.property.arguments, 'name')
-      const rightDiff = differenceBy(elementInfo.value.property.arguments, definedArgumentsData.value, 'name')
+      const leftDiff = _differenceBy(definedArgumentsData.value, elementInfo.value.property.arguments, 'name')
+      const rightDiff = _differenceBy(elementInfo.value.property.arguments, definedArgumentsData.value, 'name')
       if (leftDiff.length > 0 || rightDiff.length > 0) {
         showWarning.value = true
       }
@@ -244,7 +244,7 @@ const setElementProperty = () => {
 const checkParameter = () => {
   let pass = true
   elementInfo.value.property.arguments.forEach((item) => {
-    if (StringUtil.isBlank(item.value)) {
+    if (isBlank(item.value)) {
       pass = false
       return
     }

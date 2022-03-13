@@ -16,21 +16,21 @@
       </template>
     </el-table-column>
 
-    <!-- 键名 -->
-    <el-table-column label="键名" width="auto">
+    <!-- 参数名称 -->
+    <el-table-column label="名称" width="auto">
       <template #default="{ row }">
         <el-input v-model="row.name" :readonly="queryMode" type="textarea" rows="1" autosize />
       </template>
     </el-table-column>
 
-    <!-- 键值 -->
-    <el-table-column label="键值" width="auto">
+    <!-- 参数值 -->
+    <el-table-column label="值" width="auto">
       <template #default="{ row }">
         <el-input v-model="row.value" :readonly="queryMode" type="textarea" rows="1" autosize />
       </template>
     </el-table-column>
 
-    <!-- 键值描述 -->
+    <!-- 参数描述 -->
     <el-table-column label="描述" width="auto">
       <template #default="{ row }">
         <el-input v-model="row.desc" :readonly="queryMode" type="textarea" rows="1" autosize />
