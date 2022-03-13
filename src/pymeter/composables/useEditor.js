@@ -52,6 +52,13 @@ export default function useEditor(props) {
     store.commit('pymeter/refreshElementTreeNow')
   }
 
+  /**
+   * 重新加载列表
+   */
+  const queryDatasetAll = () => {
+    store.dispatch('pymeter/queryDatasetAll')
+  }
+
   return {
     editMode,
     queryMode,
@@ -62,6 +69,7 @@ export default function useEditor(props) {
     updateTabName,
     closeTab,
     refreshCollections,
-    refreshElementTree
+    refreshElementTree,
+    queryDatasetAll
   }
 }

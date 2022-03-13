@@ -95,21 +95,12 @@
   </div>
 </template>
 
-<script>
-import { mapState } from 'vuex'
-import BaseTextarea from '@/components/BaseTextarea'
-import EditorMixin from '@/pymeter/components/mixins/editor-mixin'
+<script setup>
 import * as HttpHeadersService from '@/api/script/headers'
-import * as StringUtil from '@/utils/string-util'
-import * as ObjectUtil from '@/utils/object-util'
+</script>
 
+<script>
 export default {
-  name: 'HttpHeadersTemplateEditor',
-
-  components: { BaseTextarea },
-
-  mixins: [EditorMixin],
-
   data() {
     return {
       templateNo: this.editorNo,
@@ -393,7 +384,6 @@ export default {
 }
 
 span {
-  overflow: hidden;
   white-space: pre-wrap;
   text-overflow: ellipsis;
   letter-spacing: 0.6px;

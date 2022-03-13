@@ -49,8 +49,8 @@ const editors = reactive({
   // RetryController: RetryControllerEditor,
   // TransactionController: TransactionControllerEditor,
   // WhileController: WhileControllerEditor,
-  // VariableDataset: VariableDatasetEditor,
-  // HttpHeadersTemplate: HttpHeadersTemplateEditor,
+  VariableDataset: markRaw(defineAsyncComponent(() => import('./configs/VariableDatasetConfig.vue'))),
+  // HttpHeadersTemplate: markRaw(defineAsyncComponent(() => import('./configs/HttpheaderTemplateConfig.vue'))),
   ConstantTimer: markRaw(defineAsyncComponent(() => import('./timers/ConstantTimer.vue')))
 })
 

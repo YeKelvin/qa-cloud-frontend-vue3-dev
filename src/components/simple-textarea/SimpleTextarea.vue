@@ -1,34 +1,30 @@
 <template>
-  <textarea ref="textarea" class="base-textarea" v-bind="$attrs" :value="value" @input="handleInput" />
+  <textarea ref="textareaRef" class="simple-textarea" :value="$attrs.modelValue" @input="handleInput" />
 </template>
 
-<script>
-export default {
-  name: 'SimpleTextarea',
-  props: {
-    value: { type: String, default: '' }
-  },
-  emits: ['input'],
-  mounted() {
-    if (this.value) {
-      this.resize()
-    }
-  },
+<script setpup>
+const emit = defineEmits(['update:modelValue'])
+const attrs = useAttrs()
+const textareaRef = ref()
 
-  methods: {
-    handleInput(event) {
-      this.$emit('input', event.target.value)
-      this.$nextTick(this.resize)
-    },
-    resize() {
-      this.$refs.textarea.style.height = `${this.$refs.textarea.scrollHeight}px`
-    }
+onMounted(() => {
+  if (attrs.modelValue) {
+    resize()
   }
+})
+
+const handleInput = (event) => {
+  emit('update:modelValue', event.target.value)
+  nextTick(resize)
+}
+
+const resize = () => {
+  textareaRef.value.style.height = `${textareaRef.value.scrollHeight}px`
 }
 </script>
 
 <style lang="scss" scoped>
-.base-textarea {
+.simple-textarea {
   overflow: hidden;
   position: relative;
   display: block;
