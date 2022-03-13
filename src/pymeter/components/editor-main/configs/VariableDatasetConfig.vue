@@ -48,10 +48,9 @@
 
       <!-- 变量名称 -->
       <el-table-column label="名称">
-        <!-- <template #default="{ row }"> -->
-        <template #default="scope">
-          <SimpleTextarea v-if="!queryMode || scope.row.editing" v-model="scope.row.varName" />
-          <span v-else>{{ scope.row.varName }}</span>
+        <template #default="{ row }">
+          <SimpleTextarea v-if="!queryMode || row.editing" v-model="row.varName" />
+          <span v-else>{{ row.varName }}</span>
         </template>
       </el-table-column>
 
@@ -118,7 +117,7 @@ import { isBlank, isBlankAll, isNotBlank } from '@/utils/string-util'
 import SimpleTextarea from '@/components/simple-textarea/SimpleTextarea.vue'
 
 const props = defineProps(editorProps)
-const { queryMode, modifyMode, createMode, editNow, setReadonly, closeTab, queryDatasetAll } = useEditor(props)
+const { queryMode, createMode, editNow, setReadonly, closeTab, queryDatasetAll } = useEditor(props)
 const { workspaceNo } = useWorkspaceState()
 const elformRef = ref()
 const eltableRef = ref()
@@ -135,7 +134,6 @@ const rows = ref([])
 const pendingDeletionList = ref([])
 
 watch(queryMode, () => {
-  console.log('queryMode: ', queryMode.value)
   // 动态显隐表格列后重新渲染表格
   nextTick(() => {
     eltableRef.value.doLayout()
@@ -190,6 +188,13 @@ const newVariable = () => {
  */
 const newAndEditVariable = () => {
   rows.value.push({ varName: '', varDesc: '', initialValue: '', currentValue: '', enabled: true, editing: true })
+  scrollToBottom()
+}
+
+/**
+ * 滚动至底部
+ */
+const scrollToBottom = () => {
   const scrollbar = document.querySelector('#editor-main-scrollbar > .el-scrollbar__wrap')
   scrollbar.scrollTop = scrollbar.scrollHeight
 }
@@ -293,7 +298,7 @@ const deletionComfirm = async (...args) => {
  */
 const saveVariables = async () => {
   // 待删除列表非空时，需要二次确认
-  if (!_isEmpty(pendingDeletionList)) {
+  if (!_isEmpty(pendingDeletionList.value)) {
     // 二次确认
     const error = await deletionComfirm(...pendingDeletionList.value.map((item) => item.varName))
     if (error) return

@@ -2,7 +2,7 @@
   <textarea ref="textareaRef" class="simple-textarea" :value="$attrs.modelValue" @input="handleInput" />
 </template>
 
-<script setpup>
+<script setup>
 const emit = defineEmits(['update:modelValue'])
 const attrs = useAttrs()
 const textareaRef = ref()

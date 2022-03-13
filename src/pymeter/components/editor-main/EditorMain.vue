@@ -43,14 +43,14 @@ const editors = reactive({
   PythonPreProcessor: markRaw(defineAsyncComponent(() => import('./pre-processors/PythonPreProcessor.vue'))),
   PythonPostProcessor: markRaw(defineAsyncComponent(() => import('./post-processors/PythonPostProcessor.vue'))),
   PythonAssertion: markRaw(defineAsyncComponent(() => import('./assertions/PythonAssertion.vue'))),
-  // IfController: IfControllerEditor,
-  // ForInController: ForInControllerEditor,
-  // LoopController: LoopControllerEditor,
-  // RetryController: RetryControllerEditor,
-  // TransactionController: TransactionControllerEditor,
-  // WhileController: WhileControllerEditor,
+  IfController: markRaw(defineAsyncComponent(() => import('./controllers/IfController.vue'))),
+  WhileController: markRaw(defineAsyncComponent(() => import('./controllers/WhileController.vue'))),
+  ForInController: markRaw(defineAsyncComponent(() => import('./controllers/ForInController.vue'))),
+  LoopController: markRaw(defineAsyncComponent(() => import('./controllers/LoopController.vue'))),
+  RetryController: markRaw(defineAsyncComponent(() => import('./controllers/RetryController.vue'))),
+  TransactionController: markRaw(defineAsyncComponent(() => import('./controllers/TransactionController.vue'))),
   VariableDataset: markRaw(defineAsyncComponent(() => import('./configs/VariableDatasetConfig.vue'))),
-  // HttpHeadersTemplate: markRaw(defineAsyncComponent(() => import('./configs/HttpheaderTemplateConfig.vue'))),
+  HttpHeadersTemplate: markRaw(defineAsyncComponent(() => import('./configs/HttpheaderTemplateConfig.vue'))),
   ConstantTimer: markRaw(defineAsyncComponent(() => import('./timers/ConstantTimer.vue')))
 })
 
