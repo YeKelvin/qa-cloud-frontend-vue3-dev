@@ -222,7 +222,7 @@
 </template>
 
 <script setup>
-import { isEmpty as _isEmpty } from 'lodash-es'
+import { isEmpty as _isEmpty, assign as _assign } from 'lodash-es'
 import { ElMessage } from 'element-plus'
 import { Check, Close, Edit } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
@@ -305,6 +305,24 @@ const hiddenConfigDot = computed(() => {
   )
 })
 
+watch(bodyMode, () => {
+  if (queryMode.value || bodyMode.value === 'none' || bodyMode.value === 'custom') {
+    return
+  }
+  if (bodyMode.value === 'x-www-form-urlencoded') {
+    setContentType('application/x-www-form-urlencoded')
+    return
+  }
+  if (bodyMode.value === 'raw') {
+    setContentType(bodyRawTypeEnum.value[bodyRawType.value])
+    return
+  }
+})
+watch(bodyRawType, () => {
+  if (queryMode.value) return
+  setContentType(bodyRawTypeEnum.value[bodyRawType.value])
+})
+
 onMounted(() => {
   // 查询或更新模式时，先拉取元素信息
   if (createMode.value) return
@@ -314,7 +332,7 @@ onMounted(() => {
     mountHeaderItems()
     mountQueryItems()
     mountBody()
-    initFocusActiveTab()
+    focusActiveTabOnMounted()
   })
 
   // 查询元素关联的请求头模板列表
@@ -323,184 +341,176 @@ onMounted(() => {
   // 查询并初始化内置元素（前置脚本和测试脚本）
   ElementService.queryElementBuiltins({ elementNo: elementNo.value }).then((response) => {
     builtIn.value = response.result
-    builtIn.value.forEach((item) => {
-      if (item.elementType === 'PRE_PROCESSOR') {
-        preCodeEditorRef.value && preCodeEditorRef.value.setValue(item.property.PythonPreProcessor__script)
-        return
-      }
-      if (item.elementType === 'ASSERTION') {
-        testsCodeEditorRef.value && testsCodeEditorRef.value.setValue(item.property.PythonAssertion__script)
-        return
-      }
-    })
+    mountBuiltIn()
   })
 })
-</script>
 
-<script>
-export default {
-  watch: {
-    bodyMode(val) {
-      if (this.queryMode || val === 'none' || val === 'custom') {
-        return
-      }
-      if (val === 'x-www-form-urlencoded') {
-        this.setContentType('application/x-www-form-urlencoded')
-        return
-      }
-      if (val === 'raw') {
-        this.setContentType(this.bodyRawTypeEnum[this.bodyRawType])
-        return
-      }
-    },
-    bodyRawType(val) {
-      if (this.queryMode) return
-      this.setContentType(this.bodyRawTypeEnum[val])
+/**
+ * 初始化 headers
+ */
+const mountHeaderItems = () => {
+  const headers = elementInfo.value.property.HTTPSampler__headers
+  if (!headers) return
+  headers.property.HeaderManager__headers.forEach((item) => {
+    headerItems.value.push({
+      enabled: item.enabled,
+      name: item.property.Header__name,
+      value: item.property.Header__value
+    })
+  })
+}
+
+/**
+ * 初始化 params
+ */
+const mountQueryItems = () => {
+  const params = elementInfo.value.property.HTTPSampler__params
+  if (!params) return
+  params.property.Arguments__arguments.forEach((item) => {
+    queryItems.value.push({
+      enabled: item.enabled,
+      name: item.property.Argument__name,
+      value: item.property.Argument__value,
+      desc: item.property.Argument__desc
+    })
+  })
+}
+
+/**
+ * 初始化 body
+ */
+const mountBody = () => {
+  // 获取 ContentType 请求头
+  const contentType = headerItems.value.find((item) => item.name.toLowerCase() === 'content-type')
+  // 设置 BodyDataType
+  setBodyMode(contentType)
+  // 初始化 BodyData
+  nextTick(() => {
+    bodyCodeEditorRef.value && bodyCodeEditorRef.value.setValue(elementInfo.value.property.HTTPSampler__data)
+  })
+  // 初始化 BodyForm
+  const form = elementInfo.value.property.HTTPSampler__form
+  if (!form) return
+  form.property.Arguments__arguments.forEach((item) => {
+    formItems.value.push({
+      enabled: item.enabled,
+      name: item.property.Argument__name,
+      value: item.property.Argument__value,
+      desc: item.property.Argument__desc
+    })
+  })
+}
+
+const mountBuiltIn = () => {
+  builtIn.value.forEach((item) => {
+    if (item.elementType === 'PRE_PROCESSOR') {
+      preCodeEditorRef.value && preCodeEditorRef.value.setValue(item.property.PythonPreProcessor__script)
+      return
     }
-  },
-
-  methods: {
-    /**
-     * 初始化 headers
-     */
-    mountHeaderItems() {
-      const headers = this.elementInfo.property.HTTPSampler__headers
-      if (!headers) return
-      headers.property.HeaderManager__headers.forEach((item) => {
-        this.headerItems.push({
-          enabled: item.enabled,
-          name: item.property.Header__name,
-          value: item.property.Header__value
-        })
-      })
-    },
-
-    /**
-     * 初始化 params
-     */
-    mountQueryItems() {
-      const params = this.elementInfo.property.HTTPSampler__params
-      if (!params) return
-      params.property.Arguments__arguments.forEach((item) => {
-        this.queryItems.push({
-          enabled: item.enabled,
-          name: item.property.Argument__name,
-          value: item.property.Argument__value,
-          desc: item.property.Argument__desc
-        })
-      })
-    },
-
-    /**
-     * 初始化 body
-     */
-    mountBody() {
-      // 获取 ContentType 请求头
-      const contentType = this.headerItems.find((item) => item.name.toLowerCase() === 'content-type')
-      // 设置 BodyDataType
-      this.setBodyMode(contentType)
-      // 初始化 BodyData
-      this.$nextTick(() => {
-        this.$refs.bodyCodeEditor && this.$refs.bodyCodeEditor.setValue(this.elementInfo.property.HTTPSampler__data)
-      })
-      // 初始化 BodyForm
-      const form = this.elementInfo.property.HTTPSampler__form
-      if (!form) return
-      form.property.Arguments__arguments.forEach((item) => {
-        this.formItems.push({
-          enabled: item.enabled,
-          name: item.property.Argument__name,
-          value: item.property.Argument__value,
-          desc: item.property.Argument__desc
-        })
-      })
-    },
-
-    initFocusActiveTab() {
-      if (this.queryItems.length > 0) {
-        this.activeTabName = 'Params'
-      } else {
-        this.activeTabName = 'Body'
-      }
-    },
-
-    /**
-     * 修改元素
-     */
-    async modifySamplerElement() {
-      // 校验表单字段
-      if (!(await this.checkForm('elementForm'))) return
-      // 更新请求参数
-      Object.assign(this.elementInfo.property, {
-        HTTPSampler__headers: this.headers,
-        HTTPSampler__params: this.queryParameters,
-        HTTPSampler__data: this.bodyData,
-        HTTPSampler__form: this.formParameters
-      })
-      // 修改元素和内置元素
-      await ElementService.modifyElements([
-        {
-          elementNo: this.elementNo,
-          ...this.elementInfo,
-          builtIn: this.pendingSubmitBuiltIn
-        }
-      ])
-      // 修改请求头模板关联
-      await ElementService.modifyHttpHeaderTemplateByRefs({
-        elementNo: this.elementNo,
-        templateNumberList: [...this.selectedHeaderTemplateNumberList]
-      })
-      // 成功提示
-      this.$message({ message: '修改元素成功', type: 'info', duration: 2 * 1000 })
-      // 修改tab标题
-      this.$store.commit('pymeter/updateTab', { editorNo: this.elementNo, editorName: this.elementInfo.elementName })
-      // 重新查询脚本
-      this.$store.commit('pymeter/refreshElementTreeNow')
-      // 设置为只读模式
-      this.setReadonly()
-    },
-
-    /**
-     * 创建元素
-     */
-    async createSamplerElement() {
-      // 校验表单字段
-      if (!(await this.checkForm('elementForm'))) return
-      // 更新请求参数
-      Object.assign(this.elementInfo.property, {
-        HTTPSampler__headers: this.headers,
-        HTTPSampler__params: this.queryParameters,
-        HTTPSampler__data: this.bodyData,
-        HTTPSampler__form: this.formParameters
-      })
-      // 新增元素和内置元素
-      const response = await ElementService.createElementChildren({
-        rootNo: this.metadata.rootNo,
-        parentNo: this.metadata.parentNo,
-        children: [{ ...this.elementInfo, builtIn: this.pendingSubmitBuiltIn }]
-      })
-      // 关联请求头模板
-      await ElementService.createHttpHeaderTemplateByRefs({
-        elementNo: response.result[0],
-        templateNumberList: [...this.selectedHeaderTemplateNumberList]
-      })
-      // 成功提示
-      this.$message({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
-      // 关闭tab
-      this.$store.commit('pymeter/removeTab', { editorNo: 'UNSAVED_HTTP_SAMPLER' })
-      // 重新查询脚本
-      this.$store.commit('pymeter/refreshElementTreeNow')
-    },
-
-    /**
-     * 查询元素关联的请求头模板列表
-     */
-    querySelectedHeaderTemplateList() {
-      ElementService.queryHttpHeaderTemplateRefs({ elementNo: this.elementNo }).then((response) => {
-        this.selectedHeaderTemplateNumberList = response.result
-      })
+    if (item.elementType === 'ASSERTION') {
+      testsCodeEditorRef.value && testsCodeEditorRef.value.setValue(item.property.PythonAssertion__script)
+      return
     }
+  })
+}
+
+const focusActiveTabOnMounted = () => {
+  if (!_isEmpty(queryItems.value)) {
+    activeTabName.value = 'Params'
+  } else {
+    activeTabName.value = 'Body'
   }
+}
+
+/**
+ * 修改元素
+ */
+const modifySamplerElement = async () => {
+  // 表单校验
+  const error = await elformRef.value
+    .validate()
+    .then(() => false)
+    .catch(() => true)
+  if (error) {
+    ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 更新请求参数
+  _assign(elementInfo.value.property, {
+    HTTPSampler__headers: headers.value,
+    HTTPSampler__params: queryParameters.value,
+    HTTPSampler__data: bodyData.value,
+    HTTPSampler__form: formParameters.value
+  })
+  // 修改元素和内置元素
+  await ElementService.modifyElements([
+    {
+      elementNo: elementNo.value,
+      ...elementInfo.value,
+      builtIn: pendingSubmitBuiltIn.value
+    }
+  ])
+  // 修改请求头模板关联
+  await ElementService.modifyHttpHeaderTemplateByRefs({
+    elementNo: elementNo.value,
+    templateNumberList: [...selectedHeaderTemplateNumberList.value]
+  })
+  // 成功提示
+  ElMessage({ message: '修改元素成功', type: 'info', duration: 2 * 1000 })
+  // 修改tab标题
+  updateTabName(elementInfo.value.elementName)
+  // 重新查询脚本列表
+  refreshElementTree()
+  // 设置为只读模式
+  setReadonly()
+}
+
+/**
+ * 创建元素
+ */
+const createSamplerElement = async () => {
+  // 表单校验
+  const error = await elformRef.value
+    .validate()
+    .then(() => false)
+    .catch(() => true)
+  if (error) {
+    ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 更新请求参数
+  _assign(elementInfo.value.property, {
+    HTTPSampler__headers: headers.value,
+    HTTPSampler__params: queryParameters.value,
+    HTTPSampler__data: bodyData.value,
+    HTTPSampler__form: formParameters.value
+  })
+  // 新增元素和内置元素
+  const response = await ElementService.createElementChildren({
+    rootNo: props.metadata.rootNo,
+    parentNo: props.metadata.parentNo,
+    children: [{ ...elementInfo.value, builtIn: pendingSubmitBuiltIn.value }]
+  })
+  // 关联请求头模板
+  await ElementService.createHttpHeaderTemplateByRefs({
+    elementNo: response.result[0],
+    templateNumberList: [...selectedHeaderTemplateNumberList.value]
+  })
+  // 成功提示
+  ElMessage({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
+  // 关闭tab
+  closeTab()
+  // 重新查询脚本列表
+  refreshElementTree()
+}
+
+/**
+ * 查询元素关联的请求头模板列表
+ */
+const querySelectedHeaderTemplateList = () => {
+  ElementService.queryHttpHeaderTemplateRefs({ elementNo: elementNo.value }).then((response) => {
+    selectedHeaderTemplateNumberList.value = response.result
+  })
 }
 </script>
 
