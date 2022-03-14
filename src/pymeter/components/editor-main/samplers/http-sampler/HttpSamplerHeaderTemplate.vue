@@ -10,7 +10,7 @@
 
     <!-- 请求头模板列表 -->
     <el-select
-      v-model="localValue"
+      v-model="localModel"
       v-bind="$attrs"
       placeholder="请求头模板"
       style="width: 100%"
@@ -27,13 +27,7 @@
     </el-select>
 
     <!-- 查看详情按钮 -->
-    <el-button
-      v-if="!showDetails"
-      type="text"
-      :icon="ArrowDown"
-      :disabled="localValue.length == 0"
-      @click="showHeaders"
-    >
+    <el-button v-if="!showDetails" type="text" :icon="ArrowDown" :disabled="_isEmpty(localModel)" @click="showHeaders">
       查看详情
     </el-button>
 
@@ -48,6 +42,7 @@
 </template>
 
 <script setup>
+import { isEmpty as _isEmpty } from 'lodash-es'
 import { ArrowDown } from '@element-plus/icons-vue'
 import useWorkspaceState from '@/composables/useWorkspaceState'
 import usePyMeterState from '@/pymeter/composables/usePyMeterState'

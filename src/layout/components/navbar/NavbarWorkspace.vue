@@ -1,5 +1,5 @@
 <template>
-  <el-popover ref="popover" placement="bottom" width="400" trigger="click">
+  <el-popover ref="elpopoverRef" placement="bottom" width="400" trigger="click">
     <!-- 切换工作空间的按钮 -->
     <template #reference>
       <el-button type="text" style="color: #606266; font: 14px; font-family: inherit">
@@ -79,7 +79,7 @@ export default {
       this.$store.commit('workspace/setWorkspaceNo', node.workspaceNo)
       this.$store.commit('workspace/setWorkspaceName', node.workspaceName)
       this.$store.commit('workspace/setWorkspaceScope', node.workspaceScope)
-      this.$refs.popover.doClose()
+      this.$refs.elpopoverRef.hide()
     },
     filterNode(value, data) {
       if (!value) return true

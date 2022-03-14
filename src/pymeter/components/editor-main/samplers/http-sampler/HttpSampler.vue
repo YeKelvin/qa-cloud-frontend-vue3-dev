@@ -3,7 +3,7 @@
     <el-form
       ref="elformRef"
       label-position="right"
-      label-width="120px"
+      label-width="80px"
       style="width: 100%"
       inline-message
       :model="elementInfo"
@@ -20,21 +20,19 @@
       </el-form-item>
 
       <!-- URL = 请求方法 + 请求方法-->
-      <el-form-item id="url" label="URL：" required>
-        <el-form-item prop="property.HTTPSampler__url">
-          <!-- 请求方法 -->
-          <el-input
-            v-model="elementInfo.property.HTTPSampler__url"
-            placeholder="请求地址"
-            clearable
-            :readonly="queryMode"
-          >
-            <template #prepend>
-              <!-- 请求方法 -->
-              <HTTPMethodSelect v-model="elementInfo.property.HTTPSampler__method" :disabled="queryMode" />
-            </template>
-          </el-input>
-        </el-form-item>
+      <el-form-item id="url" label="URL：" prop="property.HTTPSampler__url" required>
+        <!-- 请求方法 -->
+        <el-input
+          v-model="elementInfo.property.HTTPSampler__url"
+          placeholder="请求地址"
+          clearable
+          :readonly="queryMode"
+        >
+          <template #prepend>
+            <!-- 请求方法 -->
+            <HTTPMethodSelect v-model="elementInfo.property.HTTPSampler__method" :disabled="queryMode" />
+          </template>
+        </el-input>
       </el-form-item>
 
       <!-- 请求配置tab -->
@@ -120,8 +118,7 @@
         <el-form
           ref="configForm"
           label-position="right"
-          label-width="auto"
-          size="small"
+          label-width="100px"
           :model="elementInfo"
           :rules="configFormRules"
         >
@@ -171,7 +168,8 @@
       <!-- 前置脚本 -->
       <div v-show="showPreScriptTab">
         <el-descriptions :label-style="{ 'font-weight': 700 }">
-          <el-descriptions-item label="内置变量">
+          <el-descriptions-item>
+            <template #label><span style="color: #606266; font-weight: 700">内置变量：</span></template>
             <el-tag size="small" style="margin-right: 10px">log</el-tag>
             <el-tag size="small" style="margin-right: 10px">ctx</el-tag>
             <el-tag size="small" style="margin-right: 10px">vars</el-tag>
@@ -180,13 +178,14 @@
             <el-tag size="small" style="margin-right: 10px">sampler</el-tag>
           </el-descriptions-item>
         </el-descriptions>
-        <MonacoEditor ref="preCodeEditorRef" v-model="preCode" :read-only="queryMode" />
+        <MonacoEditor ref="preCodeEditorRef" v-model="preCode" language="python" :read-only="queryMode" />
       </div>
 
       <!-- 测试脚本 -->
       <div v-show="showTestsScriptTab">
-        <el-descriptions :label-style="{ 'font-weight': 700 }">
-          <el-descriptions-item label="内置变量">
+        <el-descriptions>
+          <el-descriptions-item>
+            <template #label><span style="color: #606266; font-weight: 700">内置变量：</span></template>
             <el-tag size="small" style="margin-right: 10px">log</el-tag>
             <el-tag size="small" style="margin-right: 10px">ctx</el-tag>
             <el-tag size="small" style="margin-right: 10px">vars</el-tag>
@@ -196,12 +195,12 @@
             <el-tag size="small" style="margin-right: 10px">result</el-tag>
             <el-tag size="small" style="margin-right: 10px">failure</el-tag>
             <el-tag size="small" style="margin-right: 10px">message</el-tag>
-            <el-tag size="small" style="margin-right: 10px">stop_group</el-tag>
-            <el-tag size="small" style="margin-right: 10px">stop_test</el-tag>
-            <el-tag size="small" style="margin-right: 10px">stop_test_now</el-tag>
+            <el-tag size="small" style="margin-right: 10px">stop_group()</el-tag>
+            <el-tag size="small" style="margin-right: 10px">stop_test()</el-tag>
+            <el-tag size="small" style="margin-right: 10px">stop_test_now()</el-tag>
           </el-descriptions-item>
         </el-descriptions>
-        <MonacoEditor ref="testsCodeEditorRef" v-model="testsCode" :read-only="queryMode" />
+        <MonacoEditor ref="testsCodeEditorRef" v-model="testsCode" language="python" :read-only="queryMode" />
       </div>
 
       <!-- 操作按钮 -->
@@ -240,8 +239,17 @@ import HTTPQueryTable from './HttpSamplerQueryTable.vue'
 import HTTPFormTable from './HttpSamplerFormTable.vue'
 
 const props = defineProps(editorProps)
-const { queryMode, modifyMode, createMode, editNow, setReadonly, updateTabName, closeTab, refreshElementTree } =
-  useEditor(props)
+const {
+  editMode,
+  queryMode,
+  modifyMode,
+  createMode,
+  editNow,
+  setReadonly,
+  updateTabName,
+  closeTab,
+  refreshElementTree
+} = useEditor(props)
 const elformRef = ref()
 const elementNo = ref(props.editorNo)
 const elementInfo = ref({
