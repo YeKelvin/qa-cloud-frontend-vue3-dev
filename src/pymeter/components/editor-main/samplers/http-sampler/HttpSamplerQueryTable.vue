@@ -19,21 +19,24 @@
     <!-- 参数名称 -->
     <el-table-column label="名称" width="auto">
       <template #default="{ row }">
-        <el-input v-model="row.name" :readonly="queryMode" type="textarea" rows="1" autosize />
+        <SimpleTextarea v-if="!queryMode" v-model="row.name" />
+        <span v-else>{{ row.name }}</span>
       </template>
     </el-table-column>
 
     <!-- 参数值 -->
     <el-table-column label="值" width="auto">
       <template #default="{ row }">
-        <el-input v-model="row.value" :readonly="queryMode" type="textarea" rows="1" autosize />
+        <SimpleTextarea v-if="!queryMode" v-model="row.value" />
+        <span v-else>{{ row.value }}</span>
       </template>
     </el-table-column>
 
     <!-- 参数描述 -->
     <el-table-column label="描述" width="auto">
       <template #default="{ row }">
-        <el-input v-model="row.desc" :readonly="queryMode" type="textarea" rows="1" autosize />
+        <SimpleTextarea v-if="!queryMode" v-model="row.desc" />
+        <span v-else>{{ row.desc }}</span>
       </template>
     </el-table-column>
 
@@ -51,6 +54,7 @@
 
 <script setup>
 import { Delete, Plus } from '@element-plus/icons-vue'
+import SimpleTextarea from '@/components/simple-textarea/SimpleTextarea.vue'
 
 const props = defineProps({
   editMode: { type: String, default: 'QUERY' }
@@ -67,4 +71,10 @@ const delItem = (index) => {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+span {
+  white-space: pre-wrap;
+  text-overflow: ellipsis;
+  letter-spacing: 0.6px;
+}
+</style>

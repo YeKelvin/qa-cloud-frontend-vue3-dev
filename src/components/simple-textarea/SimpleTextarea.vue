@@ -25,31 +25,36 @@ const resize = () => {
 
 <style lang="scss" scoped>
 .simple-textarea {
-  overflow: hidden;
+  display: table-cell;
+  vertical-align: middle;
   position: relative;
-  display: block;
+  overflow: hidden;
   resize: vertical;
-  padding: 5px 15px;
+  padding: 0 10px;
+  outline: 0;
   box-sizing: border-box;
-  font-size: 12px;
-  line-height: 1.5;
-  min-height: 29px;
-  height: 29px;
-  width: 100%;
   color: #606266;
-  background-color: #fff;
+  font-size: inherit;
+  font-family: inherit;
+  letter-spacing: 0.6px;
+  line-height: 32px;
+  height: 32px;
+  width: 100%;
+  background-color: #ffffff;
   background-image: none;
   border: 0;
   border-bottom: 1px solid #dcdfe6;
   border-radius: 4px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
   transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
 
   &::placeholder {
-    color: #c0c4cc;
+    color: #a8abb2;
   }
 
   &:hover {
-    border-color: #c0c4cc;
+    border-color: #a8abb2;
   }
 
   &:focus {
