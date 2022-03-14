@@ -44,7 +44,7 @@
         </el-tab-pane>
         <el-tab-pane name="Params">
           <template #label>
-            <el-badge :hidden="queryItems.length == 0" type="success" is-dot>Params</el-badge>
+            <el-badge :hidden="_isEmpty(queryItems)" type="success" is-dot>Params</el-badge>
           </template>
         </el-tab-pane>
         <el-tab-pane name="Body">
@@ -59,12 +59,12 @@
         </el-tab-pane>
         <el-tab-pane name="PreScript">
           <template #label>
-            <el-badge :hidden="preCode == ''" type="success" is-dot>Pre-Script</el-badge>
+            <el-badge :hidden="preCode === ''" type="success" is-dot>Pre-Script</el-badge>
           </template>
         </el-tab-pane>
         <el-tab-pane name="Tests">
           <template #label>
-            <el-badge :hidden="testsCode == ''" type="success" is-dot>Tests</el-badge>
+            <el-badge :hidden="testsCode === ''" type="success" is-dot>Tests</el-badge>
           </template>
         </el-tab-pane>
       </el-tabs>
@@ -409,6 +409,9 @@ const mountBody = () => {
   })
 }
 
+/**
+ * 初始化内置元素
+ */
 const mountBuiltIn = () => {
   builtIn.value.forEach((item) => {
     if (item.elementType === 'PRE_PROCESSOR') {
@@ -422,6 +425,9 @@ const mountBuiltIn = () => {
   })
 }
 
+/**
+ * 组件挂载完成时根据 http 参数激活对应的 tab
+ */
 const focusActiveTabOnMounted = () => {
   if (!_isEmpty(queryItems.value)) {
     activeTabName.value = 'Params'
