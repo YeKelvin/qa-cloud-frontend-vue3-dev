@@ -4,7 +4,7 @@
     <div style="display: flex; margin-bottom: 10px">
       <!-- 执行进度 -->
       <el-card shadow="hover" style="width: 50%; margin-right: 10px">
-        <span slot="header">执行进度</span>
+        <template #header><span>执行进度</span></template>
         <div style="display: flex; flex: 1; justify-content: center; align-items: center; align-content: center">
           <el-progress type="circle" :percentage="percentage" :width="160" />
         </div>
@@ -14,7 +14,7 @@
       <div style="display: flex; flex: 1; flex-direction: column; width: 50%">
         <!-- 配置项 -->
         <el-card shadow="hover" style="height: 50%">
-          <span slot="header">配置项</span>
+          <template #header><span>配置项</span></template>
           <div class="settings-container">
             <el-tag v-if="details.save">保存测试报告</el-tag>
             <el-tag v-if="details.saveOnError">仅保存失败结果</el-tag>
@@ -27,7 +27,7 @@
         </el-card>
         <!-- 环境/变量 -->
         <el-card shadow="hover" style="height: 50%; margin-top: 10px">
-          <span slot="header">环境/变量</span>
+          <template #header><span>环境/变量</span></template>
           <div class="settings-container">
             <el-tag v-for="dataset in details.datasetList" :key="dataset.datasetNo">{{ dataset.datasetName }}</el-tag>
           </div>
@@ -37,7 +37,7 @@
 
     <!-- 计划项目详情 -->
     <el-card shadow="hover" style="width: 100%">
-      <span slot="header">执行详情</span>
+      <template #header><span>执行详情</span></template>
       <el-table :data="tableData" stripe fit highlight-current-row>
         <!-- 空数据提示 -->
         <template #empty><el-empty /></template>
@@ -47,20 +47,24 @@
         <el-table-column prop="elementNo" label="元素编号" />
         <el-table-column prop="elementName" label="集合名称" />
         <el-table-column v-if="details.reportNo" prop="runningState" label="执行状态">
-          <template v-slot="{row}">{{ RunningState[row.runningState] }}</template>
+          <template #default="{ row }">{{ RunningState[row.runningState] }}</template>
         </el-table-column>
         <el-table-column v-if="details.reportNo" prop="success" label="执行结果">
-          <template v-slot="{row}">
+          <template #default="{ row }">
             <template v-if="row.success == null">{{ '' }}</template>
             <template v-else>{{ row.success ? '成功' : '失败' }}</template>
           </template>
         </el-table-column>
         <template v-if="details.reportNo">
           <el-table-column prop="startTime" label="开始时间">
-            <template v-slot="{row}">{{ row.startTime? $dayjs(row.startTime).format('YYYY-MM-DD HH:mm:ss'):'' }}</template>
+            <template #default="{ row }">
+              {{ row.startTime ? $dayjs(row.startTime).format('YYYY-MM-DD HH:mm:ss') : '' }}
+            </template>
           </el-table-column>
           <el-table-column prop="endTime" label="结束时间">
-            <template v-slot="{row}">{{ row.endTime? $dayjs(row.endTime).format('YYYY-MM-DD HH:mm:ss'):'' }}</template>
+            <template #default="{ row }">
+              {{ row.endTime ? $dayjs(row.endTime).format('YYYY-MM-DD HH:mm:ss') : '' }}
+            </template>
           </el-table-column>
           <el-table-column prop="elapsedTime" label="耗时" />
         </template>

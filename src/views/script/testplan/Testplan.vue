@@ -114,8 +114,8 @@
 </template>
 
 <script lang="jsx" setup>
-import { TestplanState, TestPhase } from '@/api/enum'
 import { Edit } from '@element-plus/icons-vue'
+import { TestplanState, TestPhase } from '@/api/enum'
 import * as ExecutionService from '@/api/script/execution'
 import * as TestplanService from '@/api/script/testplan'
 import useQueryConditions from '@/composables/useQueryConditions'

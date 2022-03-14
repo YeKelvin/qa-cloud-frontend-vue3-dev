@@ -20,12 +20,12 @@
           v-model="collectionsFilterText"
           size="small"
           placeholder="请输入搜索内容"
-          style="padding: 10px 10px 0 10px; margin-bottom:10px;"
+          style="padding: 10px 10px 0 10px; margin-bottom: 10px"
           clearable
         />
         <!-- collection-card -->
         <el-scrollbar
-          style="width:100%; height:100%; padding-bottom:50px;"
+          style="width: 100%; height: 100%; padding-bottom: 50px"
           wrap-style="overflow-x:auto;"
           view-style="padding: 0 10px;"
         >
@@ -42,12 +42,12 @@
           v-model="resultTreeFilterText"
           size="small"
           placeholder="请输入搜索内容"
-          style="padding: 10px 10px 0 10px; margin-bottom:10px;"
+          style="padding: 10px 10px 0 10px; margin-bottom: 10px"
           clearable
         />
         <!-- 脚本结果列表 -->
         <el-scrollbar
-          style="width:100%; height:100%; padding-bottom:50px;"
+          style="width: 100%; height: 100%; padding-bottom: 50px"
           wrap-style="overflow-x:auto;"
           view-style="padding: 0 10px;"
         >
@@ -56,11 +56,11 @@
       </el-card>
 
       <!-- ResultDetails -->
-      <el-card shadow="hover" style="display:flex; flex:1; flex-direction:column; min-width:500px;">
+      <el-card shadow="hover" style="display: flex; flex: 1; flex-direction: column; min-width: 500px">
         <!-- 卡片头部 -->
         <span slot="header">详情</span>
         <el-scrollbar
-          style="width:100%; height:100%; padding-bottom:50px;"
+          style="width: 100%; height: 100%; padding-bottom: 50px"
           wrap-style="overflow-x:auto;"
           view-style="padding:10px;"
         >
@@ -85,11 +85,15 @@ import CollectionCard from './collection-card'
 import ResultTree from './result-tree'
 
 export default {
-
   name: 'TestReport',
 
   components: {
-    OverviewDetails, CollectionResultDetails, GroupResultDetails, SamplerResultDetails, CollectionCard, ResultTree
+    OverviewDetails,
+    CollectionResultDetails,
+    GroupResultDetails,
+    SamplerResultDetails,
+    CollectionCard,
+    ResultTree
   },
 
   data() {
@@ -119,7 +123,7 @@ export default {
       if (StringUtil.isBlank(this.collectionsFilterText)) {
         return this.collections
       } else {
-        return this.collections.filter(item => item.name.indexOf(StringUtil.trim(this.collectionsFilterText)) !== -1)
+        return this.collections.filter((item) => item.name.indexOf(StringUtil.trim(this.collectionsFilterText)) !== -1)
       }
     }
   },
@@ -135,17 +139,19 @@ export default {
   methods: {
     queryReport() {
       ReportService.queryReport({ reportNo: this.reportNo })
-        .then(response => {
+        .then((response) => {
           this.overview = response.result.details
           this.collections = response.result.collections
-        }).catch(() => {})
+        })
+        .catch(() => {})
     },
     queryCollectionResult() {
       ReportService.queryCollectionResult({ collectionId: this.collectionId })
-        .then(response => {
+        .then((response) => {
           this.collectionDetails = response.result.details
           this.groups = response.result.children
-        }).catch(() => {})
+        })
+        .catch(() => {})
     },
     handleCollectionCardClick(collection) {
       // 记录当前点击的 CollectionId

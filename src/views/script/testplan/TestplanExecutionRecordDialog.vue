@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="执行记录" width="80%" center v-bind="$attrs">
+  <el-dialog title="执行记录" width="80%" center>
     <el-table :data="tableData" style="width: 100%; height: 100%" fit stripe highlight-current-row>
       <!-- 空数据提示 -->
       <template #empty><el-empty /></template>

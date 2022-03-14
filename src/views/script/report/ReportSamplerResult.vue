@@ -30,13 +30,7 @@
       </el-tab-pane>
       <!-- 请求体 -->
       <el-tab-pane key="DATA" label="请求数据" name="DATA">
-        <MonacoEditor
-          ref="requestEditor"
-          key="requestEditor"
-          :read-only="true"
-          language="json"
-          style="height: 220px"
-        />
+        <MonacoEditor ref="requestEditorRef" language="json" style="height: 220px" :read-only="true" />
       </el-tab-pane>
     </el-tabs>
 
@@ -51,114 +45,100 @@
       </el-tab-pane>
       <!-- 响应体 -->
       <el-tab-pane key="DATA" label="响应数据" name="DATA">
-        <MonacoEditor
-          ref="responseEditor"
-          key="responseEditor"
-          :read-only="true"
-          language="json"
-          style="height: 220px"
-        />
+        <MonacoEditor ref="responseEditorRef" language="json" style="height: 220px" :read-only="true" />
       </el-tab-pane>
       <!-- 断言 -->
       <el-tab-pane v-if="details.failedAssertion" key="ASSERTION" label="断言" name="ASSERTION">
-        <MonacoEditor
-          ref="assertionEditor"
-          key="assertionEditor"
-          :read-only="true"
-          language="log"
-          style="height: 220px"
-        />
+        <MonacoEditor ref="assertionEditorRef" language="log" style="height: 220px" :read-only="true" />
       </el-tab-pane>
     </el-tabs>
   </div>
 </template>
 
-<script>
+<script setup>
 import * as ReportService from '@/api/script/report'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
-export default {
-  name: 'SamplerResultDetails',
-
-  components: { MonacoEditor },
-
-  props: {
-    samplerId: { type: String, default: '' }
-  },
-
-  data() {
-    return {
-      details: {},
-      requestActiveTabName: 'DATA',
-      responseActiveTabName: 'DATA'
-    }
-  },
-
-  computed: {
-    requestHeadersData() {
-      if (!this.details.requestHeaders) return []
-      return this.stringHeadersToJson(this.details.requestHeaders)
-    },
-    responseHeadersData() {
-      if (!this.details.responseHeaders) return []
-      return this.stringHeadersToJson(this.details.responseHeaders)
-    }
-  },
-
-  watch: {
-    samplerId(val) {
-      if (!val) return
-      this.querySamplerResult()
-    }
-  },
-
-  mounted() {
-    if (!this.samplerId) return
-    this.querySamplerResult()
-  },
-
-  methods: {
-    querySamplerResult() {
-      ReportService.querySamplerResult({ samplerId: this.samplerId })
-        .then((response) => {
-          this.details = response.result
-          this.handleRequestTabClick({ name: this.requestActiveTabName })
-          this.handleResponseTabClick({ name: this.responseActiveTabName })
-        })
-        .catch(() => {})
-    },
-
-    handleRequestTabClick(tab) {
-      if (tab.name === 'DATA') {
-        this.$refs.requestEditor.setValue(this.details.requestData)
-      }
-    },
-
-    handleResponseTabClick(tab) {
-      if (tab.name === 'DATA') {
-        this.$refs.responseEditor.setValue(this.details.responseData)
-        this.$refs.responseEditor.formatDocument()
-        return
-      }
-      if (tab.name === 'ASSERTION') {
-        this.$refs.assertionEditor.setValue(this.details.failedAssertion)
-        return
-      }
-    },
-    stringHeadersToJson(val) {
-      if (!val || (val.charAt(0) !== '{' && val.charAt(val.length - 1) !== '}')) return []
-      const data = []
-      try {
-        const headers = JSON.parse(val)
-        Object.keys(headers).forEach((key) => {
-          data.push({ name: key, value: headers[key] })
-        })
-      } catch (error) {
-        console.error(error)
-      }
-      return data
-    }
+const props = defineProps({
+  samplerId: { type: String, default: '' }
+})
+const details = ref({})
+const requestActiveTabName = ref('DATA')
+const responseActiveTabName = ref('DATA')
+const requestHeadersData = computed(() => {
+  if (!details.value.requestHeaders) return []
+  return getHeadersFromJson(details.value.requestHeaders)
+})
+const responseHeadersData = computed(() => {
+  if (!details.value.responseHeaders) return []
+  return getHeadersFromJson(details.value.responseHeaders)
+})
+const requestEditorRef = ref()
+const responseEditorRef = ref()
+const assertionEditorRef = ref()
+watch(
+  () => props.samplerId,
+  (val) => {
+    if (!val) return
+    querySamplerResult()
   }
+)
+
+onMounted(() => {
+  if (!props.samplerId) return
+  querySamplerResult()
+})
+
+/**
+ * 查询取样器结果
+ */
+const querySamplerResult = () => {
+  ReportService.querySamplerResult({ samplerId: props.samplerId }).then((response) => {
+    details.value = response.result
+    handleRequestTabClick({ name: requestActiveTabName.value })
+    handleResponseTabClick({ name: responseActiveTabName.value })
+  })
+}
+
+/**
+ * el-tab handler
+ */
+const handleRequestTabClick = (tab) => {
+  if (tab.name === 'DATA') {
+    requestEditorRef.value.setValue(details.value.requestData)
+  }
+}
+
+/**
+ * el-tab handler
+ */
+const handleResponseTabClick = (tab) => {
+  if (tab.name === 'DATA') {
+    responseEditorRef.value.setValue(details.value.responseData)
+    responseEditorRef.value.formatDocument()
+    return
+  }
+  if (tab.name === 'ASSERTION') {
+    assertionEditorRef.value.setValue(details.value.failedAssertion)
+    return
+  }
+}
+
+/**
+ * 反序列化 Headers
+ */
+const getHeadersFromJson = (val) => {
+  if (!val || (val.charAt(0) !== '{' && val.charAt(val.length - 1) !== '}')) return []
+  const data = []
+  try {
+    const headers = JSON.parse(val)
+    Object.keys(headers).forEach((key) => {
+      data.push({ name: key, value: headers[key] })
+    })
+  } catch (error) {
+    console.error(error)
+  }
+  return data
 }
 </script>
 

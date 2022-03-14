@@ -5,19 +5,25 @@
       <el-descriptions-item v-if="details.groupRemark" label="案例描述">{{ details.groupRemark }}</el-descriptions-item>
     </el-descriptions>
 
-    <el-descriptions :column="3" style="margin-bottom:20px;">
-      <el-descriptions-item label="开始时间"><el-tag type="warning">{{ details.startTime }}</el-tag></el-descriptions-item>
-      <el-descriptions-item label="结束时间"><el-tag type="warning">{{ details.endTime }}</el-tag></el-descriptions-item>
-      <el-descriptions-item label="耗时"><el-tag type="danger">{{ details.elapsedTime }}</el-tag></el-descriptions-item>
+    <el-descriptions :column="3" style="margin-bottom: 20px">
+      <el-descriptions-item label="开始时间">
+        <el-tag type="warning">{{ details.startTime }}</el-tag>
+      </el-descriptions-item>
+      <el-descriptions-item label="结束时间">
+        <el-tag type="warning">{{ details.endTime }}</el-tag>
+      </el-descriptions-item>
+      <el-descriptions-item label="耗时">
+        <el-tag type="danger">{{ details.elapsedTime }}</el-tag>
+      </el-descriptions-item>
     </el-descriptions>
 
-    <div style="display:flex; justify-content:space-between; align-content:center;">
-      <el-table :data="totalData" highlight-current-row style="width:50%; height:400px;">
+    <div style="display: flex; justify-content: space-between; align-content: center">
+      <el-table :data="totalData" highlight-current-row style="width: 50%; height: 400px">
         <el-table-column prop="totalType" label="统计" />
         <el-table-column prop="samplerTotal" label="请求" />
       </el-table>
 
-      <div ref="pieChart" style="width:50%; height:400px;" />
+      <div ref="pieChart" style="width: 50%; height: 400px" />
     </div>
   </div>
 </template>
@@ -27,7 +33,6 @@ import * as echarts from 'echarts'
 import * as ReportService from '@/api/script/report'
 
 export default {
-
   name: 'GroupResultDetails',
 
   props: {
@@ -62,8 +67,8 @@ export default {
             radius: [0, '60%'],
             center: ['50%', '50%'],
             data: [
-              { value: 0, name: '成功', itemStyle: { color: '#44B197' }},
-              { value: 0, name: '失败', itemStyle: { color: '#FF7676' }}
+              { value: 0, name: '成功', itemStyle: { color: '#44B197' } },
+              { value: 0, name: '失败', itemStyle: { color: '#FF7676' } }
             ],
             itemStyle: {
               shadowBlur: 10,
@@ -72,7 +77,7 @@ export default {
             },
             animationType: 'scale',
             animationEasing: 'elasticOut',
-            animationDelay: function(idx) {
+            animationDelay: function (idx) {
               return Math.random() * 200
             }
           }
@@ -126,7 +131,7 @@ export default {
     this.queryGroupResult()
   },
 
-  destroyed() {
+  unmounted() {
     // 移除窗口尺寸变更事件
     window.removeEventListener('resize', this.pieChart.resize)
     // 销毁 echarts 实例
@@ -136,27 +141,29 @@ export default {
   methods: {
     queryGroupResult() {
       ReportService.queryGroupResult({ groupId: this.groupId })
-        .then(response => {
+        .then((response) => {
           this.details = response.result
           this.setPieChartData([
-            { value: this.details.successfulSamplersTotal, name: '成功', itemStyle: { color: '#44B197' }},
-            { value: this.details.failedSamplersTotal, name: '失败', itemStyle: { color: '#FF7676' }}
+            { value: this.details.successfulSamplersTotal, name: '成功', itemStyle: { color: '#44B197' } },
+            { value: this.details.failedSamplersTotal, name: '失败', itemStyle: { color: '#FF7676' } }
           ])
-        }).catch(() => {})
+        })
+        .catch(() => {})
     },
     setPieChartData(data) {
       const option = this.pieChart.getOption()
-      option.series[0].data = data.sort((a, b) => { return a.value - b.value })
+      option.series[0].data = data.sort((a, b) => {
+        return a.value - b.value
+      })
       this.pieChart.setOption(option, true)
       this.pieChart.resize()
     },
     successRate(successfulTotal, failedTotal) {
       const total = successfulTotal + failedTotal
-      return Math.round((successfulTotal / total) * 10000) / 100 + '%'
+      return `${Math.round((successfulTotal / total) * 10000) / 100}%`
     }
   }
 }
-
 </script>
 
 <style lang="scss" scoped>
