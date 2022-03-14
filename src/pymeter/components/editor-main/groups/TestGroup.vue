@@ -109,7 +109,7 @@
 </template>
 
 <script setup>
-import { isEmpty } from 'lodash-es'
+import { isEmpty as _isEmpty, assign as _assign } from 'lodash-es'
 import { ElMessage } from 'element-plus'
 import { Check, Close, Edit, Pointer } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
@@ -200,7 +200,7 @@ onMounted(() => {
     builtIn.value &&
       builtIn.value.forEach((item) => {
         if (item.elementClass === 'HTTPSessionManager') {
-          Object.assign(httpSessionManager.value, item)
+          _assign(httpSessionManager.value, item)
           useHTTPSession.value = item.enabled
         }
       })
@@ -271,7 +271,7 @@ const createGroupElement = async () => {
 const modifyBuiltIns = async () => {
   if (useHTTPSession.value) {
     // 使用 HTTP 会话
-    if (!isEmpty(builtIn.value)) {
+    if (!_isEmpty(builtIn.value)) {
       // 已经存在 HTTPSessionManager 时，判断是否已禁用，禁用则重新启用
       const manager = builtIn.value.find((item) => item.elementClass === 'HTTPSessionManager')
       if (!manager.enabled) {
@@ -289,7 +289,7 @@ const modifyBuiltIns = async () => {
     }
   } else {
     // 不使用 HTTP 会话
-    if (!isEmpty(builtIn.value)) {
+    if (!_isEmpty(builtIn.value)) {
       // 已经存在 HTTPSessionManager 时，禁用元素
       const manager = builtIn.value.find((item) => item.elementClass === 'HTTPSessionManager')
       manager && (await ElementService.disableElement({ elementNo: manager.elementNo }))

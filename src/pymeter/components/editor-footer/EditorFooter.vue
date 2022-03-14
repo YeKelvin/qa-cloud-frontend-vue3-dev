@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { ref, onBeforeMount, onBeforeUnmount } from 'vue'
+import { assign as _assign } from 'lodash-es'
 import { ElNotification } from 'element-plus'
 import ResultDrawer from './result/ResultDrawer.vue'
 import LogDrawer from './log/LogDrawer.vue'
@@ -38,7 +38,7 @@ onBeforeMount(() => {
   socket.on('pymeter_result_summary', (data) => {
     const result = results.value.find((result) => result.id === data.resultId)
     if (result) {
-      Object.assign(result, data.result)
+      _assign(result, data.result)
     } else {
       results.value.push(data.result)
     }
@@ -49,7 +49,7 @@ onBeforeMount(() => {
 
     const group = result.details.find((group) => group.id === data.groupId)
     if (group) {
-      Object.assign(group, data.group)
+      _assign(group, data.group)
     } else {
       result.details.push(data.group)
     }
