@@ -33,7 +33,16 @@
           <template #default="{ row }">
             <span style="display: flex; justify-content: space-between; align-items: center">
               <span>{{ TestPhase[row.testPhase] }}</span>
-              <el-popover :ref="'testphase-popover-' + row.planNo" trigger="click" placement="bottom" width="300">
+              <el-popover
+                :ref="
+                  (el) => {
+                    if (el) testphasePopoverRefs[row.planNo] = el
+                  }
+                "
+                trigger="click"
+                placement="bottom"
+                width="300"
+              >
                 <span style="display: flex; justify-content: space-between; align-items: center">
                   <el-select v-model="row.tobeModifiedTestPhase" style="width: 100%; margin-right: 10px">
                     <el-option v-for="(value, key) in TestPhase" :key="key" :label="value" :value="key" />
@@ -51,7 +60,16 @@
           <template #default="{ row }">
             <span style="display: flex; justify-content: space-between; align-items: center">
               <span>{{ TestplanState[row.state] }}</span>
-              <el-popover :ref="'state-popover-' + row.planNo" trigger="click" placement="bottom" width="300">
+              <el-popover
+                :ref="
+                  (el) => {
+                    if (el) statePopoverRefs[row.planNo] = el
+                  }
+                "
+                trigger="click"
+                placement="bottom"
+                width="300"
+              >
                 <span style="display: flex; justify-content: space-between; align-items: center">
                   <el-select v-model="row.tobeModifiedState" style="width: 100%; margin-right: 10px">
                     <el-option v-for="(value, key) in TestplanState" :key="key" :label="value" :value="key" />
@@ -114,6 +132,7 @@
 </template>
 
 <script lang="jsx" setup>
+import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 import { Edit } from '@element-plus/icons-vue'
 import { TestplanState, TestPhase } from '@/api/enum'
 import * as ExecutionService from '@/api/script/execution'
@@ -134,172 +153,160 @@ const { queryConditions, resetQueryConditions } = useQueryConditions({
   state: ''
 })
 const { workspaceNo } = useWorkspaceState()
-</script>
+const router = useRouter()
+const tableData = ref([])
+const page = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+const showRecordDialog = ref(false)
+const currentRowPlanNo = ref('')
+const testphasePopoverRefs = ref([])
+const statePopoverRefs = ref([])
 
-<script lang="jsx">
-export default {
-  name: 'TestPlan',
+watch(workspaceNo, () => queryList())
 
-  data() {
-    return {
-      // 表格数据
-      tableData: [],
-      // 分页信息
-      page: 1,
-      pageSize: 10,
-      total: 0,
-      // 对话框打开关闭标识
-      showRecordDialog: false,
-      currentRowPlanNo: ''
-    }
-  },
+onMounted(() => {
+  queryList()
+})
 
-  watch: {
-    workspaceNo() {
-      this.queryList()
-    }
-  },
+// 确保在每次更新之前重置ref
+onBeforeUpdate(() => {
+  testphasePopoverRefs.value = []
+  statePopoverRefs.value = []
+})
 
-  mounted() {
-    this.queryList()
-  },
+/**
+ * 查询
+ */
+const queryList = () => {
+  TestplanService.queryTestplanList({
+    ...queryConditions.value,
+    workspaceNo: workspaceNo.value,
+    page: page.value,
+    pageSize: pageSize.value
+  }).then((response) => {
+    tableData.value = response.result.data
+    total.value = response.result.total
+  })
+}
 
-  methods: {
-    /**
-     * 查询
-     */
-    queryList() {
-      TestplanService.queryTestplanList({
-        ...this.queryConditions,
-        workspaceNo: this.workspaceNo,
-        page: this.page,
-        pageSize: this.pageSize
-      }).then((response) => {
-        this.tableData = response.result.data
-        this.total = response.result.total
-      })
-    },
+/**
+ * 执行测试计划
+ */
+const executeTestplan = async ({ planNo, testPhase }) => {
+  let datasetNumberList = []
+  let useCurrentValue = false
+  // 弹出选择变量集的对话框
+  const error = await ElMessageBox.confirm(null, {
+    title: '请选择测试环境',
+    message: (
+      <TestplanDatasetSelect
+        key={new Date().getTime()}
+        workspaceNo={workspaceNo.value}
+        testPhase={TestPhase[testPhase]}
+        onChangeDatasetNumberList={(val) => (datasetNumberList = val)}
+        onChangeUseCurrentValue={(val) => (useCurrentValue = val)}
+      />
+    ),
+    confirmButtonText: '确定',
+    cancelButtonText: '取消'
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 异步执行测试计划
+  const response = await ExecutionService.executeTestPlan({
+    planNo: planNo,
+    datasetNumberList: datasetNumberList,
+    useCurrentValue: useCurrentValue
+  })
+  // 成功提示
+  ElNotification.success({
+    message: `开始执行测试计划，总 ${response.result.total} 个脚本，请稍等片刻`,
+    duration: 2 * 1000
+  })
+}
 
-    /**
-     * 执行测试计划
-     */
-    async executeTestplan({ planNo, testPhase }) {
-      let datasetNumberList = []
-      let useCurrentValue = false
-      // 弹出选择变量集的对话框
-      const error = await this.$confirm(null, {
-        title: '请选择测试环境',
-        message: (
-          <TestplanDatasetSelect
-            key={new Date().getTime()}
-            workspaceNo={this.workspaceNo}
-            testPhase={this.TestPhase[testPhase]}
-            onChangeDatasetNumberList={(val) => (datasetNumberList = val)}
-            onChangeUseCurrentValue={(val) => (useCurrentValue = val)}
-          />
-        ),
-        confirmButtonText: '确定',
-        cancelButtonText: '取消'
-      })
-        .then(() => false)
-        .catch(() => true)
-      if (error) return
-      // 异步执行测试计划
-      const response = await ExecutionService.executeTestPlan({
-        planNo: planNo,
-        datasetNumberList: datasetNumberList,
-        useCurrentValue: useCurrentValue
-      })
-      // 成功提示
-      this.$notify({
-        message: `开始执行测试计划，总 ${response.result.total} 个脚本，请稍等片刻`,
-        type: 'success',
-        duration: 2 * 1000
-      })
-    },
-
-    /**
-     * 修改测试阶段
-     */
-    modifyTestplanTestphase({ planNo, tobeModifiedTestPhase }) {
-      if (!tobeModifiedTestPhase || tobeModifiedTestPhase === '') {
-        // 错误提示
-        this.$message({ message: '无效的测试阶段', type: 'error', duration: 1 * 1000 })
-        // 关闭popover
-        this.$refs[`testphase-popover-${planNo}`].doClose()
-        return
-      }
-      // 修改测试阶段
-      TestplanService.modifyTestplanTestphase({ planNo: planNo, testPhase: tobeModifiedTestPhase })
-        .then(() => {
-          // 重新查询列表
-          this.queryList()
-        })
-        .finally(() => {
-          // 关闭popover
-          this.$refs[`testphase-popover-${planNo}`].doClose()
-        })
-    },
-
-    /**
-     * 修改计划状态
-     */
-    modifyTestplanState({ planNo, tobeModifiedState }) {
-      if (!tobeModifiedState || tobeModifiedState === '') {
-        // 错误提示
-        this.$message({ message: '无效的状态', type: 'error', duration: 1 * 1000 })
-        // 关闭popover
-        this.$refs[`state-popover-${planNo}`].doClose()
-        return
-      }
-      // 修改计划状态
-      TestplanService.modifyTestplanState({ planNo: planNo, state: tobeModifiedState })
-        .then(() => {
-          // 重新查询列表
-          this.queryList()
-        })
-        .finally(() => {
-          // 关闭popover
-          this.$refs[`state-popover-${planNo}`].doClose()
-        })
-    },
-
-    /**
-     * 跳转至测试计划 新增/编辑 页
-     */
-    gotoTestplanEditor(planNo, editorMode) {
-      this.$router.push({
-        path: 'testplan/editor',
-        query: planNo ? { planNo: planNo } : null,
-        name: 'TestplanEditor',
-        params: { editorMode: planNo ? editorMode : 'CREATE' }
-      })
-    },
-
-    /**
-     * 打开执行记录对话框
-     */
-    openExecutionRecordDialog({ planNo }) {
-      this.currentRowPlanNo = planNo
-      this.showRecordDialog = true
-    },
-
-    /**
-     * pagination handler
-     */
-    handleSizeChange(val) {
-      this.pageSize = val
-      this.queryList()
-    },
-
-    /**
-     * pagination handler
-     */
-    handleCurrentChange(val) {
-      this.page = val
-      this.queryList()
-    }
+/**
+ * 修改测试阶段
+ */
+const modifyTestplanTestphase = ({ planNo, tobeModifiedTestPhase }) => {
+  if (!tobeModifiedTestPhase || tobeModifiedTestPhase === '') {
+    // 错误提示
+    ElMessage({ message: '无效的测试阶段', type: 'error', duration: 2 * 1000 })
+    // 关闭popover
+    testphasePopoverRefs.value[planNo].hide()
+    return
   }
+  // 修改测试阶段
+  TestplanService.modifyTestplanTestphase({ planNo: planNo, testPhase: tobeModifiedTestPhase })
+    .then(() => {
+      // 重新查询列表
+      queryList()
+    })
+    .finally(() => {
+      // 关闭popover
+      testphasePopoverRefs.value[planNo].hide()
+    })
+}
+
+/**
+ * 修改计划状态
+ */
+const modifyTestplanState = ({ planNo, tobeModifiedState }) => {
+  if (!tobeModifiedState || tobeModifiedState === '') {
+    // 错误提示
+    ElMessage({ message: '无效的状态', type: 'error', duration: 2 * 1000 })
+    // 关闭popover
+    statePopoverRefs.value[planNo].hide()
+    return
+  }
+  // 修改计划状态
+  TestplanService.modifyTestplanState({ planNo: planNo, state: tobeModifiedState })
+    .then(() => {
+      // 重新查询列表
+      queryList()
+    })
+    .finally(() => {
+      // 关闭popover
+      statePopoverRefs.value[planNo].hide()
+    })
+}
+
+/**
+ * 跳转至测试计划 新增/编辑 页
+ */
+const gotoTestplanEditor = (planNo, editorMode) => {
+  router.push({
+    path: 'testplan/editor',
+    query: planNo ? { planNo: planNo } : null,
+    name: 'TestplanEditor',
+    params: { editorMode: planNo ? editorMode : 'CREATE' }
+  })
+}
+
+/**
+ * 打开执行记录对话框
+ */
+const openExecutionRecordDialog = ({ planNo }) => {
+  currentRowPlanNo.value = planNo
+  showRecordDialog.value = true
+}
+
+/**
+ * pagination handler
+ */
+const handleSizeChange = (val) => {
+  pageSize.value = val
+  queryList()
+}
+
+/**
+ * pagination handler
+ */
+const handleCurrentChange = (val) => {
+  page.value = val
+  queryList()
 }
 </script>
 

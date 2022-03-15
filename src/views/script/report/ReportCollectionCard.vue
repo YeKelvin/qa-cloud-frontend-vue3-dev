@@ -7,41 +7,37 @@
       :class="{ active: activeId == collection.id }"
       shadow="hover"
       style="cursor: pointer; margin-bottom: 6px"
-      @click="
-        $emit('click', collection)
-        activeId = collection.id
-      "
+      @click="handleCardClick(collection)"
     >
       <div class="collection-card">
         <!-- 序号 -->
         <span style="margin-right: 10px">{{ index + 1 }}</span>
         <!-- 集合名称 -->
-        <div style="display: flex; flex-direction: column; flex: 1">
+        <div class="collection-name-wrapper">
           <span>{{ collection.name }}</span>
-          <span style="display: inline-flex; margin-top: 5px">
-            <el-tag type="warning" size="small" style="margin-right: 5px">start: {{ collection.startTime }}</el-tag>
+          <span class="collection-result-time-wrapper">
+            <el-tag type="warning" size="small">start: {{ collection.startTime }}</el-tag>
             <el-tag type="danger" size="small">elapsed: {{ collection.elapsedTime }}</el-tag>
           </span>
         </div>
         <!-- 成功或失败的图标  -->
-        <SvgIcon v-if="collection.success" icon-class="pass" class="stauts-svg-icon" />
-        <SvgIcon v-else icon-class="failure" class="stauts-svg-icon" />
+        <SvgIcon v-if="collection.success" icon-name="pymeter-pass" class="stauts-icon" />
+        <SvgIcon v-else icon-name="pymeter-failure" class="stauts-icon" />
       </div>
     </el-card>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'CollectionCard',
-  props: {
-    collections: { type: Array, default: () => [] }
-  },
-  data() {
-    return {
-      activeId: 0
-    }
-  }
+<script setup>
+defineProps({
+  collections: { type: Array, default: () => [] }
+})
+const activeId = ref(0)
+
+const emit = defineEmits(['click'])
+const handleCardClick = (collection) => {
+  emit('click', collection)
+  activeId.value = collection.id
 }
 </script>
 
@@ -54,7 +50,21 @@ export default {
   width: 100%;
 }
 
-.stauts-svg-icon {
+.collection-name-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.collection-result-time-wrapper {
+  display: inline-flex;
+  margin-top: 5px;
+
+  .el-tag {
+    margin-right: 5px;
+  }
+}
+.stauts-icon {
   height: 2em !important;
   width: 2em !important;
 }
