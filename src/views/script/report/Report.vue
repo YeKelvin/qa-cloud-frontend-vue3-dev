@@ -14,11 +14,10 @@
       <!-- collection-card 列表 -->
       <el-card shadow="hover" class="collection-container">
         <!-- 卡片头部 -->
-        <span slot="header">集合</span>
+        <template #header><span>集合</span></template>
         <!-- 过滤input -->
         <el-input
           v-model="collectionsFilterText"
-          size="small"
           placeholder="请输入搜索内容"
           style="padding: 10px 10px 0 10px; margin-bottom: 10px"
           clearable
@@ -29,18 +28,17 @@
           wrap-style="overflow-x:auto;"
           view-style="padding: 0 10px;"
         >
-          <collection-card :collections="filteredCollections" @click="handleCollectionCardClick" />
+          <ReportCollectionCard :collections="filteredCollections" @click="handleCollectionCardClick" />
         </el-scrollbar>
       </el-card>
 
       <!-- element-tree -->
       <el-card v-show="showTree" shadow="hover" class="result-tree-container">
         <!-- 卡片头部 -->
-        <span slot="header">脚本</span>
+        <template #header><span>脚本</span></template>
         <!-- 过滤input -->
         <el-input
           v-model="resultTreeFilterText"
-          size="small"
           placeholder="请输入搜索内容"
           style="padding: 10px 10px 0 10px; margin-bottom: 10px"
           clearable
@@ -51,148 +49,151 @@
           wrap-style="overflow-x:auto;"
           view-style="padding: 0 10px;"
         >
-          <result-tree :data="groups" :filter-text="resultTreeFilterText" @node-click="handleNodeClick" />
+          <ReportResultTree :data="groups" :filter-text="resultTreeFilterText" @node-click="handleNodeClick" />
         </el-scrollbar>
       </el-card>
 
       <!-- ResultDetails -->
-      <el-card shadow="hover" style="display: flex; flex: 1; flex-direction: column; min-width: 500px">
+      <el-card shadow="hover" class="result-details-container">
         <!-- 卡片头部 -->
-        <span slot="header">详情</span>
+        <template #header><span>详情</span></template>
         <el-scrollbar
           style="width: 100%; height: 100%; padding-bottom: 50px"
-          wrap-style="overflow-x:auto;"
-          view-style="padding:10px;"
+          wrap-style="overflow-x: auto;"
+          view-style="padding: 10px;"
         >
-          <overview-details v-if="showOverview" :overview="overview" />
-          <collection-result-details v-if="showCollectionResult" :details="collectionDetails" />
-          <group-result-details v-if="showGroupResult" :group-id="groupId" />
-          <sampler-result-details v-if="showSamplerResult" :sampler-id="samplerId" />
+          <ReportOverview v-if="showOverview" :overview="overview" />
+          <ReportCollectionResult v-if="showCollectionResult" :details="collectionDetails" />
+          <ReportGroupResult v-if="showGroupResult" :group-id="groupId" />
+          <ReportSamplerResult v-if="showSamplerResult" :sampler-id="samplerId" />
         </el-scrollbar>
       </el-card>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
+import { isEmpty as _isEmpty } from 'lodash-es'
+import { isBlank } from '@/utils/string-util'
 import * as ReportService from '@/api/script/report'
-import * as StringUtil from '@/utils/string-util'
-import OverviewDetails from './overview-details'
-import CollectionResultDetails from './collection-result-details'
-import GroupResultDetails from './group-result-details'
-import SamplerResultDetails from './sampler-result-details'
-import CollectionCard from './collection-card'
-import ResultTree from './result-tree'
+import ReportOverview from './ReportOverview.vue'
+import ReportCollectionResult from './ReportCollectionResult.vue'
+import ReportGroupResult from './ReportGroupResult.vue'
+import ReportSamplerResult from './ReportSamplerResult.vue'
+import ReportCollectionCard from './ReportCollectionCard.vue'
+import ReportResultTree from './ReportResultTree'
 
-export default {
-  name: 'TestReport',
-
-  components: {
-    OverviewDetails,
-    CollectionResultDetails,
-    GroupResultDetails,
-    SamplerResultDetails,
-    CollectionCard,
-    ResultTree
-  },
-
-  data() {
-    return {
-      reportNo: this.$route.query.reportNo,
-      overview: {},
-      collections: [],
-      groups: [],
-      collectionId: '',
-      collectionDetails: {},
-      groupId: '',
-      samplerId: '',
-      collectionsFilterText: '',
-      resultTreeFilterText: '',
-      showOverview: true,
-      showCollectionResult: false,
-      showGroupResult: false,
-      showSamplerResult: false
-    }
-  },
-
-  computed: {
-    showTree() {
-      return this.groups.length > 0
-    },
-    filteredCollections() {
-      if (StringUtil.isBlank(this.collectionsFilterText)) {
-        return this.collections
-      } else {
-        return this.collections.filter((item) => item.name.indexOf(StringUtil.trim(this.collectionsFilterText)) !== -1)
-      }
-    }
-  },
-
-  mounted() {
-    if (!this.reportNo) {
-      this.goBack()
-      return
-    }
-    this.queryReport()
-  },
-
-  methods: {
-    queryReport() {
-      ReportService.queryReport({ reportNo: this.reportNo })
-        .then((response) => {
-          this.overview = response.result.details
-          this.collections = response.result.collections
-        })
-        .catch(() => {})
-    },
-    queryCollectionResult() {
-      ReportService.queryCollectionResult({ collectionId: this.collectionId })
-        .then((response) => {
-          this.collectionDetails = response.result.details
-          this.groups = response.result.children
-        })
-        .catch(() => {})
-    },
-    handleCollectionCardClick(collection) {
-      // 记录当前点击的 CollectionId
-      this.collectionId = collection.id
-      // 查询集合结果
-      this.queryCollectionResult()
-
-      // 设置当前显示的结果视图为 CollectionResultDetails
-      this.showOverview = false
-      this.showCollectionResult = true
-      this.showGroupResult = false
-      this.showSamplerResult = false
-    },
-    handleNodeClick(data, node) {
-      this.showOverview = false
-      this.showCollectionResult = false
-      if (node.level === 1) {
-        // 记录当前点击的 GroupId
-        this.groupId = data.id
-        // 设置当前显示的结果视图为 GroupResultDetails
-        this.showGroupResult = true
-        this.showSamplerResult = false
-      } else {
-        // 记录当前点击的 SamplerId
-        this.samplerId = data.id
-        // 设置当前显示的结果视图为 SamplerResultDetails
-        this.showGroupResult = false
-        this.showSamplerResult = true
-      }
-    },
-    goBack() {
-      window.history.length > 1 ? this.$router.go(-1) : this.$router.push('/')
-    },
-    openOverview() {
-      this.groups = []
-      this.showOverview = true
-      this.showCollectionResult = false
-      this.showGroupResult = false
-      this.showSamplerResult = false
-    }
+const route = useRoute()
+const reportNo = ref(route.query.reportNo)
+const overview = ref({})
+const collections = ref([])
+const groups = ref([])
+const collectionId = ref('')
+const collectionDetails = ref({})
+const groupId = ref('')
+const samplerId = ref('')
+const collectionsFilterText = ref('')
+const resultTreeFilterText = ref('')
+const showOverview = ref(true)
+const showCollectionResult = ref(false)
+const showGroupResult = ref(false)
+const showSamplerResult = ref(false)
+const showTree = computed(() => !_isEmpty(groups.value))
+const filteredCollections = computed(() => {
+  if (isBlank(collectionsFilterText.value)) {
+    return collections.value
+  } else {
+    return collections.value.filter((item) => item.name.indexOf(collectionsFilterText.value.trim()) !== -1)
   }
+})
+
+onMounted(() => {
+  if (!reportNo.value) {
+    goBack()
+    return
+  }
+  queryReport()
+})
+
+/**
+ * 查询报告
+ */
+const queryReport = () => {
+  ReportService.queryReport({ reportNo: this.reportNo }).then((response) => {
+    overview.value = response.result.details
+    collections.value = response.result.collections
+  })
+}
+
+/**
+ * 查询集合结果
+ */
+const queryCollectionResult = () => {
+  ReportService.queryCollectionResult({ collectionId: collectionId.value }).then((response) => {
+    collectionDetails.value = response.result.details
+    groups.value = response.result.children
+  })
+}
+
+/**
+ * 打开统计面板
+ */
+const openOverview = () => {
+  groups.value = []
+  showOverview.value = true
+  showCollectionResult.value = false
+  showGroupResult.value = false
+  showSamplerResult.value = false
+}
+
+/**
+ * el-card handler
+ */
+const handleCollectionCardClick = (collection) => {
+  // 记录当前点击的 CollectionId
+  collectionId.value = collection.id
+  // 查询集合结果
+  queryCollectionResult()
+
+  // 设置当前显示的结果视图为 CollectionResultDetails
+  showOverview.value = false
+  showCollectionResult.value = true
+  showGroupResult.value = false
+  showSamplerResult.value = false
+}
+
+/**
+ * el-tree handler
+ */
+const handleNodeClick = (data, node) => {
+  showOverview.value = false
+  showCollectionResult.value = false
+  if (node.level === 1) {
+    // 记录当前点击的 GroupId
+    groupId.value = data.id
+    // 设置当前显示的结果视图为 GroupResultDetails
+    showGroupResult.value = true
+    showSamplerResult.value = false
+  } else {
+    // 记录当前点击的 SamplerId
+    samplerId.value = data.id
+    // 设置当前显示的结果视图为 SamplerResultDetails
+    showGroupResult.value = false
+    showSamplerResult.value = true
+  }
+}
+
+/**
+ * 返回上一页
+ */
+const goBack = () => {
+  window.history.length > 1 ? this.$router.go(-1) : this.$router.push('/')
+}
+</script>
+
+<script>
+export default {
+  methods: {}
 }
 </script>
 
@@ -264,6 +265,13 @@ export default {
   max-width: 400px;
 
   margin-right: 10px;
+}
+
+.result-details-container {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 500px;
 }
 
 .el-card {
