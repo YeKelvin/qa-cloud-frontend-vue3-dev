@@ -10,7 +10,7 @@
         <!-- 变量集选择器 -->
         <DatasetSelect :show="show" />
         <!-- 详情按钮 -->
-        <el-button type="text" size="small" :icon="View" @click="showVariables = true" />
+        <el-button type="text" size="small" :icon="View" @click="showVariablesDialog = true" />
       </span>
     </div>
 
