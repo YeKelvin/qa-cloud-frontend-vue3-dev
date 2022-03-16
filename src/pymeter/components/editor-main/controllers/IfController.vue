@@ -20,13 +20,15 @@
       </el-form-item>
 
       <!-- if条件 -->
-      <el-form-item label="if条件：" prop="property.IfController__condition">
+      <el-form-item label="if表达式：" prop="property.IfController__condition">
         <MonacoEditor
           ref="codeEditorRef"
           v-model="elementInfo.property.IfController__condition"
           style="height: 100px"
+          language="python"
           :read-only="queryMode"
         />
+        <el-tag type="danger" style="font-size: 14px">注意：仅支持单行表达式</el-tag>
       </el-form-item>
 
       <!-- 操作按钮 -->

@@ -10,13 +10,14 @@
     >
       <el-select
         v-model="selectedCollectionNumberList"
-        :teleported="false"
-        effect="dark"
-        size="large"
+        placeholder="请选择"
         style="flex-grow: 1"
         tag-type="danger"
+        effect="dark"
+        size="large"
         filterable
         multiple
+        :teleported="false"
       >
         <!-- 脚本集合 -->
         <el-option-group key="collections" label="集合">

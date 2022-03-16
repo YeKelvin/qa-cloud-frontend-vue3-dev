@@ -104,7 +104,7 @@ const querySamplerResult = () => {
  * el-tab handler
  */
 const handleRequestTabClick = (tab) => {
-  if (tab.name === 'DATA') {
+  if (tab.paneName === 'DATA') {
     requestEditorRef.value.setValue(details.value.requestData)
   }
 }
@@ -113,12 +113,12 @@ const handleRequestTabClick = (tab) => {
  * el-tab handler
  */
 const handleResponseTabClick = (tab) => {
-  if (tab.name === 'DATA') {
+  if (tab.paneName === 'DATA') {
     responseEditorRef.value.setValue(details.value.responseData)
     responseEditorRef.value.formatDocument()
     return
   }
-  if (tab.name === 'ASSERTION') {
+  if (tab.paneName === 'ASSERTION') {
     assertionEditorRef.value.setValue(details.value.failedAssertion)
     return
   }

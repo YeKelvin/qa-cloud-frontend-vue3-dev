@@ -23,7 +23,7 @@
       <el-form-item label="最大循环数：" prop="property.WhileController__max_loop_count">
         <el-input
           v-model="elementInfo.property.WhileController__max_loop_count"
-          placeholder="while 最大循环次数"
+          placeholder="最大循环次数"
           clearable
           :readonly="queryMode"
         />
@@ -33,7 +33,7 @@
       <el-form-item label="超时时间：" prop="property.WhileController__timeout">
         <el-input
           v-model="elementInfo.property.WhileController__timeout"
-          placeholder="while 超时时间（ms）"
+          placeholder="循环超时时间（ms）"
           clearable
           :readonly="queryMode"
         />
@@ -43,20 +43,22 @@
       <el-form-item label="延迟时间：" prop="property.WhileController__delay">
         <el-input
           v-model="elementInfo.property.WhileController__delay"
-          placeholder="延迟下一个循环的开始时间（ms）"
+          placeholder="循环的间隔时间（ms）"
           clearable
           :readonly="queryMode"
         />
       </el-form-item>
 
       <!-- while条件 -->
-      <el-form-item label="while条件：" prop="property.WhileController__condition">
+      <el-form-item label="while表达式：" prop="property.WhileController__condition">
         <MonacoEditor
           ref="codeEditorRef"
           v-model="elementInfo.property.WhileController__condition"
           style="height: 100px"
+          language="python"
           :read-only="queryMode"
         />
+        <el-tag type="danger" style="font-size: 14px">注意：仅支持单行表达式</el-tag>
       </el-form-item>
 
       <!-- 操作按钮 -->

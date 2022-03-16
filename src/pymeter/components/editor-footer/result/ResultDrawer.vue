@@ -93,7 +93,7 @@ const clean = () => {
  * el-tab handler
  */
 const handleTabClick = (tab) => {
-  const result = tabs.value.find((result) => result.id === tab.name)
+  const result = tabs.value.find((result) => result.id === tab.paneName)
   activeDetails.value = result.details
 }
 
