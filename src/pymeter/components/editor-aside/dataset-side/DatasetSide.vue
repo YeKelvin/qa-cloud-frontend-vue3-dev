@@ -23,7 +23,7 @@
 
     <!-- 变量集列表 -->
     <el-scrollbar style="width: 100%; height: 100%" wrap-style="overflow-x:auto;" view-style="padding:10px;">
-      <DatasetTree ref="tree" :filter-text="filterText" />
+      <DatasetTree ref="datasetTreeRef" />
     </el-scrollbar>
   </div>
 </template>
@@ -34,7 +34,12 @@ import { Plus } from '@element-plus/icons-vue'
 import DatasetTree from './DatasetTree'
 
 const store = useStore()
+const datasetTreeRef = ref()
 const filterText = ref('')
+
+watch(filterText, (val) => {
+  datasetTreeRef.value.filter(val)
+})
 
 const openNewEnvironmentTab = () => {
   store.commit({

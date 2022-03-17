@@ -12,18 +12,22 @@
 
     <!-- 变量集列表 -->
     <el-scrollbar style="width: 100%; height: 100%" wrap-style="overflow-x:auto;" view-style="padding:10px;">
-      <HttpheaderTemplateTree :filter-text="filterText" />
+      <HttpheaderTemplateTree ref="templateTreeRef" />
     </el-scrollbar>
   </div>
 </template>
 
 <script setup>
-import { useStore } from 'vuex'
 import { Plus } from '@element-plus/icons-vue'
 import HttpheaderTemplateTree from './HttpheaderTemplateTree.vue'
 
 const store = useStore()
+const templateTreeRef = ref()
 const filterText = ref('')
+
+watch(filterText, (val) => {
+  templateTreeRef.value.filter(val)
+})
 
 const openNewTemplateTab = () => {
   store.commit({

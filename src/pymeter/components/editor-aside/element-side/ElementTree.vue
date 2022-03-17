@@ -38,8 +38,6 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
-import { useStore } from 'vuex'
 import { isEmpty } from 'lodash-es'
 import { ElMessage } from 'element-plus'
 import * as ElementService from '@/api/script/element'

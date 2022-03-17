@@ -386,12 +386,9 @@ const duplicateElement = ({ elementNo, elementName, elementType }) => {
       type: 'warning',
       confirmButtonText: '确定',
       cancelButtonText: '取消',
+      title: '警告',
       message: (
-        <div>
-          <p>确认复制以下分组吗？</p>
-          <br />
-          <p style="white-space:normal; overflow:hidden; text-overflow:ellipsis;">{elementName}</p>
-        </div>
+        <span style="white-space:normal; overflow:hidden; text-overflow:ellipsis;">确认复制 {elementName} 吗？</span>
       )
     }).then(() => {
       ElementService.duplicateElement({ elementNo: elementNo }).then(() => {
@@ -498,16 +495,12 @@ const disableElement = ({ elementNo }) => {
 const removeElement = async ({ elementNo, elementName }) => {
   // 二次确认
   const error = await ElMessageBox.confirm(null, {
-    title: '警告',
     type: 'warning',
     confirmButtonText: '确定',
     cancelButtonText: '取消',
+    title: '警告',
     message: (
-      <div>
-        <p>确认删除以下元素吗？</p>
-        <br />
-        <p style="white-space:normal; overflow:hidden; text-overflow:ellipsis;">{elementName}</p>
-      </div>
+      <span style="white-space:normal; overflow:hidden; text-overflow:ellipsis;">确认删除 {elementName} 吗？</span>
     )
   })
     .then(() => false)

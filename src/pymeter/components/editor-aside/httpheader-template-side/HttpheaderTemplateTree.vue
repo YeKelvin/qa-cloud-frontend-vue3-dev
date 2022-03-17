@@ -46,6 +46,7 @@
 </template>
 
 <script lang="jsx" setup>
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { More } from '@element-plus/icons-vue'
 import * as HeadersService from '@/api/script/headers'
 import useElTree from '@/composables/useElTree'
@@ -56,140 +57,149 @@ import WorkspaceTree from '@/pymeter/components/editor-aside/common/WorkspaceTre
 const { eltreeRef, hoveredNode, mouseenter, mouseleave, visibleChange } = useElTree()
 const { httpHeaderTemplateList } = usePyMeterState()
 const { workspaceList } = useWorkspaceState()
-</script>
+const store = useStore()
 
-<script lang="jsx">
-export default {
-  name: 'HttpHeadersTree',
-  props: {
-    filterText: { type: String, default: '' }
-  },
-  watch: {
-    filterText(val) {
-      this.$refs.eltreeRef.filter(val)
-    }
-  },
-  methods: {
-    filter(val) {
-      this.$refs.eltreeRef.filter(val)
-    },
-    filterNode(value, data) {
-      if (!value) return true
-      return data.templateName.indexOf(value) !== -1
-    },
-    handleNodeClick(data) {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: data.templateNo,
-        editorName: data.templateName,
-        editorComponent: 'HttpHeadersTemplate',
-        editorMode: 'QUERY',
-        metadata: {
-          templateName: data.templateName,
-          templateDesc: data.templateDesc
-        }
-      })
-    },
-
-    /**
-     * 复制请求头模板
-     */
-    async duplicateTemplate({ templateNo }) {
-      // 二次确认
-      const error = await this.$confirm('确定复制吗？', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => false)
-        .catch(() => true)
-      if (error) return
-      // 复制请求头模板
-      await HeadersService.duplicateHttpHeaderTemplate({ templateNo: templateNo })
-      //  重新查询列表
-      this.$store.dispatch('pymeter/queryHttpHeaderTemplateAll')
-      // 成功提示
-      this.$message({ message: '复制成功', type: 'info', duration: 2 * 1000 })
-    },
-
-    /**
-     * 复制请求头模板到指定空间
-     */
-    async copyTemplateToWorkspace({ templateNo }) {
-      let workspaceNo = null
-      // 弹出选择空间的对话框
-      const error = await this.$confirm(null, {
-        title: '请选择工作空间',
-        message: (
-          <WorkspaceTree
-            key={templateNo}
-            data={this.workspaceList}
-            onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
-          />
-        ),
-        confirmButtonText: '确定',
-        cancelButtonText: '取消'
-      })
-        .then(() => false)
-        .catch(() => true)
-      if (error) return
-      // 复制请求头模板到指定空间
-      await HeadersService.copyHttpHeaderTemplateToWorkspace({ templateNo: templateNo, workspaceNo: workspaceNo })
-      //  成功提示
-      this.$message({ message: '复制成功', type: 'info', duration: 1 * 1000 })
-    },
-
-    /**
-     * 移动请求头模板到指定空间
-     */
-    async moveTemplateToWorkspace({ templateNo }) {
-      let workspaceNo = null
-      // 弹出选择空间的对话框
-      const error = await this.$confirm(null, {
-        title: '请选择工作空间',
-        message: (
-          <WorkspaceTree
-            key={templateNo}
-            data={this.workspaceList}
-            onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
-          />
-        ),
-        confirmButtonText: '确定',
-        cancelButtonText: '取消'
-      })
-        .then(() => false)
-        .catch(() => true)
-      if (error) return
-      // 移动请求头模板到指定空间
-      await HeadersService.moveHttpHeaderTemplateToWorkspace({ templateNo: templateNo, workspaceNo: workspaceNo })
-      // 重新查询列表
-      this.$store.dispatch('pymeter/queryHttpHeaderTemplateAll')
-      // 成功提示
-      this.$message({ message: '移动成功', type: 'info', duration: 1 * 1000 })
-    },
-
-    /**
-     * 删除请求头模板
-     */
-    async deleteTemplate({ templateNo }) {
-      // 二次确认
-      const error = await this.$confirm('确定删除吗？', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => false)
-        .catch(() => true)
-      if (error) return
-      // 删除请求头模板
-      await HeadersService.deleteHttpHeaderTemplate({ templateNo: templateNo })
-      // 重新查询列表
-      this.$store.dispatch('pymeter/queryHttpHeaderTemplateAll')
-      // 成功提示
-      this.$message({ message: '删除成功', type: 'info', duration: 1 * 1000 })
-    }
-  }
+/**
+ * 复制请求头模板
+ */
+const duplicateTemplate = async ({ templateNo, templateName }) => {
+  // 二次确认
+  const error = await ElMessageBox.confirm(null, {
+    type: 'warning',
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    title: '警告',
+    message: (
+      <span style="white-space:normal; overflow:hidden; text-overflow:ellipsis;">确认复制 {templateName} 吗？</span>
+    )
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 复制请求头模板
+  await HeadersService.duplicateHttpHeaderTemplate({ templateNo: templateNo })
+  //  重新查询列表
+  store.dispatch('pymeter/queryHttpHeaderTemplateAll')
+  // 成功提示
+  ElMessage({ message: '复制成功', type: 'info', duration: 2 * 1000 })
 }
+
+/**
+ * 复制请求头模板到指定空间
+ */
+const copyTemplateToWorkspace = async ({ templateNo }) => {
+  let workspaceNo = null
+  // 弹出选择空间的对话框
+  const error = await ElMessageBox.confirm(null, {
+    title: '请选择工作空间',
+    message: (
+      <WorkspaceTree
+        key={templateNo}
+        data={workspaceList.value}
+        onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
+      />
+    ),
+    confirmButtonText: '确定',
+    cancelButtonText: '取消'
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 复制请求头模板到指定空间
+  await HeadersService.copyHttpHeaderTemplateToWorkspace({ templateNo: templateNo, workspaceNo: workspaceNo })
+  //  成功提示
+  ElMessage({ message: '复制成功', type: 'info', duration: 1 * 1000 })
+}
+
+/**
+ * 移动请求头模板到指定空间
+ */
+const moveTemplateToWorkspace = async ({ templateNo }) => {
+  let workspaceNo = null
+  // 弹出选择空间的对话框
+  const error = await ElMessageBox.confirm(null, {
+    title: '请选择工作空间',
+    message: (
+      <WorkspaceTree
+        key={templateNo}
+        data={workspaceList.value}
+        onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
+      />
+    ),
+    confirmButtonText: '确定',
+    cancelButtonText: '取消'
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 移动请求头模板到指定空间
+  await HeadersService.moveHttpHeaderTemplateToWorkspace({ templateNo: templateNo, workspaceNo: workspaceNo })
+  // 重新查询列表
+  store.dispatch('pymeter/queryHttpHeaderTemplateAll')
+  // 成功提示
+  ElMessage({ message: '移动成功', type: 'info', duration: 1 * 1000 })
+}
+
+/**
+ * 删除请求头模板
+ */
+const deleteTemplate = async ({ templateNo, templateName }) => {
+  // 二次确认
+  const error = await ElMessageBox.confirm(null, {
+    type: 'warning',
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    title: '警告',
+    message: (
+      <span style="white-space:normal; overflow:hidden; text-overflow:ellipsis;">确认删除 {templateName} 吗？</span>
+    )
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 删除请求头模板
+  await HeadersService.deleteHttpHeaderTemplate({ templateNo: templateNo })
+  // 重新查询列表
+  store.dispatch('pymeter/queryHttpHeaderTemplateAll')
+  // 成功提示
+  ElMessage({ message: '删除成功', type: 'info', duration: 1 * 1000 })
+}
+
+/**
+ * el-tree handler
+ */
+const handleNodeClick = (data) => {
+  store.commit({
+    type: 'pymeter/addTab',
+    editorNo: data.templateNo,
+    editorName: data.templateName,
+    editorComponent: 'HttpHeadersTemplate',
+    editorMode: 'QUERY',
+    metadata: {
+      templateName: data.templateName,
+      templateDesc: data.templateDesc
+    }
+  })
+}
+
+/**
+ * el-tree 节点过滤
+ */
+const filterNode = (value, data) => {
+  if (!value) return true
+  return data.templateName.indexOf(value) !== -1
+}
+
+/**
+ * el-tree 文本过滤
+ */
+const filter = (val) => {
+  eltreeRef.value.filter(val)
+}
+
+defineExpose({
+  filter
+})
 </script>
 
 <style lang="scss" scoped>
