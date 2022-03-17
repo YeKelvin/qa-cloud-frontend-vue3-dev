@@ -4,6 +4,7 @@ import { useStore } from 'vuex'
 export default function usePyMeterState() {
   const store = useStore()
 
+  const refreshCollections = computed(() => store.state.pymeter.refreshCollections)
   const refreshElementTree = computed(() => store.state.pymeter.refreshElementTree)
 
   const globalDatasetList = computed(() => store.state.pymeter.globalDatasetList)
@@ -38,6 +39,7 @@ export default function usePyMeterState() {
   })
 
   return {
+    refreshCollections,
     refreshElementTree,
     globalDatasetList,
     environmentDatasetList,

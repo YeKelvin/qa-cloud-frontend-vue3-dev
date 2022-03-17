@@ -66,7 +66,7 @@
     </span>
 
     <!-- 选择脚本后才显示 -->
-    <template v-if="!loading && !isEmpty(selectedCollectionNumberList)">
+    <template v-if="!loading && !_isEmpty(selectedCollectionNumberList)">
       <!-- 元素操作按钮 -->
       <div class="operation-container" style="margin-top: 5px">
         <!-- 展开节点按钮 -->
@@ -91,145 +91,125 @@
       <el-divider />
       <!-- 脚本内容 -->
       <el-scrollbar style="width: 100%; height: 100%" wrap-style="overflow-x:auto;" view-style="padding:10px;">
-        <ElementTree ref="eltreeRef" :collection-number-list="selectedCollectionNumberList" />
+        <ElementTree ref="elementTreeRef" :collection-number-list="selectedCollectionNumberList" />
       </el-scrollbar>
     </template>
 
     <!-- 没有选择脚本时给出提示 -->
-    <el-empty v-if="!loading && isEmpty(selectedCollectionNumberList)" description="请选择脚本" />
+    <el-empty v-if="!loading && _isEmpty(selectedCollectionNumberList)" description="请选择脚本" />
   </div>
 </template>
 
 <script setup>
-import { mapState } from 'vuex'
+import { isEmpty as _isEmpty } from 'lodash-es'
 import { Plus } from '@element-plus/icons-vue'
-import { isEmpty } from 'lodash-es'
 import * as ElementService from '@/api/script/element'
+import useWorkspaceState from '@/composables/useWorkspaceState'
+import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 import ElementTree from './ElementTree.vue'
-</script>
 
-<script>
-export default {
-  name: 'ElementAside',
-  data() {
-    return {
-      loading: false,
-      collections: [],
-      snippets: []
-    }
+const { workspaceNo } = useWorkspaceState()
+const { refreshCollections } = usePyMeterState()
+const store = useStore()
+const loading = ref(false)
+const collections = ref([])
+const snippets = ref([])
+const elementTreeRef = ref()
+const selectedCollectionNumberList = computed({
+  get() {
+    return store.state.pymeter.selectedCollectionNumberList
   },
+  set(val) {
+    if (!loading.value) store.commit('pymeter/setSelectedCollectionNumberList', val)
+  }
+})
 
-  computed: {
-    ...mapState('workspace', {
-      workspaceNo: (state) => state.workspaceNo,
-      workspaceList: (state) => state.workspaceList
-    }),
-    ...mapState('pymeter', {
-      refreshCollections: (state) => state.refreshCollections
-    }),
-    // 当前选中的集合编号列表
-    selectedCollectionNumberList: {
-      get() {
-        return this.$store.state.pymeter.selectedCollectionNumberList
-      },
-      set(val) {
-        if (!this.loading) this.$store.commit('pymeter/setSelectedCollectionNumberList', val)
-      }
-    }
-  },
+watch(workspaceNo, (val) => {
+  if (!val) return
+  // 重新查询集合列表
+  queryCollections()
+  // 清空已选择的集合
+  selectedCollectionNumberList.value = []
+})
+watch(refreshCollections, () => queryCollections())
 
-  watch: {
-    workspaceNo(val) {
-      if (!val) return
-      this.queryCollections()
-      // 清空已选择的集合
-      this.selectedCollectionNumberList = []
-    },
-    refreshCollections() {
-      this.queryCollections()
-    }
-  },
+onMounted(() => {
+  if (!workspaceNo.value) return
+  queryCollections()
+})
 
-  mounted() {
-    if (!this.workspaceNo) return
-    this.queryCollections()
-  },
-
-  methods: {
-    /**
-     * 根据工作空间编号查询测试集合和脚本片段
-     */
-    async queryCollections() {
-      // 加载中
-      this.loading = true
-      // 查询 TestCollection
-      this.collections = (
-        await ElementService.queryElementAll({
-          workspaceNo: this.workspaceNo,
-          elementType: 'COLLECTION',
-          elementClass: 'TestCollection'
-        })
-      ).result
-      // 查询 TestSnippets
-      this.snippets = (
-        await ElementService.queryElementAll({
-          workspaceNo: this.workspaceNo,
-          elementType: 'COLLECTION',
-          elementClass: 'TestSnippets'
-        })
-      ).result
-      // 加载完成
-      this.loading = false
-      // 提取集合编号
-      const collectionNumberList = [...this.collections, ...this.snippets].map((item) => item.elementNo)
-      // 遍历取消选择无效的集合
-      for (let i = this.selectedCollectionNumberList.length - 1; i >= 0; i--) {
-        if (!collectionNumberList.includes(this.selectedCollectionNumberList[i])) {
-          this.selectedCollectionNumberList.splice(i, 1)
-        }
-      }
-    },
-
-    /**
-     * 根据集合编号查询测试案例
-     */
-    queryElementsTree() {
-      this.$refs.eltreeRef.queryElementsTree()
-    },
-
-    /**
-     * 打开新增 TestCollection 的标签页
-     */
-    openNewCollectionTab() {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_COLLECTION',
-        editorName: 'New Script',
-        editorComponent: 'TestCollection',
-        editorMode: 'CREATE'
-      })
-    },
-
-    /**
-     * 打开新增 TestSnippets 的标签页
-     */
-    openNewSnippetTab() {
-      this.$store.commit({
-        type: 'pymeter/addTab',
-        editorNo: 'UNSAVED_SNIPPET',
-        editorName: 'New Snippet',
-        editorComponent: 'TestSnippets',
-        editorMode: 'CREATE'
-      })
-    },
-
-    /**
-     * 展开或收起所有节点
-     */
-    expandAll(expand) {
-      this.$refs.eltreeRef.expandAll(expand)
+/**
+ * 根据工作空间编号查询测试集合和脚本片段
+ */
+const queryCollections = async () => {
+  // 加载中
+  loading.value = true
+  // 查询 TestCollection
+  collections.value = (
+    await ElementService.queryElementAll({
+      workspaceNo: workspaceNo.value,
+      elementType: 'COLLECTION',
+      elementClass: 'TestCollection'
+    })
+  ).result
+  // 查询 TestSnippets
+  snippets.value = (
+    await ElementService.queryElementAll({
+      workspaceNo: workspaceNo.value,
+      elementType: 'COLLECTION',
+      elementClass: 'TestSnippets'
+    })
+  ).result
+  // 加载完成
+  loading.value = false
+  // 提取集合编号
+  const collectionNumberList = [...collections.value, ...snippets.value].map((item) => item.elementNo)
+  // 遍历取消选择无效的集合
+  for (let i = selectedCollectionNumberList.value.length - 1; i >= 0; i--) {
+    if (!collectionNumberList.includes(selectedCollectionNumberList.value[i])) {
+      selectedCollectionNumberList.value.splice(i, 1)
     }
   }
+}
+
+/**
+ * 根据集合编号查询测试案例
+ */
+const queryElementsTree = () => {
+  elementTreeRef.value.queryElementsTree()
+}
+
+/**
+ * 打开新增 TestCollection 的标签页
+ */
+const openNewCollectionTab = () => {
+  store.commit({
+    type: 'pymeter/addTab',
+    editorNo: 'UNSAVED_COLLECTION',
+    editorName: 'New Script',
+    editorComponent: 'TestCollection',
+    editorMode: 'CREATE'
+  })
+}
+
+/**
+ * 打开新增 TestSnippets 的标签页
+ */
+const openNewSnippetTab = () => {
+  store.commit({
+    type: 'pymeter/addTab',
+    editorNo: 'UNSAVED_SNIPPET',
+    editorName: 'New Snippet',
+    editorComponent: 'TestSnippets',
+    editorMode: 'CREATE'
+  })
+}
+
+/**
+ * 展开或收起所有节点
+ */
+const expandAll = (expand) => {
+  elementTreeRef.value.expandAll(expand)
 }
 </script>
 
