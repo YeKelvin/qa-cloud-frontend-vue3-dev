@@ -1,18 +1,17 @@
 <template>
   <el-card shadow="hover">
-    <el-badge is-dot :hidden="resultsReaded">
+    <div class="l-container">
       <el-button type="primary" plain @click="showResultDrawer = !showResultDrawer">响应结果</el-button>
-    </el-badge>
+      <el-button type="primary" plain @click="showLogDrawer = !showLogDrawer">运行日志</el-button>
+    </div>
 
-    <el-button type="primary" plain @click="showLogDrawer = !showLogDrawer">运行日志</el-button>
+    <div class="r-container">
+      <el-button type="danger" plain circle><SvgIcon icon-name="pymeter-broom" @click="clearAll()" /></el-button>
+    </div>
 
-    <ResultDrawer
-      v-model="showResultDrawer"
-      v-model:data="results"
-      @open="resultsReaded = true"
-      @close="resultsReaded = true"
-    />
-
+    <!-- 运行结果 -->
+    <ResultDrawer v-model="showResultDrawer" v-model:data="results" />
+    <!-- 运行日志 -->
     <LogDrawer v-model="showLogDrawer" v-model:data="logs" />
   </el-card>
 </template>
@@ -25,13 +24,12 @@ import LogDrawer from './log/LogDrawer.vue'
 import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 import useSocket from '@/composables/useSocket'
 import useSocketIO from '@/composables/useSocketIO'
+import SvgIcon from '@/components/svg-icon/SvgIcon.vue'
 
 const socket = useSocket()
 const socketio = useSocketIO()
 const results = ref([])
-const resultsReaded = ref(true)
 const logs = ref([])
-const logsReaded = ref(true)
 const { showResultDrawer, showLogDrawer } = usePyMeterState()
 
 onBeforeMount(() => {
@@ -62,7 +60,6 @@ onBeforeMount(() => {
     if (!group) return
 
     group.children.push(data.sampler)
-    resultsReaded.value = false
   })
   socket.on('pymeter_message', (data) => {
     ElNotification({ message: data, type: 'success', duration: 1 * 1000 })
@@ -90,12 +87,20 @@ onBeforeUnmount(() => {
   socket.off('pymeter_error')
   socketio.disconnect()
 })
+
+/**
+ * 清空所有记录
+ */
+const clearAll = () => {
+  results.value = []
+  logs.value = []
+}
 </script>
 
 <style lang="scss" scoped>
 :deep(.el-card__body) {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
 
   padding: 5px 20px;
@@ -110,7 +115,7 @@ onBeforeUnmount(() => {
   top: 2px;
 }
 
-.el-button {
+.l-container .el-button {
   margin-right: 20px;
 }
 </style>

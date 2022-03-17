@@ -54,7 +54,7 @@
                   <el-button type="danger" @click="modifyTestplanTestphase(row)">保存</el-button>
                 </span>
                 <template #reference>
-                  <el-button v-if="row.testPhase != 'COMPLETED'" :icon="Edit" type="danger" size="small" circle />
+                  <el-button v-if="row.testPhase != 'COMPLETED'" :icon="Edit" type="danger" size="small" circle plain />
                 </template>
               </el-popover>
             </span>
@@ -85,7 +85,7 @@
                   <el-button type="danger" @click="modifyTestplanState(row)">保存</el-button>
                 </span>
                 <template #reference>
-                  <el-button v-if="row.state != 'COMPLETED'" :icon="Edit" type="danger" size="small" circle />
+                  <el-button v-if="row.state != 'COMPLETED'" :icon="Edit" type="danger" size="small" circle plain />
                 </template>
               </el-popover>
             </span>
