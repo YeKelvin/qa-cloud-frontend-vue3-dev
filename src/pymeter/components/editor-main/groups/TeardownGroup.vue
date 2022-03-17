@@ -58,8 +58,8 @@
           placement="bottom"
           @click="executeTestGroup(false)"
         >
-          <el-icon><Pointer /></el-icon>
-          <span style="margin-left: 5px">运 行</span>
+          <SvgIcon icon-name="pymeter-send" style="margin-right: 5px" />
+          <span>运 行</span>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item @click="executeTestGroup(true)">独立运行</el-dropdown-item>

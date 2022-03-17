@@ -82,8 +82,8 @@
           style="margin-left: 10px"
           @click="executeTestGroup(false)"
         >
-          <el-icon><Pointer /></el-icon>
-          <span style="margin-left: 5px">运 行</span>
+          <SvgIcon icon-name="pymeter-send" style="margin-right: 5px" />
+          <span>运 行</span>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item @click="executeTestGroup(true)">独立运行</el-dropdown-item>
@@ -117,6 +117,7 @@ import editorProps from '@/pymeter/composables/editor.props'
 import useEditor from '@/pymeter/composables/useEditor'
 import useRunnableElement from '@/pymeter/composables/useRunnableElement'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
+import SvgIcon from '@/components/svg-icon/SvgIcon.vue'
 
 const checkLoops = (_, value, callback) => {
   if (!value) {

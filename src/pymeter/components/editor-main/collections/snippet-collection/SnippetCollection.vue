@@ -109,8 +109,8 @@
           placement="bottom"
           @click="executeCollection()"
         >
-          <el-icon><Pointer /></el-icon>
-          <span style="margin-left: 5px">运 行</span>
+          <SvgIcon icon-name="pymeter-send" style="margin-right: 5px" />
+          <span>运 行</span>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item @click="querySnippetsJson()">查看JSON</el-dropdown-item>
