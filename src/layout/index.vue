@@ -14,7 +14,7 @@
 
 <script setup>
 import { Navbar, Sidebar, AppMain } from './components'
-import useResizeHandler from './useResizeHandler'
+import useResizeHandler from './composables/useResizeHandler'
 
 const store = useStore()
 const route = useRoute()
