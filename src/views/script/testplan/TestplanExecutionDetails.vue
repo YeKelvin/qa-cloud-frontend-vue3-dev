@@ -78,74 +78,70 @@
     </el-card>
 
     <!-- 按钮 -->
-    <div style="display: flex; justify-content: center; align-items: center; margin-top: 10px">
-      <el-button v-if="details.reportNo" type="primary" @click="openReport">报告</el-button>
-      <el-button style="margin-left: 10px" @click="goBack">返回</el-button>
+    <div class="btn-wrapper">
+      <el-button v-if="details.reportNo" type="primary" @click="openReport()">报告</el-button>
+      <el-button style="margin-left: 10px" @click="goBack()">返回</el-button>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import { RunningState } from '@/api/enum'
 import * as TestplanService from '@/api/script/testplan'
 
-export default {
-  name: 'ExecutionDetails',
-
-  data() {
-    return {
-      RunningState: RunningState,
-      executionNo: this.$route.query.executionNo,
-      details: {},
-      tableData: []
-    }
-  },
-
-  computed: {
-    percentage() {
-      if (this.details.iterations > 1) {
-        // 统计迭代的进度
-        const percentage = this.details.iterationCount / this.details.iterations
-        if (!percentage) return 0
-        return percentage * 100
-      } else {
-        // 统计执行进度（需要保存测试报告的计划）
-        const total = this.tableData.length
-        let completedTotal = 0
-        this.tableData.forEach((item) => {
-          if (item.runningState === 'COMPLETED' || item.runningState === 'ERROR') {
-            completedTotal += 1
-          }
-        })
-        const percentage = completedTotal / total
-        if (!percentage) return 0
-        return percentage * 100
+const route = useRoute()
+const router = useRouter()
+const executionNo = ref(route.query.executionNo)
+const details = ref({})
+const tableData = ref([])
+const percentage = computed(() => {
+  if (details.value.iterations > 1) {
+    // 统计迭代的进度
+    const percentage = details.value.iterationCount / details.value.iterations
+    if (!percentage) return 0
+    return percentage * 100
+  } else {
+    // 统计执行进度（需要保存测试报告的计划）
+    const total = tableData.value.length
+    let completedTotal = 0
+    tableData.value.forEach((item) => {
+      if (item.runningState === 'COMPLETED' || item.runningState === 'ERROR') {
+        completedTotal += 1
       }
-    }
-  },
-
-  mounted() {
-    if (!this.executionNo) {
-      this.goBack()
-      return
-    }
-    this.queryTestplanExecutionDetails()
-  },
-
-  methods: {
-    queryTestplanExecutionDetails() {
-      TestplanService.queryTestplanExecutionDetails({ executionNo: this.executionNo }).then((response) => {
-        this.details = response.result
-        this.tableData = response.result.collectionList
-      })
-    },
-    openReport() {
-      this.$router.push({ path: '/script/report', query: { reportNo: this.details.reportNo } })
-    },
-    goBack() {
-      window.history.length > 1 ? this.$router.go(-1) : this.$router.push('/')
-    }
+    })
+    const percentage = completedTotal / total
+    if (!percentage) return 0
+    return percentage * 100
   }
+})
+
+onMounted(() => {
+  if (!executionNo.value) {
+    goBack()
+    return
+  }
+  queryTestplanExecutionDetails()
+})
+
+const queryTestplanExecutionDetails = () => {
+  TestplanService.queryTestplanExecutionDetails({ executionNo: executionNo.value }).then((response) => {
+    details.value = response.result
+    tableData.value = response.result.collectionList
+  })
+}
+
+/**
+ * 跳转至测试报告页
+ */
+const openReport = () => {
+  router.push({ path: '/script/report', query: { reportNo: details.value.reportNo } })
+}
+
+/**
+ * 返回上一页
+ */
+const goBack = () => {
+  window.history.length > 1 ? router.go(-1) : router.push('/')
 }
 </script>
 
@@ -169,6 +165,13 @@ export default {
   .el-tag {
     margin: 5px;
   }
+}
+
+.btn-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
 }
 
 :deep(.el-card__header) {

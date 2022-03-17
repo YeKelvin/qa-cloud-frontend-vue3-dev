@@ -10,7 +10,6 @@
     >
       <el-select
         v-model="selectedCollectionNumberList"
-        placeholder="请选择"
         style="flex-grow: 1"
         tag-type="danger"
         effect="dark"

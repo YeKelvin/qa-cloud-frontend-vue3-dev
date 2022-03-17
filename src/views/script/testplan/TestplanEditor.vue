@@ -96,7 +96,7 @@ export default {
   name: 'TestplanEditor',
 
   data() {
-    const checkIterations = (rule, value, callback) => {
+    const checkIterations = (_, value, callback) => {
       if (!value) {
         return callback(new Error('迭代次数不能为空'))
       }

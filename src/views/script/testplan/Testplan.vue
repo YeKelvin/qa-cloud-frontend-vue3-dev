@@ -44,7 +44,11 @@
                 width="300"
               >
                 <span style="display: flex; justify-content: space-between; align-items: center">
-                  <el-select v-model="row.tobeModifiedTestPhase" style="width: 100%; margin-right: 10px">
+                  <el-select
+                    v-model="row.tobeModifiedTestPhase"
+                    style="width: 100%; margin-right: 10px"
+                    automatic-dropdown
+                  >
                     <el-option v-for="(value, key) in TestPhase" :key="key" :label="value" :value="key" />
                   </el-select>
                   <el-button type="danger" @click="modifyTestplanTestphase(row)">保存</el-button>
@@ -71,7 +75,7 @@
                 width="300"
               >
                 <span style="display: flex; justify-content: space-between; align-items: center">
-                  <el-select v-model="row.tobeModifiedState" style="width: 100%; margin-right: 10px">
+                  <el-select v-model="row.tobeModifiedState" style="width: 100%; margin-right: 10px" automatic-dropdown>
                     <el-option v-for="(value, key) in TestplanState" :key="key" :label="value" :value="key" />
                   </el-select>
                   <el-button type="danger" @click="modifyTestplanState(row)">保存</el-button>
@@ -96,7 +100,7 @@
         <el-table-column fixed="right" label="操作" min-width="150">
           <template #default="{ row }">
             <template v-if="row.state != 'COMPLETED'">
-              <el-button type="text" style="margin-left: 10px" @click="gotoTestplanEditor(row.planNo, 'QUERY')">
+              <el-button type="text" style="margin-left: 12px" @click="gotoTestplanEditor(row.planNo, 'QUERY')">
                 计划详情
               </el-button>
               <el-button type="text" @click="openExecutionRecordDialog(row)">执行记录</el-button>
@@ -105,7 +109,7 @@
               </el-button>
             </template>
             <template v-else>
-              <el-button type="text" style="margin-left: 10px" @click="openExecutionRecordDialog(row)">
+              <el-button type="text" style="margin-left: 12px" @click="openExecutionRecordDialog(row)">
                 执行记录
               </el-button>
             </template>

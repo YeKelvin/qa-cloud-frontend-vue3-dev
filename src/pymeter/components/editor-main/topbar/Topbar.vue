@@ -3,7 +3,7 @@
     <!-- 操作栏 -->
     <div class="topbar-main">
       <!-- 左侧：组件名称 -->
-      <div style="user-select: none">{{ componentName }}</div>
+      <div class="component-name">{{ componentName }}</div>
 
       <!-- 右侧：操作区域 -->
       <span class="dataset-container">
@@ -95,6 +95,15 @@ export default {
   justify-content: space-between;
 
   width: 100%;
+}
+
+.component-name {
+  font-weight: bold;
+  font-size: 16px;
+  margin-left: 4px;
+  box-shadow: -4px 0 0 0 #f56c6c;
+  padding: 0 10px;
+  user-select: none;
 }
 
 .dataset-container {

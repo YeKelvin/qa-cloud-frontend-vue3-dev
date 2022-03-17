@@ -5,7 +5,7 @@
         <el-input v-model="form.workspaceName" clearable />
       </el-form-item>
       <el-form-item label="空间作用域：" prop="workspaceScope">
-        <el-select v-model="form.workspaceScope" placeholder="请选择" style="width: 100%">
+        <el-select v-model="form.workspaceScope" style="width: 100%">
           <el-option label="私有" value="PRIVATE" />
           <el-option label="保护" value="PROTECTED" />
           <el-option label="公共" value="PUBLIC" />

@@ -21,15 +21,15 @@
       </el-table-column>
       <el-table-column fixed="right" label="操作" min-width="100" width="100">
         <template #default="{ row }">
-          <el-button type="text" @click="openDetails(row.executionNo)">详情</el-button>
-          <el-button v-if="row.reportNo" type="text" @click="openReport(row.reportNo)">报告</el-button>
+          <el-button type="text" style="margin-left: 12px" @click="openDetails(row.executionNo)">查看详情</el-button>
+          <el-button v-if="row.reportNo" type="text" @click="openReport(row.reportNo)">查看报告</el-button>
           <el-button
-            v-if="row.runningState == 'WAITING' || row.runningState == 'RUNNING' || row.runningState == 'ITERATING'"
+            v-if="isShowInterruptBtn(row)"
             type="text"
             style="color: #f56c6c"
             @click="interrupt(row.executionNo)"
           >
-            中断
+            中断运行
           </el-button>
         </template>
       </el-table-column>
@@ -37,54 +37,62 @@
   </el-dialog>
 </template>
 
-<script>
+<script setup>
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { RunningState, TestPhase } from '@/api/enum'
 import * as ExecutionService from '@/api/script/execution'
 import * as TestplanService from '@/api/script/testplan'
 
-export default {
-  name: 'ExecutionRecordDialog',
+const props = defineProps({
+  planNo: { type: String, default: '' }
+})
+const router = useRouter()
+const tableData = ref([])
 
-  props: {
-    planNo: { type: String, default: '' }
-  },
+onMounted(() => {
+  queryTestplanExecutionAll()
+})
 
-  data() {
-    return {
-      RunningState: RunningState,
-      TestPhase: TestPhase,
-      tableData: []
-    }
-  },
+const queryTestplanExecutionAll = () => {
+  TestplanService.queryTestplanExecutionAll({ planNo: props.planNo }).then((response) => {
+    tableData.value = response.result
+  })
+}
 
-  mounted() {
-    this.queryTestplanExecutionAll()
-  },
+/**
+ * 中断运行
+ */
+const interrupt = (executionNo) => {
+  ElMessageBox.confirm('确定中断运行吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    ExecutionService.interruptTestplanExecution({ executionNo: executionNo }).then(() => {
+      ElMessage({ message: '中断成功', type: 'info', duration: 1 * 1000 })
+    })
+  })
+}
 
-  methods: {
-    queryTestplanExecutionAll() {
-      TestplanService.queryTestplanExecutionAll({ planNo: this.planNo }).then((response) => {
-        this.tableData = response.result
-      })
-    },
-    interrupt(executionNo) {
-      this.$confirm('确定中断运行吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        ExecutionService.interruptTestplanExecution({ executionNo: executionNo }).then(() => {
-          this.$message({ message: '中断成功', type: 'info', duration: 1 * 1000 })
-        })
-      })
-    },
-    openDetails(executionNo) {
-      this.$router.push({ path: 'testplan/execution/details', query: { executionNo: executionNo } })
-    },
-    openReport(reportNo) {
-      this.$router.push({ path: 'report', query: { reportNo: reportNo } })
-    }
-  }
+/**
+ * 判断是否展示中断按钮
+ */
+const isShowInterruptBtn = (row) => {
+  return row.runningState == 'WAITING' || row.runningState == 'RUNNING' || row.runningState == 'ITERATING'
+}
+
+/**
+ * 跳转至计划执行详情页
+ */
+const openDetails = (executionNo) => {
+  router.push({ path: 'testplan/execution/details', query: { executionNo: executionNo } })
+}
+
+/**
+ * 跳转至测试报告页
+ */
+const openReport = (reportNo) => {
+  router.push({ path: 'report', query: { reportNo: reportNo } })
 }
 </script>
 
