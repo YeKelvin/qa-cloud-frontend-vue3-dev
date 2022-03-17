@@ -47,7 +47,7 @@
                   <el-select
                     v-model="row.tobeModifiedTestPhase"
                     style="width: 100%; margin-right: 10px"
-                    automatic-dropdown
+                    :teleported="false"
                   >
                     <el-option v-for="(value, key) in TestPhase" :key="key" :label="value" :value="key" />
                   </el-select>
@@ -75,7 +75,11 @@
                 width="300"
               >
                 <span style="display: flex; justify-content: space-between; align-items: center">
-                  <el-select v-model="row.tobeModifiedState" style="width: 100%; margin-right: 10px" automatic-dropdown>
+                  <el-select
+                    v-model="row.tobeModifiedState"
+                    style="width: 100%; margin-right: 10px"
+                    :teleported="false"
+                  >
                     <el-option v-for="(value, key) in TestplanState" :key="key" :label="value" :value="key" />
                   </el-select>
                   <el-button type="danger" @click="modifyTestplanState(row)">保存</el-button>

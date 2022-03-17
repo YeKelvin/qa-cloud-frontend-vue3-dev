@@ -14,33 +14,28 @@
 
 <script setup>
 import { Navbar, Sidebar, AppMain } from './components'
-</script>
+import useResizeHandler from './useResizeHandler'
 
-<script>
-import ResizeMixin from './mixin/ResizeHandler'
-
-export default {
-  name: 'Layout',
-  mixins: [ResizeMixin],
-  computed: {
-    sidebar() {
-      return this.$store.state.app.sidebar
-    },
-    device() {
-      return this.$store.state.app.device
-    },
-    fixedHeader() {
-      return this.$store.state.settings.fixedHeader
-    },
-    classObj() {
-      return {
-        hideSidebar: !this.sidebar.opened,
-        openSidebar: this.sidebar.opened,
-        withoutAnimation: this.sidebar.withoutAnimation
-      }
-    }
+const store = useStore()
+const route = useRoute()
+const sidebar = computed(() => store.state.app.sidebar)
+const device = computed(() => store.state.app.device)
+const fixedHeader = computed(() => store.state.settings.fixedHeader)
+const classObj = computed(() => {
+  return {
+    hideSidebar: !sidebar.value.opened,
+    openSidebar: sidebar.value.opened,
+    withoutAnimation: sidebar.value.withoutAnimation
   }
-}
+})
+
+watch(route, () => {
+  if (device.value === 'mobile' && sidebar.value.opened) {
+    store.dispatch('app/closeSideBar', { withoutAnimation: false })
+  }
+})
+
+useResizeHandler()
 </script>
 
 <style lang="scss" scoped>

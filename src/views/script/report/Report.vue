@@ -84,6 +84,7 @@ import ReportCollectionCard from './ReportCollectionCard.vue'
 import ReportResultTree from './ReportResultTree'
 
 const route = useRoute()
+const router = useRouter()
 const reportNo = ref(route.query.reportNo)
 const overview = ref({})
 const collections = ref([])
@@ -119,7 +120,7 @@ onMounted(() => {
  * 查询报告
  */
 const queryReport = () => {
-  ReportService.queryReport({ reportNo: this.reportNo }).then((response) => {
+  ReportService.queryReport({ reportNo: reportNo.value }).then((response) => {
     overview.value = response.result.details
     collections.value = response.result.collections
   })
@@ -187,13 +188,7 @@ const handleNodeClick = (data, node) => {
  * 返回上一页
  */
 const goBack = () => {
-  window.history.length > 1 ? this.$router.go(-1) : this.$router.push('/')
-}
-</script>
-
-<script>
-export default {
-  methods: {}
+  window.history.length > 1 ? router.go(-1) : router.push('/')
 }
 </script>
 
