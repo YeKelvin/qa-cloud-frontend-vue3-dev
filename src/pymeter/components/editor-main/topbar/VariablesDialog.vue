@@ -12,11 +12,11 @@
               :name="item.datasetNo"
             />
           </el-tabs>
-          <el-button type="text" :icon="Edit" @click="openVariableDatasetEditor()">编辑</el-button>
+          <el-button type="text" :icon="Edit" @click="openVariableDatasetEditor()">批量编辑</el-button>
         </div>
       </template>
 
-      <el-input v-model="filterText" style="padding: 10px 10px 0 10px" placeholder="请输入" />
+      <el-input v-model="filterText" style="padding: 10px" placeholder="请输入" />
 
       <!-- 滚动条 -->
       <el-scrollbar
@@ -26,7 +26,7 @@
         view-style="padding: 0 10px 10px 10px;"
       >
         <!-- 变量表格 -->
-        <el-table ref="table" :data="rows" fit stripe highlight-current-row>
+        <el-table :data="filteredTableData" fit stripe highlight-current-row>
           <!-- 空表格 -->
           <template #empty><el-empty /></template>
 
@@ -81,17 +81,30 @@
 <script setup>
 import { isEmpty as _isEmpty } from 'lodash-es'
 import { Check, Close, Edit } from '@element-plus/icons-vue'
+import { isBlank } from '@/utils/string-util'
 import * as VariablesService from '@/api/script/variables'
 import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 
 const emit = defineEmits(['update:model-value'])
 const store = useStore()
 const activeTabNo = ref('')
-const filterText = ref('')
 const rows = ref([])
 const backtop = reactive({
   right: 40,
   bottom: 40
+})
+const filterText = ref('')
+const filteredTableData = computed(() => {
+  if (isBlank(filterText.value)) {
+    return rows.value
+  } else {
+    return rows.value.filter(
+      (item) =>
+        item.varName.indexOf(filterText.value.trim()) !== -1 ||
+        item.initialValue.indexOf(filterText.value.trim()) !== -1 ||
+        item.currentValue.indexOf(filterText.value.trim()) !== -1
+    )
+  }
 })
 const { datasetList, selectedDatasetNumberList } = usePyMeterState()
 const selectedDatasetList = computed(() =>

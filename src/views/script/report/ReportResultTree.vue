@@ -26,7 +26,7 @@
             </span>
           </div>
           <SvgIcon v-if="node.data.success" icon-name="pymeter-success" style="padding-left: 5px" class="stauts-icon" />
-          <SvgIcon v-else icon-name="pymeter-fail" style="padding-left: 5px" class="stauts-icon" />
+          <SvgIcon v-else icon-name="pymeter-failure" style="padding-left: 5px" class="stauts-icon" />
         </template>
 
         <!-- Sampler -->

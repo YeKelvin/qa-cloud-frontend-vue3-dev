@@ -22,7 +22,7 @@
         </div>
         <!-- 成功或失败的图标  -->
         <SvgIcon v-if="collection.success" icon-name="pymeter-pass" class="stauts-icon" />
-        <SvgIcon v-else icon-name="pymeter-failure" class="stauts-icon" />
+        <SvgIcon v-else icon-name="pymeter-fail" class="stauts-icon" />
       </div>
     </el-card>
   </div>
