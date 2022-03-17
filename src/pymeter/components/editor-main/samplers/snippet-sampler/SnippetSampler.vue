@@ -78,8 +78,17 @@ import useEditor from '@/pymeter/composables/useEditor'
 import ArgumentTable from './SnippetSamplerArgumentTable.vue'
 
 const props = defineProps(editorProps)
-const { queryMode, modifyMode, createMode, editNow, setReadonly, updateTabName, closeTab, refreshElementTree } =
-  useEditor(props)
+const {
+  editMode,
+  queryMode,
+  modifyMode,
+  createMode,
+  editNow,
+  setReadonly,
+  updateTabName,
+  closeTab,
+  refreshElementTree
+} = useEditor(props)
 const elformRef = ref()
 const elementNo = ref(props.editorNo)
 const elementInfo = ref({
@@ -102,11 +111,16 @@ const snippets = ref([])
 const definedArgumentsData = ref([])
 const showWarning = ref(false)
 
-watch('elementInfo.property.snippetNo', (val) => {
-  if (!val) return
-  definedArgumentsData.value = []
-  querySnippet(val)
-})
+watch(
+  () => elementInfo.value.property.snippetNo,
+  (val) => {
+    if (!val) return
+    // 清空原有的参数
+    definedArgumentsData.value = []
+    // 查询选中的片段信息
+    querySnippet(val)
+  }
+)
 
 onMounted(() => {
   querySnippets()

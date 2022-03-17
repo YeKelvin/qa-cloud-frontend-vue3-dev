@@ -85,7 +85,7 @@
       <!-- 请求主体 -->
       <div v-show="showBodyTab">
         <!-- 主体数据类型单选框 -->
-        <span style="display: inline-flex; align-items: center; height: 30px; line-height: 30px">
+        <span class="body-mode-options-wrapper">
           <el-radio-group v-model="bodyMode" :disabled="queryMode">
             <el-radio label="none">none</el-radio>
             <el-radio label="x-www-form-urlencoded">x-www-form-urlencoded</el-radio>
@@ -529,13 +529,28 @@ const querySelectedHeaderTemplateList = () => {
 </script>
 
 <style lang="scss" scoped>
+.body-mode-options-wrapper {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  line-height: 30px;
+  margin-bottom: 5px;
+}
+
 .raw-type {
   margin-left: 40px;
   width: 80px;
 
+  &.el-select {
+    --el-select-border-color-hover: none;
+    --el-select-input-focus-border-color: none;
+    --el-select-disabled-border: none;
+  }
+
   :deep(.el-input__inner) {
-    border: 0;
+    box-shadow: none;
     color: #409eff;
+    background-color: #ffffff;
   }
 
   :deep(.el-select__caret) {
