@@ -9,18 +9,8 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import img from '@/assets/images/dashboard/construction.jpg'
-
-export default {
-  name: 'Dashboard',
-
-  data() {
-    return {
-      img
-    }
-  }
-}
 </script>
 
 <style lang="scss" scoped>
