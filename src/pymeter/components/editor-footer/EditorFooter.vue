@@ -6,7 +6,7 @@
     </div>
 
     <div class="r-container">
-      <el-button type="danger" plain circle><SvgIcon icon-name="pymeter-broom" @click="clearAll()" /></el-button>
+      <el-button type="danger" plain circle @click="clearAll()"><SvgIcon icon-name="pymeter-broom" /></el-button>
     </div>
 
     <!-- 运行结果 -->
@@ -106,13 +106,6 @@ const clearAll = () => {
   padding: 5px 20px;
   width: 100%;
   min-height: 30px;
-}
-
-:deep(.el-badge__content.is-dot) {
-  height: 12px;
-  width: 12px;
-  right: 8px;
-  top: 2px;
 }
 
 .l-container .el-button {

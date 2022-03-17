@@ -1,5 +1,5 @@
 <template>
-  <el-popover ref="elpopoverRef" placement="bottom" width="400" trigger="click">
+  <el-popover ref="elpopoverRef" placement="bottom" width="400px" trigger="click">
     <!-- 切换工作空间的按钮 -->
     <template #reference>
       <el-button type="text" style="color: #606266; font: 14px; font-family: inherit">
@@ -10,12 +10,11 @@
     </template>
 
     <!-- 过滤input -->
-    <el-input v-model="filterText" placeholder="请输入搜索内容" />
+    <el-input v-model="filterText" placeholder="请输入" style="margin-bottom: 10px" />
 
     <!-- 工作空间列表 -->
     <el-tree
-      ref="tree"
-      style="margin-top: 10px"
+      ref="eltreeRef"
       highlight-current
       :props="{ label: 'workspaceName' }"
       :data="workspaceList"
@@ -24,7 +23,7 @@
     >
       <template #default="{ node, data }">
         <!-- 空间名称 -->
-        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ node.label }}</span>
+        <span class="workspace-name">{{ node.label }}</span>
         <!-- 标签 -->
         <template v-if="data.workspaceScope == 'PRIVATE'">
           <el-tag size="small" type="danger" style="margin-left: 5px">private</el-tag>
@@ -41,52 +40,42 @@
 </template>
 
 <script setup>
-import { mapState } from 'vuex'
 import { CaretBottom } from '@element-plus/icons-vue'
-</script>
+import useWorkspaceState from '@/composables/useWorkspaceState'
 
-<script>
-export default {
-  name: 'NavbarWorkspace',
+const store = useStore()
+const elpopoverRef = ref()
+const eltreeRef = ref()
+const filterText = ref('')
+const { workspaceList, workspaceName } = useWorkspaceState()
+watch(filterText, (val) => eltreeRef.value.filter(val))
+onMounted(() => store.dispatch('workspace/setWorkspaceList'))
 
-  data() {
-    return {
-      filterText: ''
-    }
-  },
-
-  computed: {
-    ...mapState('workspace', {
-      workspaceList: (state) => state.workspaceList,
-      workspaceNo: (state) => state.workspaceNo,
-      workspaceName: (state) => state.workspaceName,
-      workspaceScope: (state) => state.workspaceScope
-    })
-  },
-
-  watch: {
-    filterText(val) {
-      this.$refs.tree.filter(val)
-    }
-  },
-
-  mounted() {
-    this.$store.dispatch('workspace/setWorkspaceList')
-  },
-
-  methods: {
-    handleNodeClick(node) {
-      this.$store.commit('workspace/setWorkspaceNo', node.workspaceNo)
-      this.$store.commit('workspace/setWorkspaceName', node.workspaceName)
-      this.$store.commit('workspace/setWorkspaceScope', node.workspaceScope)
-      this.$refs.elpopoverRef.hide()
-    },
-    filterNode(value, data) {
-      if (!value) return true
-      return data.workspaceName.indexOf(value) !== -1
-    }
-  }
+const handleNodeClick = (node) => {
+  store.commit('workspace/setWorkspaceNo', node.workspaceNo)
+  store.commit('workspace/setWorkspaceName', node.workspaceName)
+  store.commit('workspace/setWorkspaceScope', node.workspaceScope)
+  elpopoverRef.value.hide()
+}
+const filterNode = (value, data) => {
+  if (!value) return true
+  return data.workspaceName.indexOf(value) !== -1
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.workspace-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:deep(.el-tree-node__content) {
+  justify-content: space-between;
+  padding: 0 10px !important;
+
+  .el-tree-node__expand-icon {
+    display: none;
+  }
+}
+</style>
