@@ -12,7 +12,6 @@
     <el-select
       v-model="localModel"
       v-bind="$attrs"
-      placeholder="请求头模板"
       style="width: 100%"
       multiple
       :disabled="queryMode"
@@ -95,6 +94,9 @@ const handleChange = () => {
   })
 }
 
+/**
+ * 显示请求头模板内的所有请求头
+ */
 const showHeaders = () => {
   queryHttpHeaders()
   showDetails.value = true

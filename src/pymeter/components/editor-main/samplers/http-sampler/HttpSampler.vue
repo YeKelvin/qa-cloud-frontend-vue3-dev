@@ -147,20 +147,24 @@
           <el-form-item label="连接超时：" prop="property.HTTPSampler__connect_timeout">
             <el-input
               v-model="elementInfo.property.HTTPSampler__connect_timeout"
-              placeholder="ms"
+              placeholder="超时时间"
               clearable
               :readonly="queryMode"
-            />
+            >
+              <template #append>ms</template>
+            </el-input>
           </el-form-item>
 
           <!-- 响应超时时间 -->
           <el-form-item label="响应超时：" prop="property.HTTPSampler__response_timeout">
             <el-input
               v-model="elementInfo.property.HTTPSampler__response_timeout"
-              placeholder="ms"
+              placeholder="超时时间"
               clearable
               :readonly="queryMode"
-            />
+            >
+              <template #append>ms</template>
+            </el-input>
           </el-form-item>
         </el-form>
       </div>
