@@ -1,20 +1,20 @@
 <template>
   <div class="details-container">
     <el-descriptions :column="1">
-      <el-descriptions-item label="请求名称">{{ details.samplerName }}</el-descriptions-item>
-      <el-descriptions-item v-if="details.samplerRemark" label="请求描述">
+      <el-descriptions-item label="请求名称：">{{ details.samplerName }}</el-descriptions-item>
+      <el-descriptions-item v-if="details.samplerRemark" label="请求描述：">
         {{ details.samplerRemark }}
       </el-descriptions-item>
     </el-descriptions>
 
     <el-descriptions :column="3">
-      <el-descriptions-item label="开始时间">
+      <el-descriptions-item label="开始时间：">
         <el-tag type="warning">{{ details.startTime }}</el-tag>
       </el-descriptions-item>
-      <el-descriptions-item label="结束时间">
+      <el-descriptions-item label="结束时间：">
         <el-tag type="warning">{{ details.endTime }}</el-tag>
       </el-descriptions-item>
-      <el-descriptions-item label="耗时">
+      <el-descriptions-item label="耗时：">
         <el-tag type="danger">{{ details.elapsedTime }}</el-tag>
       </el-descriptions-item>
     </el-descriptions>
@@ -95,8 +95,8 @@ onMounted(() => {
 const querySamplerResult = () => {
   ReportService.querySamplerResult({ samplerId: props.samplerId }).then((response) => {
     details.value = response.result
-    handleRequestTabClick({ name: requestActiveTabName.value })
-    handleResponseTabClick({ name: responseActiveTabName.value })
+    handleRequestTabClick({ paneName: requestActiveTabName.value })
+    handleResponseTabClick({ paneName: responseActiveTabName.value })
   })
 }
 
@@ -150,6 +150,11 @@ const getHeadersFromJson = (val) => {
 }
 
 .el-descriptions {
+  :deep(.el-descriptions__label) {
+    color: #606266;
+    font-weight: bold;
+    margin-right: 0;
+  }
   :deep(.el-descriptions-item__container) {
     display: inline-flex;
     align-items: center;

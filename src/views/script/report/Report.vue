@@ -3,9 +3,9 @@
     <!-- 报告标题 -->
     <div class="report-header">
       <el-card shadow="hover">
-        <el-button type="text" icon="el-icon-arrow-left" @click="goBack">返回</el-button>
-        <span>接口测试报告</span>
-        <el-button type="text" icon="el-icon-s-data" @click="openOverview">统计</el-button>
+        <el-button type="text" :icon="ArrowLeft" @click="goBack()">返回</el-button>
+        <span style="font-size: 16px">接口测试报告</span>
+        <el-button type="text" :icon="DataAnalysis" @click="openOverview()">统计</el-button>
       </el-card>
     </div>
 
@@ -14,7 +14,7 @@
       <!-- collection-card 列表 -->
       <el-card shadow="hover" class="collection-container">
         <!-- 卡片头部 -->
-        <template #header><span>集合</span></template>
+        <template #header><span style="font-size: 16px">集合</span></template>
         <!-- 过滤input -->
         <el-input
           v-model="collectionsFilterText"
@@ -35,7 +35,7 @@
       <!-- element-tree -->
       <el-card v-show="showTree" shadow="hover" class="result-tree-container">
         <!-- 卡片头部 -->
-        <template #header><span>脚本</span></template>
+        <template #header><span style="font-size: 16px">脚本</span></template>
         <!-- 过滤input -->
         <el-input
           v-model="resultTreeFilterText"
@@ -56,7 +56,7 @@
       <!-- ResultDetails -->
       <el-card shadow="hover" class="result-details-container">
         <!-- 卡片头部 -->
-        <template #header><span>详情</span></template>
+        <template #header><span style="font-size: 16px">详情</span></template>
         <el-scrollbar
           style="width: 100%; height: 100%; padding-bottom: 50px"
           wrap-style="overflow-x: auto;"
@@ -75,6 +75,7 @@
 <script setup>
 import { isEmpty as _isEmpty } from 'lodash-es'
 import { isBlank } from '@/utils/string-util'
+import { ArrowLeft, DataAnalysis } from '@element-plus/icons-vue'
 import * as ReportService from '@/api/script/report'
 import ReportOverview from './ReportOverview.vue'
 import ReportCollectionResult from './ReportCollectionResult.vue'
@@ -246,6 +247,7 @@ const goBack = () => {
   flex-direction: column;
 
   height: 100%;
+  min-width: 300px;
   max-width: 400px;
 
   margin-right: 10px;
@@ -257,6 +259,7 @@ const goBack = () => {
   flex-direction: column;
 
   height: 100%;
+  min-width: 300px;
   max-width: 400px;
 
   margin-right: 10px;

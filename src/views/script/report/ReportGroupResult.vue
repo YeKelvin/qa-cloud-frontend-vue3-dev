@@ -1,18 +1,20 @@
 <template>
   <div class="details-container">
     <el-descriptions :column="1">
-      <el-descriptions-item label="案例名称">{{ details.groupName }}</el-descriptions-item>
-      <el-descriptions-item v-if="details.groupRemark" label="案例描述">{{ details.groupRemark }}</el-descriptions-item>
+      <el-descriptions-item label="案例名称：">{{ details.groupName }}</el-descriptions-item>
+      <el-descriptions-item v-if="details.groupRemark" label="案例描述：">
+        {{ details.groupRemark }}
+      </el-descriptions-item>
     </el-descriptions>
 
     <el-descriptions :column="3" style="margin-bottom: 20px">
-      <el-descriptions-item label="开始时间">
+      <el-descriptions-item label="开始时间：">
         <el-tag type="warning">{{ details.startTime }}</el-tag>
       </el-descriptions-item>
-      <el-descriptions-item label="结束时间">
+      <el-descriptions-item label="结束时间：">
         <el-tag type="warning">{{ details.endTime }}</el-tag>
       </el-descriptions-item>
-      <el-descriptions-item label="耗时">
+      <el-descriptions-item label="耗时：">
         <el-tag type="danger">{{ details.elapsedTime }}</el-tag>
       </el-descriptions-item>
     </el-descriptions>
@@ -180,6 +182,11 @@ export default {
 }
 
 .el-descriptions {
+  :deep(.el-descriptions__label) {
+    color: #606266;
+    font-weight: bold;
+    margin-right: 0;
+  }
   :deep(.el-descriptions-item__container) {
     display: inline-flex;
     align-items: center;

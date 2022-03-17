@@ -47,7 +47,7 @@
       </el-table-column>
 
       <!-- 变量名称 -->
-      <el-table-column label="名称">
+      <el-table-column label="变量名称">
         <template #default="{ row }">
           <SimpleTextarea v-if="!queryMode || row.editing" v-model="row.varName" />
           <span v-else>{{ row.varName }}</span>

@@ -47,7 +47,7 @@
       </el-table-column>
 
       <!-- 请求头名称 -->
-      <el-table-column label="名称">
+      <el-table-column label="请求头名称">
         <template #default="{ row }">
           <SimpleTextarea v-if="!queryMode || row.editing" v-model="row.headerName" />
           <span v-else>{{ row.headerName }}</span>
@@ -55,7 +55,7 @@
       </el-table-column>
 
       <!-- 请求头的值 -->
-      <el-table-column label="值">
+      <el-table-column label="请求头内容">
         <template #default="{ row }">
           <SimpleTextarea v-if="!queryMode || row.editing" v-model="row.headerValue" />
           <span v-else>{{ row.headerValue }}</span>

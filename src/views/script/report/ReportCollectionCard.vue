@@ -58,6 +58,7 @@ const handleCardClick = (collection) => {
 
 .collection-result-time-wrapper {
   display: inline-flex;
+  flex-wrap: wrap;
   margin-top: 5px;
 
   .el-tag {

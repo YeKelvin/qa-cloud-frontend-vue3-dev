@@ -90,6 +90,7 @@ const handleNodeClick = (data, node) => {
 
 .result-time-wrapper {
   display: inline-flex;
+  flex-wrap: wrap;
   margin-top: 2px;
 
   .el-tag {

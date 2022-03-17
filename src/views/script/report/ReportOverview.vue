@@ -1,18 +1,20 @@
 <template>
   <div class="details-container">
     <el-descriptions :column="1">
-      <el-descriptions-item label="报告名称">{{ overview.reportName }}</el-descriptions-item>
-      <el-descriptions-item v-if="overview.reportDesc" label="报告描述">{{ overview.reportDesc }}</el-descriptions-item>
+      <el-descriptions-item label="报告名称：">{{ overview.reportName }}</el-descriptions-item>
+      <el-descriptions-item v-if="overview.reportDesc" label="报告描述：">
+        {{ overview.reportDesc }}
+      </el-descriptions-item>
     </el-descriptions>
 
     <el-descriptions :column="3" style="margin-bottom: 20px">
-      <el-descriptions-item label="开始时间">
+      <el-descriptions-item label="开始时间：">
         <el-tag type="warning">{{ overview.startTime }}</el-tag>
       </el-descriptions-item>
-      <el-descriptions-item label="结束时间">
+      <el-descriptions-item label="结束时间：">
         <el-tag type="warning">{{ overview.endTime }}</el-tag>
       </el-descriptions-item>
-      <el-descriptions-item label="耗时">
+      <el-descriptions-item label="耗时：">
         <el-tag type="danger">{{ overview.elapsedTime }}</el-tag>
       </el-descriptions-item>
     </el-descriptions>
@@ -173,6 +175,11 @@ export default {
 }
 
 .el-descriptions {
+  :deep(.el-descriptions__label) {
+    color: #606266;
+    font-weight: bold;
+    margin-right: 0;
+  }
   :deep(.el-descriptions-item__container) {
     display: inline-flex;
     align-items: center;

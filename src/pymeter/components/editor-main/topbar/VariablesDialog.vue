@@ -31,7 +31,7 @@
           <template #empty><el-empty /></template>
 
           <!-- 变量名称 -->
-          <el-table-column label="名称" width="auto">
+          <el-table-column label="变量名称" width="auto">
             <template #default="{ row }">
               <span>{{ row.varName }}</span>
             </template>
@@ -47,20 +47,20 @@
           <!-- 当前值 -->
           <el-table-column label="当前值" width="auto">
             <template #header="{}">
-              <span style="display: flex; align-items: center; justify-content: space-between">
+              <span class="current-value-header">
                 <span>当前值</span>
-                <el-switch v-model="useCurrentValue" size="small" active-color="#13ce66" inactive-color="#ff4949" />
+                <el-switch v-model="useCurrentValue" size="small" active-color="#67C23A" inactive-color="#F56C6C" />
               </span>
             </template>
             <template #default="{ row }">
-              <span v-if="row.editing" style="display: flex; flex-direction: column; padding-top: 10px">
+              <span v-if="row.editing" class="current-value-item__editing">
                 <el-input v-model="row.currentValue" autosize type="textarea" size="small" :rows="1" />
                 <span id="current-value-button" style="display: flex; justify-content: flex-end">
                   <el-button type="text" :icon="Close" @click="row.editing = false" />
                   <el-button type="text" :icon="Check" @click="updateCurrentValue(row)" />
                 </span>
               </span>
-              <span v-else style="display: flex; align-items: center; justify-content: space-between">
+              <span v-else class="current-value-item">
                 <span>{{ row.currentValue || '-' }}</span>
                 <el-button type="text" :icon="Edit" @click="row.editing = true" />
               </span>
@@ -189,6 +189,24 @@ const openVariableDatasetEditor = () => {
   &::before {
     height: 0;
   }
+}
+
+.current-value-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.current-value-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.current-value-item__editing {
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
 }
 
 :deep(.el-dialog__header) {

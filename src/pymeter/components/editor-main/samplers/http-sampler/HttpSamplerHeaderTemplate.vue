@@ -33,9 +33,9 @@
     <!-- 模板下的请求头表格 -->
     <el-table v-else-if="rows.length > 0" style="width: 100%; margin-bottom: 10px" stripe :data="rows">
       <!-- header名称 -->
-      <el-table-column prop="headerName" label="名称" />
+      <el-table-column prop="headerName" label="请求头名称" />
       <!-- header值 -->
-      <el-table-column prop="headerValue" label="值" />
+      <el-table-column prop="headerValue" label="请求头内容" />
     </el-table>
   </el-card>
 </template>
