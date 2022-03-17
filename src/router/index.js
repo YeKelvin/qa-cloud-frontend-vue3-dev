@@ -57,7 +57,7 @@ export const constantRoutes = [
     alwaysShow: true,
     component: Layout,
     redirect: 'noRedirect',
-    meta: { title: '接口测试', icon: 'sidebar-apitest' },
+    meta: { title: '接口测试', icon: 'sidebar-api' },
     children: [
       {
         path: 'editor',
