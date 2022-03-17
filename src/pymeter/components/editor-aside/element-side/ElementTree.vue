@@ -2,7 +2,6 @@
   <el-tree
     ref="eltreeRef"
     node-key="elementNo"
-    empty-text="请开始编辑脚本"
     highlight-current
     draggable
     :indent="36"
@@ -71,10 +70,13 @@ const {
 const { refreshElementTree } = usePyMeterState()
 
 watch(refreshElementTree, () => queryElementsTree())
-watch(props.collectionNumberList, (val) => {
-  if (!val) return
-  queryElementsTree()
-})
+watch(
+  () => props.collectionNumberList,
+  (val) => {
+    if (!val) return
+    queryElementsTree()
+  }
+)
 
 onMounted(() => {
   if (!isEmpty(props.collectionNumberList)) queryElementsTree()

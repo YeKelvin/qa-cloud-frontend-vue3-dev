@@ -4,10 +4,7 @@
     <el-skeleton v-if="loading" :rows="10" style="padding: 10px" animated />
 
     <!-- 脚本集合列表 -->
-    <span
-      v-if="!loading"
-      style="display: inline-flex; justify-content: space-between; align-items: center; padding: 5px 10px"
-    >
+    <span v-if="!loading" class="collection-list-container">
       <el-select
         v-model="selectedCollectionNumberList"
         style="flex-grow: 1"
@@ -71,19 +68,19 @@
       <div class="operation-container" style="margin-top: 5px">
         <!-- 展开节点按钮 -->
         <el-button type="text" @click="expandAll(true)">
-          <SvgIcon icon-name="pymeter-expand-all" style="margin-right: 5px" />
+          <SvgIcon icon-name="pymeter-expand-all" />
           展开
         </el-button>
         <el-divider direction="vertical" />
         <!-- 收起节点按钮 -->
         <el-button type="text" @click="expandAll(false)">
-          <SvgIcon icon-name="pymeter-collapse-all" style="margin-right: 5px" />
+          <SvgIcon icon-name="pymeter-collapse-all" />
           收起
         </el-button>
         <el-divider direction="vertical" />
         <!-- 刷新脚本按钮 -->
         <el-button type="text" @click="queryElementsTree()">
-          <SvgIcon icon-name="pymeter-refresh" style="margin-right: 5px" />
+          <SvgIcon icon-name="pymeter-refresh" />
           刷新
         </el-button>
       </div>
@@ -228,6 +225,13 @@ const expandAll = (expand) => {
   }
 }
 
+.collection-list-container {
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+}
+
 .operation-container {
   display: flex;
   flex-direction: row;
@@ -237,6 +241,10 @@ const expandAll = (expand) => {
   .el-button--text {
     padding-top: 6px;
     padding-bottom: 6px;
+  }
+
+  .svg-icon {
+    margin-right: 5px;
   }
 }
 
