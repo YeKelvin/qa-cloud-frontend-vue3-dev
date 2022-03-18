@@ -39,7 +39,7 @@
     "vuex": "4.0.2"
   },
   "devDependencies": {
-    "@babel/core": "7.17.5",
+    "@babel/core": "7.17.7",
     "@babel/eslint-parser": "7.17.0",
     "@types/echarts": "4.9.13",
     "@types/lodash-es": "4.17.6",
@@ -52,11 +52,11 @@
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-vue": "8.5.0",
     "husky": "7.0.4",
-    "prettier": "2.5.1",
+    "prettier": "2.6.0",
     "sass": "1.49.9",
     "svg-sprite-loader": "6.0.11",
     "unplugin-auto-import": "0.6.6",
-    "unplugin-vue-components": "0.18.0",
+    "unplugin-vue-components": "0.18.1",
     "vite": "2.8.6",
     "vite-plugin-style-import": "2.0.0",
     "vite-plugin-svg-icons": "1.1.0"

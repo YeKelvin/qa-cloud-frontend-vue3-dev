@@ -12,24 +12,15 @@
   </el-card>
 </template>
 
-<script>
-import { markRaw, defineAsyncComponent } from 'vue'
-
-export default {
-  name: 'EditorAside',
-  data() {
-    return {
-      asideName: 'ELEMENT',
-      asideComponents: {
-        ELEMENT: markRaw(defineAsyncComponent(() => import('./element-side/ElementSide.vue'))),
-        DATASET: markRaw(defineAsyncComponent(() => import('./dataset-side/DatasetSide.vue'))),
-        HTTP_HEADER_TEMPLATE: markRaw(
-          defineAsyncComponent(() => import('./httpheader-template-side/HttpheaderTemplateSide.vue'))
-        )
-      }
-    }
-  }
-}
+<script setup>
+const asideName = ref('ELEMENT')
+const asideComponents = reactive({
+  ELEMENT: markRaw(defineAsyncComponent(() => import('./element-side/ElementSide.vue'))),
+  DATASET: markRaw(defineAsyncComponent(() => import('./dataset-side/DatasetSide.vue'))),
+  HTTP_HEADER_TEMPLATE: markRaw(
+    defineAsyncComponent(() => import('./httpheader-template-side/HttpheaderTemplateSide.vue'))
+  )
+})
 </script>
 
 <style lang="scss" scoped>

@@ -8,18 +8,18 @@
       </div>
 
       <!-- 搜索 -->
-      <el-input v-model="filterText" placeholder="请输入搜索内容" style="margin-bottom: 10px" clearable />
+      <el-input v-model="filterText" placeholder="请输入" style="margin-bottom: 10px" clearable />
 
       <el-tree
-        ref="tree"
+        ref="eltreeRef"
         node-key="elementNo"
         draggable
-        highlight-current
         show-checkbox
-        :props="{ label: 'elementName', children: 'children' }"
+        highlight-current
         :data="collections"
         :allow-drop="allowDrop"
         :filter-node-method="filterNode"
+        :props="{ label: 'elementName', children: 'children' }"
         @node-click="handleNodeClick"
       >
         <template #default="{ node, data }">
@@ -38,118 +38,105 @@
   </div>
 </template>
 
-<script>
-import { mapState } from 'vuex'
+<script setup>
+import useWorkspaceState from '@/composables/useWorkspaceState'
 import * as ElementService from '@/api/script/element'
 
-export default {
-  name: 'CollectionTree',
+const { workspaceNo } = useWorkspaceState()
+const props = defineProps({
+  readonly: { type: Boolean, default: true }
+})
+const collections = ref([])
+const filterText = ref('')
+const eltreeRef = ref()
 
-  props: {
-    readonly: { type: Boolean, default: true }
-  },
-
-  data() {
-    return {
-      collections: [],
-      filterText: ''
-    }
-  },
-
-  computed: {
-    ...mapState('workspace', {
-      workspaceNo: (state) => state.workspaceNo
-    })
-  },
-
-  watch: {
-    workspaceNo(val) {
-      if (!val) return
-      this.queryCollections()
-    },
-    filterText(val) {
-      this.$refs.tree.filter(val)
-    },
-    readonly(val) {
-      if (val) {
-        this.collections.forEach((item) => {
-          item.disabled = true
-        })
-      } else {
-        this.collections.forEach((item) => {
-          item.disabled = false
-        })
-      }
-    }
-  },
-
-  mounted() {
-    if (this.workspaceNo) {
-      this.queryCollections()
-    }
-  },
-
-  methods: {
-    /**
-     * 根据工作空间编号查询测试集合
-     */
-    queryCollections() {
-      ElementService.queryElementAll({
-        workspaceNo: this.workspaceNo,
-        elementType: 'COLLECTION',
-        elementClass: 'TestCollection'
-      }).then((response) => {
-        this.collections = response.result
-        if (this.readonly) {
-          this.collections.forEach((item) => (item.disabled = true))
-        }
+watch(workspaceNo, (val) => {
+  if (!val) return
+  queryCollections()
+})
+watch(filterText, (val) => eltreeRef.value.filter(val))
+watch(
+  () => props.readonly,
+  (val) => {
+    if (val) {
+      collections.value.forEach((item) => {
+        item.disabled = true
       })
-    },
-
-    filterNode(value, data) {
-      if (!value) return true
-      return data.elementName.indexOf(value) !== -1
-    },
-
-    /**
-     * 拖拽时判定目标节点能否被放置
-     */
-    allowDrop(draggingNode, dropNode, type) {
-      // 只允许在 Collection 前后插入，不允许在 Collection 里插入
-      if (type === 'inner') {
-        return false
-      }
-      return true
-    },
-
-    getCheckedCollections() {
-      const nodes = this.$refs.tree.getCheckedNodes()
-      const collectionList = []
-      for (let i = 0, len = nodes.length; i < len; i++) {
-        collectionList.push({ sortNo: i, elementNo: nodes[i].elementNo })
-      }
-      return collectionList
-    },
-
-    setAllChecked() {
-      this.$refs.tree.setCheckedKeys(this.collections.map((item) => item.elementNo))
-    },
-
-    setCheckedKeys(keys) {
-      this.$refs.tree.setCheckedKeys(keys)
-    },
-
-    resetChecked() {
-      this.$refs.tree.setCheckedKeys([])
-    },
-
-    handleNodeClick(data, node) {
-      if (this.readonly) return
-      // 点击节点勾选 checkbox
-      node.checked = !node.checked
+    } else {
+      collections.value.forEach((item) => {
+        item.disabled = false
+      })
     }
   }
+)
+
+onMounted(() => {
+  if (workspaceNo.value) queryCollections()
+})
+
+/**
+ * 根据工作空间编号查询测试集合
+ */
+const queryCollections = () => {
+  ElementService.queryElementAll({
+    workspaceNo: workspaceNo.value,
+    elementType: 'COLLECTION',
+    elementClass: 'TestCollection'
+  }).then((response) => {
+    collections.value = response.result
+    if (props.readonly) {
+      collections.value.forEach((item) => (item.disabled = true))
+    }
+  })
 }
+
+/**
+ * 拖拽时判定目标节点能否被放置
+ */
+const allowDrop = (draggingNode, dropNode, type) => {
+  // 只允许在 Collection 前后插入，不允许在 Collection 里插入
+  if (type === 'inner') {
+    return false
+  }
+  return true
+}
+
+const handleNodeClick = (data, node) => {
+  if (props.readonly) return
+  // 点击节点勾选 checkbox
+  node.checked = !node.checked
+}
+
+const filterNode = (value, data) => {
+  if (!value) return true
+  return data.elementName.indexOf(value) !== -1
+}
+
+const setAllChecked = () => {
+  eltreeRef.value.setCheckedKeys(collections.value.map((item) => item.elementNo))
+}
+
+const setCheckedKeys = (keys) => {
+  eltreeRef.value.setCheckedKeys(keys)
+}
+
+const resetChecked = () => {
+  eltreeRef.value.setCheckedKeys([])
+}
+
+const getCheckedCollections = () => {
+  const nodes = eltreeRef.value.getCheckedNodes()
+  const collectionList = []
+  for (let i = 0, len = nodes.length; i < len; i++) {
+    collectionList.push({ sortNo: i, elementNo: nodes[i].elementNo })
+  }
+  return collectionList
+}
+
+defineExpose({
+  getCheckedCollections,
+  setCheckedKeys
+})
 </script>
 
 <style lang="scss" scoped>

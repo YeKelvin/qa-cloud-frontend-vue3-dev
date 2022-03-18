@@ -35,6 +35,10 @@ defineProps({
 const activeId = ref(0)
 
 const emit = defineEmits(['click'])
+
+/**
+ * el-card handler
+ */
 const handleCardClick = (collection) => {
   emit('click', collection)
   activeId.value = collection.id

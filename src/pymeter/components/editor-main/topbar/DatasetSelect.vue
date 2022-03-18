@@ -38,8 +38,6 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
-import { useStore } from 'vuex'
 import { isEmpty } from 'lodash-es'
 import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 
