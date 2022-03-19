@@ -43,4 +43,8 @@ export default {
   width: fit-content;
   white-space: nowrap;
 }
+
+:deep(.el-date-editor.el-input) {
+  width: inherit;
+}
 </style>

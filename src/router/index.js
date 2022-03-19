@@ -143,9 +143,9 @@ export const asyncRoutes = [
         meta: { title: '空间管理', icon: 'sidebar-workspace' }
       },
       {
-        path: 'action/log',
-        name: 'ActionLog',
-        component: () => import('@/views/system/action-log/ActionLog'),
+        path: 'operation/log',
+        name: 'OperationLog',
+        component: () => import('@/views/system/operation-log/OperationLog.vue'),
         meta: { title: '操作日志', icon: 'sidebar-log' }
       }
     ]
