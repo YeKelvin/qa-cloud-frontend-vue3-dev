@@ -1,20 +1,16 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import jsx from '@vitejs/plugin-vue-jsx'
 import SvgIcons from 'vite-plugin-svg-icons'
 import AutoImport from 'unplugin-auto-import/vite'
 import path from 'path'
 
-export default () =>
+export default ({ mode }) =>
   defineConfig({
-    base: './',
+    base: loadEnv(mode, process.cwd()).VITE_PUBLIC_PATH,
     define: {
       'process.platform': null,
-      'process.version': null,
-      GLOBAL_STRING: JSON.stringify('i am global var from vite.config.js define'),
-      GLOBAL_VAR: {
-        test: 'i am global var from vite.config.js define'
-      }
+      'process.version': null
     },
     clearScreen: false,
     plugins: [
@@ -47,14 +43,14 @@ export default () =>
         output: {
           chunkFileNames: 'static/js/[name].[hash].js',
           entryFileNames: 'static/js/[name].[hash].js',
-          assetFileNames: 'static/[ext]/[name].[hash].[ext]'
-          // manualChunks: {
-          //   jsonWorker: ['monaco-editor/esm/vs/language/json/json.worker'],
-          //   cssWorker: ['monaco-editor/esm/vs/language/css/css.worker'],
-          //   htmlWorker: ['monaco-editor/esm/vs/language/html/html.worker'],
-          //   tsWorker: ['monaco-editor/esm/vs/language/typescript/ts.worker'],
-          //   editorWorker: ['monaco-editor/esm/vs/editor/editor.worker']
-          // }
+          assetFileNames: 'static/[ext]/[name].[hash].[ext]',
+          manualChunks: {
+            jsonWorker: ['monaco-editor/esm/vs/language/json/json.worker'],
+            cssWorker: ['monaco-editor/esm/vs/language/css/css.worker'],
+            htmlWorker: ['monaco-editor/esm/vs/language/html/html.worker'],
+            tsWorker: ['monaco-editor/esm/vs/language/typescript/ts.worker'],
+            editorWorker: ['monaco-editor/esm/vs/editor/editor.worker']
+          }
         }
       }
     },
