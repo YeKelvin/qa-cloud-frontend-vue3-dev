@@ -1,7 +1,7 @@
 // https://github.com/vuejs/core/pull/4339#issuecomment-1061855701
 const fs = require('fs')
 const path = require('path')
-const vue_bundler_file = path.resolve(__dirname, '../node_modules/vue/dist/vue.runtime.esm-bundler.js')
+const vue_bundler_file = path.resolve(__dirname, '../node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js')
 fs.readFile(vue_bundler_file, 'utf8', function (err, data) {
   if (err) console.error(err)
   const orginal_str =
