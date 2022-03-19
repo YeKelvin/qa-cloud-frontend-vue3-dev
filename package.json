@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "vite --mode development",
     "build": "node ./build/modify-keepalive.js && vite build --mode production",
-    "preview": "npm run build && vite preview"
+    "preview": "pnpm run build && vite preview"
   },
   "peerDependencies": {
     "vue": "^3.2.0"
