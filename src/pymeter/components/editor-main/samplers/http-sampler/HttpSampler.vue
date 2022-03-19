@@ -326,13 +326,13 @@ watch(bodyMode, () => {
     return
   }
   if (bodyMode.value === 'raw') {
-    setContentType(bodyRawTypeEnum.value[bodyRawType.value])
+    setContentType(bodyRawTypeEnum[bodyRawType.value])
     return
   }
 })
 watch(bodyRawType, () => {
   if (queryMode.value) return
-  setContentType(bodyRawTypeEnum.value[bodyRawType.value])
+  setContentType(bodyRawTypeEnum[bodyRawType.value])
 })
 
 onMounted(() => {

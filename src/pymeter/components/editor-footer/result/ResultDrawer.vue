@@ -1,11 +1,5 @@
 <template>
-  <el-drawer
-    direction="btt"
-    size="50%"
-    custom-class="pymeter-footer-result-drawer"
-    :show-close="false"
-    @open="setFirstLoading"
-  >
+  <el-drawer custom-class="pymeter-footer-result-drawer" direction="btt" size="50%" :show-close="false">
     <template #title>
       <span class="drawer-title">
         <el-tabs
@@ -16,26 +10,36 @@
           @tab-click="handleTabClick"
           @tab-remove="handleTabRemove"
         >
-          <el-tab-pane v-for="tab in tabs" :key="tab.id" :label="tab.name" :name="tab.id" />
+          <el-tab-pane v-for="tab in tabs" :key="tab.id" :label="tab.name" :name="tab.id">
+            <template #label>
+              <SvgIcon
+                v-if="tab.running"
+                icon-name="pymeter-running"
+                style="width: 1.5em; height: 1.5em; margin-right: 5px"
+              />
+              <span>{{ tab.name }}</span>
+            </template>
+          </el-tab-pane>
         </el-tabs>
-        <div v-show="!isEmpty(tabs)" class="clean-btn-wrapper">
+        <div v-show="!_isEmpty(tabs)" class="clean-btn-wrapper">
           <el-button type="danger" :icon="Delete" circle plain @click="clean()" />
         </div>
       </span>
     </template>
 
-    <ResultCollector v-if="!isEmpty(tabs)" :groups="activeDetails" />
-    <el-empty v-if="isEmpty(tabs) && !loading" description="暂无结果" />
-    <el-skeleton :loading="loading" :rows="6" style="padding: 40px" animated />
+    <template v-if="_isEmpty(tabs)">
+      <el-empty description="暂无结果" />
+    </template>
+    <template v-else>
+      <ResultCollector v-if="!activeTabLoading" :groups="activeTabDetails" />
+      <el-skeleton v-else :rows="6" style="padding: 40px" animated />
+    </template>
   </el-drawer>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import { useStore } from 'vuex'
-import { isEmpty } from 'lodash-es'
+import { isEmpty as _isEmpty } from 'lodash-es'
 import { Delete } from '@element-plus/icons-vue'
-import useSocket from '@/composables/useSocket'
 import ResultCollector from './ResultCollector.vue'
 
 const emit = defineEmits(['update:data'])
@@ -44,11 +48,10 @@ const props = defineProps({
 })
 
 const store = useStore()
-const socket = useSocket()
 
 const activeTabNo = ref('')
-const activeDetails = ref([])
-const loading = ref(false)
+const activeTabDetails = ref([])
+const activeTabLoading = ref(false)
 
 const tabs = computed({
   get() {
@@ -58,28 +61,19 @@ const tabs = computed({
     emit('update:data', val)
   }
 })
+
 watch(
   tabs,
   () => {
-    if (isEmpty(tabs.value)) return
-    // 停止 loading
-    loading.value = false
+    if (_isEmpty(tabs.value)) return
     // 激活最新的 tab
     const result = tabs.value[tabs.value.length - 1]
     activeTabNo.value = result.id
-    activeDetails.value = result.details
+    activeTabDetails.value = result.details
+    activeTabLoading.value = result.loading
   },
   { deep: true }
 )
-
-/**
- * 第一个结果给 loading 效果
- */
-const setFirstLoading = () => {
-  if (!socket.id) return
-  if (!isEmpty(tabs)) return
-  loading.value = true
-}
 
 /**
  * 清空结果
@@ -94,13 +88,27 @@ const clean = () => {
  */
 const handleTabClick = (tab) => {
   const result = tabs.value.find((result) => result.id === tab.paneName)
-  activeDetails.value = result.details
+  activeTabDetails.value = result.details
+  activeTabLoading.value = result.loading
 }
 
 /**
  * el-tab handler
  */
 const handleTabRemove = (tabName) => {
+  if (activeTabNo.value === tabName) {
+    for (let i = 0; i < tabs.value.length; i++) {
+      const tab = tabs.value[i]
+      if (tab.id === tabName) {
+        const nextTab = tabs.value[i + 1] || tabs.value[i - 1]
+        if (nextTab) {
+          activeTabNo.value = nextTab.id
+          activeTabDetails.value = nextTab.details
+          activeTabLoading.value = nextTab.loading
+        }
+      }
+    }
+  }
   const index = tabs.value.findIndex((result) => result.id === tabName)
   if (index > -1) tabs.value.splice(index, 1)
 }
@@ -124,5 +132,10 @@ const handleTabRemove = (tabName) => {
 
 :deep(.el-tabs__header) {
   margin: 0;
+}
+
+:deep(.el-tabs__item) {
+  display: inline-flex;
+  align-items: center;
 }
 </style>

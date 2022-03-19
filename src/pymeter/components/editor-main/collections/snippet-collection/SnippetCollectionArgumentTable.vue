@@ -15,7 +15,7 @@
     </el-table-column>
 
     <!-- 参数描述 -->
-    <el-table-column label="描述" width="auto">
+    <el-table-column label="参数描述" width="auto">
       <template #default="{ row }">
         <span>{{ row.desc }}</span>
       </template>

@@ -111,7 +111,7 @@
 <script setup>
 import { isEmpty as _isEmpty, assign as _assign } from 'lodash-es'
 import { ElMessage } from 'element-plus'
-import { Check, Close, Edit, Pointer } from '@element-plus/icons-vue'
+import { Check, Close, Edit } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
 import editorProps from '@/pymeter/composables/editor.props'
 import useEditor from '@/pymeter/composables/useEditor'

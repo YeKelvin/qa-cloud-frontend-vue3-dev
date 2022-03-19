@@ -19,12 +19,11 @@
 <script setup>
 import { assign as _assign } from 'lodash-es'
 import { ElNotification } from 'element-plus'
-import ResultDrawer from './result/ResultDrawer.vue'
-import LogDrawer from './log/LogDrawer.vue'
 import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 import useSocket from '@/composables/useSocket'
 import useSocketIO from '@/composables/useSocketIO'
-import SvgIcon from '@/components/svg-icon/SvgIcon.vue'
+import ResultDrawer from './result/ResultDrawer.vue'
+import LogDrawer from './log/LogDrawer.vue'
 
 const socket = useSocket()
 const socketio = useSocketIO()
@@ -33,6 +32,10 @@ const logs = ref([])
 const { showResultDrawer, showLogDrawer } = usePyMeterState()
 
 onBeforeMount(() => {
+  socket.on('pymeter_start', (data) => {
+    ElNotification.success({ message: '开始执行脚本', duration: 2 * 1000 })
+    results.value.push(data.result)
+  })
   socket.on('pymeter_result_summary', (data) => {
     const result = results.value.find((result) => result.id === data.resultId)
     if (result) {
@@ -62,22 +65,23 @@ onBeforeMount(() => {
     group.children.push(data.sampler)
   })
   socket.on('pymeter_message', (data) => {
-    ElNotification({ message: data, type: 'success', duration: 1 * 1000 })
+    ElNotification.info({ message: data, duration: 2 * 1000 })
   })
   socket.on('pymeter_log', (data) => {
     logs.value.push(data)
   })
   socket.on('pymeter_completed', () => {
-    ElNotification({ message: '脚本执行完毕', type: 'success', duration: 2 * 1000 })
+    ElNotification.success({ message: '脚本执行完成', duration: 2 * 1000 })
     socketio.disconnect()
   })
   socket.on('pymeter_error', (data) => {
-    ElNotification({ message: data, type: 'error', duration: 2 * 1000 })
+    ElNotification.error({ message: data, duration: 2 * 1000 })
     socketio.disconnect()
   })
 })
 
 onBeforeUnmount(() => {
+  socket.off('pymeter_start')
   socket.off('pymeter_result_summary')
   socket.off('pymeter_group_result')
   socket.off('pymeter_sampler_result')

@@ -12,7 +12,7 @@
     </el-table-column>
 
     <!-- 默认值 -->
-    <el-table-column label="默认值" width="auto">
+    <el-table-column label="参数默认值" width="auto">
       <template #default="{ row }">
         <el-input v-if="!queryMode" v-model="row.default" type="textarea" rows="1" autosize />
         <span v-else>{{ row.default }}</span>
@@ -20,7 +20,7 @@
     </el-table-column>
 
     <!-- 参数描述 -->
-    <el-table-column label="描述" width="auto">
+    <el-table-column label="参数描述" width="auto">
       <template #default="{ row }">
         <el-input v-if="!queryMode" v-model="row.desc" type="textarea" rows="1" autosize />
         <span v-else>{{ row.desc }}</span>
@@ -54,9 +54,9 @@ const tableData = computed(() => attrs.data)
 
 watch(queryMode, () => {
   // 动态显隐表格列后重新渲染表格
-  // nextTick(() => {
-  //   eltableRef.value.doLayout()
-  // })
+  nextTick(() => {
+    eltableRef.value.doLayout()
+  })
   // 表格没有数据时自动添加一行
   if (!queryMode.value && isEmpty(tableData.value)) {
     newParameter()

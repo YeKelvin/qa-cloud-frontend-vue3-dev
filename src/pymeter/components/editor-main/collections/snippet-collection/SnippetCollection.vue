@@ -59,7 +59,10 @@
         <el-button :icon="Edit" type="primary" @click="editNow()">编 辑</el-button>
         <el-button :icon="Close" @click="closeTab()">关 闭</el-button>
         <template v-if="!isEmpty(argumentsData)">
-          <el-button :icon="Pointer" type="danger" @click="showArgumentsDialog = true">运 行</el-button>
+          <el-button type="danger" @click="showArgumentsDialog = true">
+            <SvgIcon icon-name="pymeter-send" style="margin-right: 5px" />
+            运 行
+          </el-button>
         </template>
         <template v-else>
           <el-dropdown
@@ -70,7 +73,7 @@
             placement="bottom"
             @click="executeSnippetCollection()"
           >
-            <el-icon><Pointer /></el-icon>
+            <SvgIcon icon-name="pymeter-send" style="margin-right: 5px" />
             <span style="margin-left: 5px">运 行</span>
             <template #dropdown>
               <el-dropdown-menu>
@@ -97,18 +100,12 @@
 
       <template #default>
         <ArgumentTable :data="argumentsData" />
-        <el-tag type="danger" style="padding: 10px">备注：片段参数不支持函数</el-tag>
+        <el-tag type="danger" style="margin-top: 10px">注意：片段参数不支持函数</el-tag>
       </template>
 
       <template #footer>
-        <el-dropdown
-          split-button
-          trigger="click"
-          type="danger"
-          style="margin-right: 10px"
-          placement="bottom"
-          @click="executeCollection()"
-        >
+        <el-button style="margin-right: 10px" :icon="Close" @click="showArgumentsDialog = false">取 消</el-button>
+        <el-dropdown trigger="click" type="danger" placement="bottom" split-button @click="executeCollection()">
           <SvgIcon icon-name="pymeter-send" style="margin-right: 5px" />
           <span>运 行</span>
           <template #dropdown>
@@ -117,7 +114,6 @@
             </el-dropdown-menu>
           </template>
         </el-dropdown>
-        <el-button :icon="Close" @click="showArgumentsDialog = false">取 消</el-button>
       </template>
     </el-dialog>
 
@@ -129,7 +125,7 @@
 
 <script setup>
 import { ElMessage } from 'element-plus'
-import { Check, Close, Edit, Pointer } from '@element-plus/icons-vue'
+import { Check, Close, Edit } from '@element-plus/icons-vue'
 import { isEmpty } from 'lodash-es'
 import { isBlank, isBlankAll } from '@/utils/string-util'
 import * as ElementService from '@/api/script/element'

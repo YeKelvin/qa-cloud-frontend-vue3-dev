@@ -64,7 +64,7 @@ export default function useRunnableElement(elementNo) {
       const sid = await socketio.getId()
       // 后端异步执行脚本
       await ExecutionService.executeSnippets({
-        collectionNo: elementNo.value,
+        collectionNo: elementNo,
         socketId: sid,
         variableDataSet: {
           useCurrentValue: useCurrentValue.value,

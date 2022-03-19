@@ -39,7 +39,7 @@
     "vuex": "4.0.2"
   },
   "devDependencies": {
-    "@babel/core": "7.17.7",
+    "@babel/core": "7.17.8",
     "@babel/eslint-parser": "7.17.0",
     "@types/echarts": "4.9.13",
     "@types/lodash-es": "4.17.6",
