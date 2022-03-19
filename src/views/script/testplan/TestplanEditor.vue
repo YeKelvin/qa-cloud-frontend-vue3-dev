@@ -7,62 +7,62 @@
 
     <div class="testplan-body">
       <!-- 脚本列表 -->
-      <TestplanCollectionTree ref="tree" style="width: 50%" :readonly="queryMode" />
+      <TestplanCollectionTree ref="collectionTreeRef" style="width: 50%" :readonly="queryMode" />
       <!-- 设置表单 -->
       <div style="width: 50%" class="settings-container">
         <el-form
-          ref="form"
+          ref="elformRef"
           label-position="right"
           label-width="140px"
           style="width: 100%"
           inline-message
-          :model="formParams"
+          :model="formInfo"
           :rules="formRules"
         >
           <!-- 计划名称 -->
           <el-form-item label="计划名称：" prop="planName">
-            <el-input v-model="formParams.planName" clearable :readonly="queryMode" />
+            <el-input v-model="formInfo.planName" clearable :readonly="queryMode" />
           </el-form-item>
 
           <!-- 计划描述 -->
           <el-form-item label="计划描述：" prop="planDesc">
-            <el-input v-model="formParams.planDesc" clearable :readonly="queryMode" />
+            <el-input v-model="formInfo.planDesc" clearable :readonly="queryMode" />
           </el-form-item>
 
           <!-- 版本号 -->
           <el-form-item label="版本号：" prop="productRequirementsVersion">
-            <el-input v-model="formParams.productRequirementsVersion" clearable :readonly="queryMode" />
+            <el-input v-model="formInfo.productRequirementsVersion" clearable :readonly="queryMode" />
           </el-form-item>
 
           <!-- 并发数 -->
           <el-form-item label="并发数：" prop="concurrency">
-            <el-input v-model="formParams.concurrency" clearable disabled>
+            <el-input v-model="formInfo.concurrency" clearable disabled>
               <template #append>个</template>
             </el-input>
           </el-form-item>
 
           <!-- 迭代次数 -->
           <el-form-item label="迭代数：" prop="iterations">
-            <el-input v-model="formParams.iterations" clearable :readonly="queryMode">
+            <el-input v-model="formInfo.iterations" clearable :readonly="queryMode">
               <template #append>次</template>
             </el-input>
           </el-form-item>
 
           <!-- 迭代间隔时间 -->
           <el-form-item label="迭代间隔：" prop="delay">
-            <el-input v-model="formParams.delay" clearable :readonly="queryMode">
+            <el-input v-model="formInfo.delay" clearable :readonly="queryMode">
               <template #append>ms</template>
             </el-input>
           </el-form-item>
 
           <!-- 保存结果 -->
           <el-form-item label="保存结果：" prop="save">
-            <el-switch v-model="formParams.save" active-color="#13ce66" :disabled="queryMode" />
+            <el-switch v-model="formInfo.save" active-color="#13ce66" :disabled="queryMode" />
           </el-form-item>
 
           <!-- 仅保存失败结果 -->
           <el-form-item label="仅保存失败结果：" prop="saveOnError">
-            <el-switch v-model="formParams.saveOnError" active-color="#13ce66" disabled />
+            <el-switch v-model="formInfo.saveOnError" active-color="#13ce66" disabled />
           </el-form-item>
 
           <!-- 操作按钮 -->
@@ -85,147 +85,157 @@
 </template>
 
 <script setup>
-import { mapState } from 'vuex'
+import { assign as _assign } from 'lodash-es'
+import { ElMessage } from 'element-plus'
 import { Check, Close, Edit } from '@element-plus/icons-vue'
 import * as TestplanService from '@/api/script/testplan'
+import useWorkspaceState from '@/composables/useWorkspaceState'
 import TestplanCollectionTree from './TestplanCollectionTree.vue'
-</script>
 
-<script>
-export default {
-  name: 'TestplanEditor',
-
-  data() {
-    const checkIterations = (_, value, callback) => {
-      if (!value) {
-        return callback(new Error('迭代次数不能为空'))
-      }
-      const val = parseInt(value)
-      if (!Number.isInteger(val)) {
-        return callback(new Error('迭代次数必须为整数'))
-      } else {
-        if (val < 1 || val > 999) {
-          return callback(new Error('迭代次数仅支持[1-999]'))
-        } else {
-          return callback()
-        }
-      }
-    }
-    return {
-      planNo: this.$route.query.planNo,
-      editorMode: this.$route.params.editorMode,
-      formParams: {
-        planName: '',
-        planDesc: '',
-        productRequirementsVersion: '',
-        concurrency: '1',
-        iterations: '1',
-        delay: '0',
-        save: true,
-        saveOnError: false,
-        stopTestOnErrorCount: '3'
-      },
-      formRules: {
-        planName: [{ required: true, message: '计划名称不能为空', trigger: 'blur' }],
-        iterations: [{ validator: checkIterations, trigger: 'blur' }]
-      }
-    }
-  },
-
-  computed: {
-    queryMode() {
-      return this.editorMode === 'QUERY'
-    },
-    modifyMode() {
-      return this.editorMode === 'MODIFY'
-    },
-    createMode() {
-      return this.editorMode === 'CREATE'
-    },
-
-    // 当前选中的工作空间编号
-    ...mapState('workspace', {
-      workspaceNo: (state) => state.workspaceNo
-    })
-  },
-
-  watch: {
-    'formParams.iterations'(val) {
-      if (val && val > 1) {
-        this.formParams.save = false
-        this.formParams.saveOnError = false
-      }
-    },
-    'formParams.save'(val) {
-      if (val) {
-        this.formParams.iterations = '1'
-        this.formParams.delay = '0'
-      }
-    }
-  },
-
-  mounted() {
-    if (this.createMode) return
-
-    if (!this.planNo) {
-      this.editorMode = 'CREATE'
-      return
-    }
-
-    this.editorMode = 'QUERY'
-    this.queryTestplan()
-  },
-
-  methods: {
-    queryTestplan() {
-      TestplanService.queryTestplan({ planNo: this.planNo }).then((response) => {
-        Object.assign(this.formParams, response.result)
-        this.$refs.tree.setCheckedKeys(response.result.collectionNumberList)
-      })
-    },
-
-    createTestplan() {
-      this.$refs.form.validate((valid) => {
-        if (!valid) return
-
-        const collectionList = this.$refs.tree.getCheckedCollections()
-        if (collectionList.length === 0) {
-          this.$message({ message: '脚本至少选择一个', type: 'warning', duration: 2 * 1000 })
-          return
-        }
-
-        TestplanService.createTestplan({
-          workspaceNo: this.workspaceNo,
-          collectionList: collectionList,
-          ...this.formParams
-        }).then(() => {
-          this.$message({ message: '创建测试计划成功', type: 'info', duration: 1 * 1000 })
-          this.goBack()
-        })
-      })
-    },
-
-    modifyTestplan() {
-      this.$refs.form.validate((valid) => {
-        if (!valid) return
-
-        const collectionList = this.$refs.tree.getCheckedCollections()
-        if (collectionList.length === 0) {
-          this.$message({ message: '脚本至少选择一个', type: 'warning', duration: 2 * 1000 })
-          return
-        }
-
-        TestplanService.modifyTestplan({ ...this.formParams, collectionList: collectionList }).then(() => {
-          this.$message({ message: '修改测试计划成功', type: 'info', duration: 1 * 1000 })
-          this.goBack()
-        })
-      })
-    },
-
-    goBack() {
-      window.history.length > 1 ? this.$router.go(-1) : this.$router.push('/script/testplan')
+const { workspaceNo } = useWorkspaceState()
+const route = useRoute()
+const router = useRouter()
+const checkIterations = (_, value, callback) => {
+  if (!value) {
+    return callback(new Error('迭代次数不能为空'))
+  }
+  const val = parseInt(value)
+  if (!Number.isInteger(val)) {
+    return callback(new Error('迭代次数必须为整数'))
+  } else {
+    if (val < 1 || val > 999) {
+      return callback(new Error('迭代次数仅支持[1-999]'))
+    } else {
+      return callback()
     }
   }
+}
+const elformRef = ref()
+const collectionTreeRef = ref()
+const planNo = ref(route.query.planNo)
+const editorMode = ref(route.params.editorMode)
+const formInfo = reactive({
+  planName: '',
+  planDesc: '',
+  productRequirementsVersion: '',
+  concurrency: '1',
+  iterations: '1',
+  delay: '0',
+  save: true,
+  saveOnError: false,
+  stopTestOnErrorCount: '3'
+})
+const formRules = reactive({
+  planName: [{ required: true, message: '计划名称不能为空', trigger: 'blur' }],
+  iterations: [{ validator: checkIterations, trigger: 'blur' }]
+})
+
+const queryMode = computed(() => editorMode.value === 'QUERY')
+const modifyMode = computed(() => editorMode.value === 'MODIFY')
+const createMode = computed(() => editorMode.value === 'CREATE')
+
+watch(
+  () => formInfo.iterations,
+  (val) => {
+    if (val && val > 1) {
+      formInfo.save = false
+      formInfo.saveOnError = false
+    }
+  }
+)
+watch(
+  () => formInfo.save,
+  (val) => {
+    if (val) {
+      formInfo.iterations = '1'
+      formInfo.delay = '0'
+    }
+  }
+)
+
+onMounted(() => {
+  if (createMode.value) return
+  if (!planNo.value) {
+    editorMode.value = 'CREATE'
+    return
+  }
+  editorMode.value = 'QUERY'
+  queryTestplan()
+})
+
+/**
+ * 查询测试计划
+ */
+const queryTestplan = () => {
+  TestplanService.queryTestplan({ planNo: planNo.value }).then((response) => {
+    _assign(formInfo, response.result)
+    collectionTreeRef.value.setCheckedKeys(response.result.collectionNumberList)
+  })
+}
+
+/**
+ * 创建测试计划
+ */
+const createTestplan = async () => {
+  // 表单校验
+  const error = await elformRef.value
+    .validate()
+    .then(() => false)
+    .catch(() => true)
+  if (error) {
+    ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+    return
+  }
+
+  // 获取已勾选的集合
+  const collectionList = collectionTreeRef.value.getCheckedCollections()
+  if (collectionList.length === 0) {
+    ElMessage({ message: '脚本至少选择一个', type: 'warning', duration: 2 * 1000 })
+    return
+  }
+
+  // 新增测试计划
+  await TestplanService.createTestplan({ workspaceNo: workspaceNo.value, collectionList: collectionList, ...formInfo })
+  // 成功提示
+  ElMessage({ message: '创建成功', type: 'info', duration: 2 * 1000 })
+  // 返回上一页
+  goBack()
+}
+
+/**
+ * 修改测试计划
+ */
+const modifyTestplan = async () => {
+  // 表单校验
+  const error = await elformRef.value
+    .validate()
+    .then(() => false)
+    .catch(() => true)
+  if (error) {
+    ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+    return
+  }
+
+  // 获取已勾选的集合
+  const collectionList = collectionTreeRef.value.getCheckedCollections()
+  if (collectionList.length === 0) {
+    ElMessage({ message: '脚本至少选择一个', type: 'warning', duration: 2 * 1000 })
+    return
+  }
+
+  // 修改测试计划
+  await TestplanService.modifyTestplan({ collectionList: collectionList, ...formInfo })
+  // 成功提示
+  ElMessage({ message: '修改成功', type: 'info', duration: 2 * 1000 })
+  // 返回上一页
+  goBack()
+}
+
+/**
+ * 返回上一页
+ */
+const goBack = () => {
+  window.history.length > 1 ? router.go(-1) : router.push('/script/testplan')
 }
 </script>
 
