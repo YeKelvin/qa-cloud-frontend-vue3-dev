@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="成员管理" width="50%" center v-bind="$attrs" @close="$emit('update:model-value', false)">
+  <el-dialog title="成员管理" width="50%" center @close="$emit('update:model-value', false)">
     <div style="display: flex; flex: 1; flex-direction: column">
       <el-transfer
         v-model="memberList"
@@ -51,9 +51,11 @@ export default {
       return data
     }
   },
-  mounted() {
-    this.queryUserAll()
-    this.queryWorkspaceUserAll()
+  watch: {
+    row() {
+      this.queryUserAll()
+      this.queryWorkspaceUserAll()
+    }
   },
   methods: {
     /**

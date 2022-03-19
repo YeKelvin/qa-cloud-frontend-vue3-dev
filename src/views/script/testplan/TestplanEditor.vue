@@ -16,53 +16,53 @@
           label-width="140px"
           style="width: 100%"
           inline-message
-          :model="formInfo"
+          :model="formData"
           :rules="formRules"
         >
           <!-- 计划名称 -->
           <el-form-item label="计划名称：" prop="planName">
-            <el-input v-model="formInfo.planName" clearable :readonly="queryMode" />
+            <el-input v-model="formData.planName" clearable :readonly="queryMode" />
           </el-form-item>
 
           <!-- 计划描述 -->
           <el-form-item label="计划描述：" prop="planDesc">
-            <el-input v-model="formInfo.planDesc" clearable :readonly="queryMode" />
+            <el-input v-model="formData.planDesc" clearable :readonly="queryMode" />
           </el-form-item>
 
           <!-- 版本号 -->
           <el-form-item label="版本号：" prop="productRequirementsVersion">
-            <el-input v-model="formInfo.productRequirementsVersion" clearable :readonly="queryMode" />
+            <el-input v-model="formData.productRequirementsVersion" clearable :readonly="queryMode" />
           </el-form-item>
 
           <!-- 并发数 -->
           <el-form-item label="并发数：" prop="concurrency">
-            <el-input v-model="formInfo.concurrency" clearable disabled>
+            <el-input v-model="formData.concurrency" clearable disabled>
               <template #append>个</template>
             </el-input>
           </el-form-item>
 
           <!-- 迭代次数 -->
           <el-form-item label="迭代数：" prop="iterations">
-            <el-input v-model="formInfo.iterations" clearable :readonly="queryMode">
+            <el-input v-model="formData.iterations" clearable :readonly="queryMode">
               <template #append>次</template>
             </el-input>
           </el-form-item>
 
           <!-- 迭代间隔时间 -->
           <el-form-item label="迭代间隔：" prop="delay">
-            <el-input v-model="formInfo.delay" clearable :readonly="queryMode">
+            <el-input v-model="formData.delay" clearable :readonly="queryMode">
               <template #append>ms</template>
             </el-input>
           </el-form-item>
 
           <!-- 保存结果 -->
           <el-form-item label="保存结果：" prop="save">
-            <el-switch v-model="formInfo.save" active-color="#13ce66" :disabled="queryMode" />
+            <el-switch v-model="formData.save" active-color="#13ce66" :disabled="queryMode" />
           </el-form-item>
 
           <!-- 仅保存失败结果 -->
           <el-form-item label="仅保存失败结果：" prop="saveOnError">
-            <el-switch v-model="formInfo.saveOnError" active-color="#13ce66" disabled />
+            <el-switch v-model="formData.saveOnError" active-color="#13ce66" disabled />
           </el-form-item>
 
           <!-- 操作按钮 -->
@@ -114,7 +114,7 @@ const elformRef = ref()
 const collectionTreeRef = ref()
 const planNo = ref(route.query.planNo)
 const editorMode = ref(route.params.editorMode)
-const formInfo = reactive({
+const formData = reactive({
   planName: '',
   planDesc: '',
   productRequirementsVersion: '',
@@ -135,20 +135,20 @@ const modifyMode = computed(() => editorMode.value === 'MODIFY')
 const createMode = computed(() => editorMode.value === 'CREATE')
 
 watch(
-  () => formInfo.iterations,
+  () => formData.iterations,
   (val) => {
     if (val && val > 1) {
-      formInfo.save = false
-      formInfo.saveOnError = false
+      formData.save = false
+      formData.saveOnError = false
     }
   }
 )
 watch(
-  () => formInfo.save,
+  () => formData.save,
   (val) => {
     if (val) {
-      formInfo.iterations = '1'
-      formInfo.delay = '0'
+      formData.iterations = '1'
+      formData.delay = '0'
     }
   }
 )
@@ -168,7 +168,7 @@ onMounted(() => {
  */
 const queryTestplan = () => {
   TestplanService.queryTestplan({ planNo: planNo.value }).then((response) => {
-    _assign(formInfo, response.result)
+    _assign(formData, response.result)
     collectionTreeRef.value.setCheckedKeys(response.result.collectionNumberList)
   })
 }
@@ -195,7 +195,7 @@ const createTestplan = async () => {
   }
 
   // 新增测试计划
-  await TestplanService.createTestplan({ workspaceNo: workspaceNo.value, collectionList: collectionList, ...formInfo })
+  await TestplanService.createTestplan({ workspaceNo: workspaceNo.value, collectionList: collectionList, ...formData })
   // 成功提示
   ElMessage({ message: '创建成功', type: 'info', duration: 2 * 1000 })
   // 返回上一页
@@ -224,7 +224,7 @@ const modifyTestplan = async () => {
   }
 
   // 修改测试计划
-  await TestplanService.modifyTestplan({ collectionList: collectionList, ...formInfo })
+  await TestplanService.modifyTestplan({ collectionList: collectionList, ...formData })
   // 成功提示
   ElMessage({ message: '修改成功', type: 'info', duration: 2 * 1000 })
   // 返回上一页

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="新增工作空间" width="50%" center v-bind="$attrs" @close="$emit('update:model-value', false)">
+  <el-dialog title="新增工作空间" width="50%" center @close="$emit('update:model-value', false)">
     <el-form ref="form" label-width="120px" style="width: 100%" inline-message :model="form" :rules="formRules">
       <el-form-item label="空间名称：" prop="workspaceName">
         <el-input v-model="form.workspaceName" clearable />

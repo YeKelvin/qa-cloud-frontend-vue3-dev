@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="编辑角色" width="50%" center v-bind="$attrs" @close="$emit('update:model-value', false)">
+  <el-dialog title="编辑角色" width="50%" center @close="$emit('update:model-value', false)">
     <el-form ref="form" label-width="100px" style="width: 100%" inline-message :model="form" :rules="formRules">
       <el-form-item label="角色名称：" prop="roleName">
         <el-input v-model="form.roleName" clearable />

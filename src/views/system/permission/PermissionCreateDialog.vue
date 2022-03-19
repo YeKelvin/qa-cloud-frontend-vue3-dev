@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="新增权限" width="50%" center v-bind="$attrs" @close="$emit('update:model-value', false)">
+  <el-dialog title="新增权限" width="50%" center @close="$emit('update:model-value', false)">
     <el-form ref="form" label-width="100px" style="width: 100%" inline-message :model="form" :rules="formRules">
       <el-form-item label="权限名称：" prop="permissionName">
         <el-input v-model="form.permissionName" clearable />
