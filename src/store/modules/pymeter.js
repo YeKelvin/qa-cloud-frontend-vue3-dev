@@ -1,5 +1,5 @@
 import store from '@/store'
-import { isEmpty } from 'lodash-es'
+import { isEmpty as _isEmpty } from 'lodash-es'
 import * as VariablesService from '@/api/script/variables'
 import * as HttpHeadersService from '@/api/script/headers'
 
@@ -25,6 +25,19 @@ function removeCache(keepAlive, cacheKey) {
     keepAliveRenderer.um(cachedVnode, keepAliveComponent, keepAliveComponent.suspense, false, false)
     cacheMap.delete(cacheKey)
   }
+}
+
+const isGlobal = (state, datasetNo) => {
+  const index = state.globalDatasetList.findIndex((item) => item.datasetNo === datasetNo)
+  return index > -1
+}
+const isEnvironment = (state, datasetNo) => {
+  const index = state.environmentDatasetList.findIndex((item) => item.datasetNo === datasetNo)
+  return index > -1
+}
+const isCustom = (state, datasetNo) => {
+  const index = state.customDatasetList.findIndex((item) => item.datasetNo === datasetNo)
+  return index > -1
 }
 
 const state = {
@@ -262,26 +275,23 @@ const actions = {
    */
   disableOtherUnselectedEnvironmentDataset({ state }) {
     // 没有选中任何变量集时，开放所有环境变量集
-    if (isEmpty(state.selectedDatasetNumberList)) {
-      state.environmentDatasetList.forEach((env) => {
-        env.disabled = false
-      })
+    if (_isEmpty(state.selectedDatasetNumberList)) {
+      state.environmentDatasetList.forEach((env) => (env.disabled = false))
     }
     // 判断当前选中的变量集是否需要禁用
+    let environmentCount = 0
     state.selectedDatasetNumberList.forEach((datasetNo) => {
-      const index = state.environmentDatasetList.findIndex((item) => item.datasetNo === datasetNo)
+      if (isGlobal(state, datasetNo) || isCustom(state, datasetNo)) return
       // 已经选择了环境变量集，禁用其余环境变量集
-      if (index > -1) {
-        state.environmentDatasetList.forEach((env) => {
-          env.disabled = env.datasetNo !== datasetNo
-        })
-        // 没有选择环境变量集时，开放所有环境变量集
-      } else {
-        state.environmentDatasetList.forEach((env) => {
-          env.disabled = false
-        })
+      if (isEnvironment(state, datasetNo)) {
+        environmentCount += 1
+        state.environmentDatasetList.forEach((env) => (env.disabled = env.datasetNo !== datasetNo))
       }
     })
+    // 没有选择环境变量集时，开放所有环境变量集
+    if (environmentCount === 0) {
+      state.environmentDatasetList.forEach((env) => (env.disabled = false))
+    }
   },
 
   /**
