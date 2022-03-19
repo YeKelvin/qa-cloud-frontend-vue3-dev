@@ -39,23 +39,22 @@ export default () =>
       cors: true // 跨域
     },
     build: {
-      minify: 'terser',
-      brotliSize: false,
-      // 消除打包大小超过500kb警告
+      // chunk 大小警告的限制（以 kbs 为单位）
       chunkSizeWarningLimit: 2000,
-      terserOptions: {
-        compress: {
-          drop_console: false,
-          pure_funcs: ['console.log', 'console.info'],
-          drop_debugger: true
-        }
-      },
+      // 指定生成静态资源的存放路径
       assetsDir: 'static/assets',
       rollupOptions: {
         output: {
-          chunkFileNames: 'static/js/[name]-[hash].js',
-          entryFileNames: 'static/js/[name]-[hash].js',
-          assetFileNames: 'static/[ext]/[name]-[hash].[ext]'
+          chunkFileNames: 'static/js/[name].[hash].js',
+          entryFileNames: 'static/js/[name].[hash].js',
+          assetFileNames: 'static/[ext]/[name].[hash].[ext]'
+          // manualChunks: {
+          //   jsonWorker: ['monaco-editor/esm/vs/language/json/json.worker'],
+          //   cssWorker: ['monaco-editor/esm/vs/language/css/css.worker'],
+          //   htmlWorker: ['monaco-editor/esm/vs/language/html/html.worker'],
+          //   tsWorker: ['monaco-editor/esm/vs/language/typescript/ts.worker'],
+          //   editorWorker: ['monaco-editor/esm/vs/editor/editor.worker']
+          // }
         }
       }
     },
@@ -72,5 +71,14 @@ export default () =>
           additionalData: `@import "@/styles/variables.scss";`
         }
       }
+    },
+    optimizeDeps: {
+      include: [
+        'monaco-editor/esm/vs/language/json/json.worker',
+        'monaco-editor/esm/vs/language/css/css.worker',
+        'monaco-editor/esm/vs/language/html/html.worker',
+        'monaco-editor/esm/vs/language/typescript/ts.worker',
+        'monaco-editor/esm/vs/editor/editor.worker'
+      ]
     }
   })
