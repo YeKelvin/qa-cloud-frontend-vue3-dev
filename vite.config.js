@@ -50,9 +50,9 @@ export default ({ mode }) =>
             vue: ['vue', 'vuex', 'vue-router'],
             echarts: ['echarts'],
             jsonWorker: ['monaco-editor/esm/vs/language/json/json.worker'],
-            cssWorker: ['monaco-editor/esm/vs/language/css/css.worker'],
+            // cssWorker: ['monaco-editor/esm/vs/language/css/css.worker'],
             htmlWorker: ['monaco-editor/esm/vs/language/html/html.worker'],
-            tsWorker: ['monaco-editor/esm/vs/language/typescript/ts.worker'],
+            // tsWorker: ['monaco-editor/esm/vs/language/typescript/ts.worker'],
             editorWorker: ['monaco-editor/esm/vs/editor/editor.worker']
           }
         }
@@ -75,9 +75,9 @@ export default ({ mode }) =>
     optimizeDeps: {
       include: [
         'monaco-editor/esm/vs/language/json/json.worker',
-        'monaco-editor/esm/vs/language/css/css.worker',
+        // 'monaco-editor/esm/vs/language/css/css.worker',
         'monaco-editor/esm/vs/language/html/html.worker',
-        'monaco-editor/esm/vs/language/typescript/ts.worker',
+        // 'monaco-editor/esm/vs/language/typescript/ts.worker',
         'monaco-editor/esm/vs/editor/editor.worker'
       ]
     }
