@@ -9,7 +9,7 @@ const props = defineProps({
   option: { type: Object, default: () => ({}) }
 })
 const echartRef = ref()
-const echarts = useECharts()
+const { echarts } = useECharts()
 
 onMounted(() => {
   echarts.init(echartRef.value).setOption(props.option)

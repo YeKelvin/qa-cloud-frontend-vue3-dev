@@ -2,15 +2,9 @@
 import * as echarts from 'echarts/core'
 // 引入图表，图表后缀都为 Chart
 import { PieChart } from 'echarts/charts'
-// 引入提示框，标题，直角坐标系，数据集，内置数据转换器组件，组件后缀都为 Component
-import {
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  DatasetComponent,
-  TransformComponent
-} from 'echarts/components'
-// 标签自动布局，全局过渡动画等特性
+// 引入组件，组件后缀都为 Component
+import { TitleComponent, TooltipComponent, LegendComponent } from 'echarts/components'
+// 引入特性
 import { LabelLayout, UniversalTransition } from 'echarts/features'
 // 引入渲染器，注意引入 CanvasRenderer 或者 SVGRenderer 是必须的一步
 import { SVGRenderer } from 'echarts/renderers'
@@ -20,9 +14,7 @@ echarts.use([
   // 组件
   TitleComponent,
   TooltipComponent,
-  GridComponent,
-  DatasetComponent,
-  TransformComponent,
+  LegendComponent,
   // 图表
   PieChart,
   // 特性

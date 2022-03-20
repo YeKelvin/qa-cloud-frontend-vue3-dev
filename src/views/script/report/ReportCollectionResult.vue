@@ -35,7 +35,7 @@ import useECharts from '@/composables/useECharts'
 const props = defineProps({
   details: { type: Object, default: () => ({}) }
 })
-const echarts = useECharts()
+const { echarts } = useECharts()
 const pieChartRef = ref()
 const pieChart = ref(null)
 const pieChartOption = reactive({

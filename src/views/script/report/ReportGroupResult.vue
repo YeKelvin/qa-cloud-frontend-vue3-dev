@@ -38,7 +38,7 @@ const props = defineProps({
   groupId: { type: String, default: '' }
 })
 const details = ref({})
-const echarts = useECharts()
+const { echarts } = useECharts()
 const pieChartRef = ref()
 const pieChart = ref(null)
 const pieChartOption = reactive({
