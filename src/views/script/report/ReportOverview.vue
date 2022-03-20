@@ -31,11 +31,12 @@
 </template>
 
 <script setup>
-import * as echarts from 'echarts'
+import useECharts from '@/composables/useECharts'
 
 const props = defineProps({
   overview: { type: Object, default: () => ({}) }
 })
+const echarts = useECharts()
 const pieChartRef = ref()
 const pieChart = ref(null)
 const pieChartOption = reactive({

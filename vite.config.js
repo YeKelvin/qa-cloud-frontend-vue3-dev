@@ -4,6 +4,7 @@ import jsx from '@vitejs/plugin-vue-jsx'
 import SvgIcons from 'vite-plugin-svg-icons'
 import AutoImport from 'unplugin-auto-import/vite'
 import path from 'path'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 export default ({ mode }) =>
   defineConfig({
@@ -27,7 +28,8 @@ export default ({ mode }) =>
       SvgIcons({
         iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
         symbolId: 'icon-[dir]-[name]'
-      })
+      }),
+      visualizer()
     ],
     server: {
       port: 9529, // 服务器端口
@@ -45,6 +47,8 @@ export default ({ mode }) =>
           entryFileNames: 'static/js/[name].[hash].js',
           assetFileNames: 'static/[ext]/[name].[hash].[ext]',
           manualChunks: {
+            vue: ['vue', 'vuex', 'vue-router'],
+            echarts: ['echarts'],
             jsonWorker: ['monaco-editor/esm/vs/language/json/json.worker'],
             cssWorker: ['monaco-editor/esm/vs/language/css/css.worker'],
             htmlWorker: ['monaco-editor/esm/vs/language/html/html.worker'],

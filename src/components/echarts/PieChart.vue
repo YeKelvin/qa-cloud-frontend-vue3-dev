@@ -3,12 +3,13 @@
 </template>
 
 <script setup>
-import * as echarts from 'echarts'
+import useECharts from '@/composables/useECharts'
 
 const props = defineProps({
   option: { type: Object, default: () => ({}) }
 })
 const echartRef = ref()
+const echarts = useECharts()
 
 onMounted(() => {
   echarts.init(echartRef.value).setOption(props.option)

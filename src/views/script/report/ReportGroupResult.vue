@@ -31,14 +31,15 @@
 </template>
 
 <script setup>
-import * as echarts from 'echarts'
+import useECharts from '@/composables/useECharts'
 import * as ReportService from '@/api/script/report'
 
 const props = defineProps({
   groupId: { type: String, default: '' }
 })
-const pieChartRef = ref()
 const details = ref({})
+const echarts = useECharts()
+const pieChartRef = ref()
 const pieChart = ref(null)
 const pieChartOption = reactive({
   title: {
