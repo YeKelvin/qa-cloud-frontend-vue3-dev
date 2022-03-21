@@ -69,6 +69,7 @@
 </template>
 
 <script setup>
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { PermissionState, HttpMethods } from '@/api/enum'
 import * as PermissionService from '@/api/usercenter/permission'
 import ConditionInput from '@/components/query-condition/ConditionInput.vue'
@@ -86,109 +87,95 @@ const { queryConditions, resetQueryConditions } = useQueryConditions({
   method: '',
   state: ''
 })
-</script>
+const tableData = ref([])
+const page = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+const currentRow = ref({})
+const showCreateDialog = ref(false)
+const showModifyDialog = ref(false)
 
-<script>
-export default {
-  name: 'Permission',
-  data() {
-    return {
-      // 表格数据
-      tableData: [],
-      // 分页信息
-      page: 1,
-      pageSize: 10,
-      total: 0,
-      // 当前操作的行数据
-      currentRow: {},
-      // 对话框打开关闭标识
-      showCreateDialog: false,
-      showModifyDialog: false
+onMounted(() => {
+  query()
+})
+
+/**
+ * 查询
+ */
+const query = () => {
+  PermissionService.queryPermissionList({ ...queryConditions.value, page: page.value, pageSize: pageSize.value }).then(
+    (response) => {
+      tableData.value = response.result['data']
+      total.value = response.result['total']
     }
-  },
-  mounted() {
-    this.query()
-  },
-  methods: {
-    /**
-     * 查询
-     */
-    query() {
-      PermissionService.queryPermissionList({ ...this.queryConditions, page: this.page, pageSize: this.pageSize }).then(
-        (response) => {
-          this.tableData = response.result['data']
-          this.total = response.result['total']
-        }
-      )
-    },
+  )
+}
 
-    /**
-     * 修改权限状态
-     */
-    async modifyPermissionState(row, state) {
-      const stateMsg = state === 'DISABLE' ? '禁用' : '启用'
-      // 二次确认
-      const error = await this.$confirm(`确定${stateMsg}吗？`, '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => false)
-        .catch(() => true)
-      if (error) return
-      // 修改权限状态
-      await PermissionService.modifyPermissionState({ permissionNo: row.permissionNo, state: state })
-      // 成功提示
-      this.$message({ message: `${stateMsg}权限成功`, type: 'info', duration: 2 * 1000 })
-      // 重新查询列表
-      this.query()
-    },
+/**
+ * 修改权限状态
+ */
+const modifyPermissionState = async (row, state) => {
+  const stateMsg = state === 'DISABLE' ? '禁用' : '启用'
+  // 二次确认
+  const error = await ElMessageBox.confirm(`确定${stateMsg}吗？`, '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 修改权限状态
+  await PermissionService.modifyPermissionState({ permissionNo: row.permissionNo, state: state })
+  // 成功提示
+  ElMessage({ message: `${stateMsg}权限成功`, type: 'info', duration: 2 * 1000 })
+  // 重新查询列表
+  query()
+}
 
-    /**
-     * 删除权限
-     */
-    async disablePermission(row) {
-      // 二次确认
-      const error = await this.$confirm('确定删除吗？', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => false)
-        .catch(() => true)
-      if (error) return
-      // 删除权限
-      await PermissionService.deletePermission({ permissionNo: row.permissionNo })
-      // 成功提示
-      this.$message({ message: '删除权限成功', type: 'info', duration: 2 * 1000 })
-      // 重新查询列表
-      this.query()
-    },
+/**
+ * 删除权限
+ */
+const disablePermission = async (row) => {
+  // 二次确认
+  const error = await ElMessageBox.confirm('确定删除吗？', '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 删除权限
+  await PermissionService.deletePermission({ permissionNo: row.permissionNo })
+  // 成功提示
+  ElMessage({ message: '删除权限成功', type: 'info', duration: 2 * 1000 })
+  // 重新查询列表
+  query()
+}
 
-    /**
-     * 打开编辑对话框
-     */
-    openModifyDialog(row) {
-      this.showModifyDialog = true
-      this.currentRow = row
-    },
+/**
+ * 打开编辑对话框
+ */
+const openModifyDialog = (row) => {
+  showModifyDialog.value = true
+  currentRow.value = row
+}
 
-    /**
-     * pagination handler
-     */
-    handleSizeChange(val) {
-      this.pageSize = val
-      this.query()
-    },
+/**
+ * pagination handler
+ */
+const handleSizeChange = (val) => {
+  pageSize.value = val
+  query()
+}
 
-    /**
-     * pagination handler
-     */
-    handleCurrentChange(val) {
-      this.page = val
-      this.query()
-    }
-  }
+/**
+ * pagination handler
+ */
+const handleCurrentChange = (val) => {
+  page.value = val
+  query()
 }
 </script>
 

@@ -73,6 +73,7 @@
 </template>
 
 <script setup>
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { RoleState, RoleType } from '@/api/enum'
 import * as RoleService from '@/api/usercenter/role'
 import ConditionInput from '@/components/query-condition/ConditionInput.vue'
@@ -81,7 +82,7 @@ import useQueryConditions from '@/composables/useQueryConditions'
 import CreateDialog from './RoleCreateDialog.vue'
 import ModifyDialog from './RoleModifyDialog.vue'
 
-// 查询条件
+const router = useRouter()
 const { queryConditions, resetQueryConditions } = useQueryConditions({
   roleNo: '',
   roleName: '',
@@ -90,116 +91,102 @@ const { queryConditions, resetQueryConditions } = useQueryConditions({
   roleType: '',
   state: ''
 })
-</script>
+const tableData = ref([])
+const page = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+const currentRow = ref({})
+const showCreateDialog = ref(false)
+const showModifyDialog = ref(false)
 
-<script>
-export default {
-  name: 'Role',
-  data() {
-    return {
-      // 表格数据
-      tableData: [],
-      // 分页信息
-      page: 1,
-      pageSize: 10,
-      total: 0,
-      // 当前操作的行数据
-      currentRow: {},
-      // 对话框打开关闭标识
-      showCreateDialog: false,
-      showModifyDialog: false
+onMounted(() => {
+  query()
+})
+
+/**
+ * 查询
+ */
+const query = () => {
+  RoleService.queryRoleList({ ...queryConditions.value, page: page.value, pageSize: pageSize.value }).then(
+    (response) => {
+      tableData.value = response.result['data']
+      total.value = response.result['total']
     }
-  },
-  mounted() {
-    this.query()
-  },
-  methods: {
-    /**
-     * 查询
-     */
-    query() {
-      RoleService.queryRoleList({ ...this.queryConditions, page: this.page, pageSize: this.pageSize }).then(
-        (response) => {
-          this.tableData = response.result['data']
-          this.total = response.result['total']
-        }
-      )
-    },
+  )
+}
 
-    /**
-     * 修改角色状态
-     */
-    async modifyRoleState(row, state) {
-      const stateMsg = state === 'DISABLE' ? '禁用' : '启用'
-      // 二次确认
-      const error = await this.$confirm(`确定${stateMsg}吗？`, '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => false)
-        .catch(() => true)
-      if (error) return
-      // 修改角色状态
-      await RoleService.modifyRoleState({ roleNo: row.roleNo, state: state })
-      // 成功提示
-      this.$message({ message: `${stateMsg}角色成功`, type: 'info', duration: 2 * 1000 })
-      // 重新查询列表
-      this.query()
-    },
+/**
+ * 修改角色状态
+ */
+const modifyRoleState = async (row, state) => {
+  const stateMsg = state === 'DISABLE' ? '禁用' : '启用'
+  // 二次确认
+  const error = await ElMessageBox.confirm(`确定${stateMsg}吗？`, '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 修改角色状态
+  await RoleService.modifyRoleState({ roleNo: row.roleNo, state: state })
+  // 成功提示
+  ElMessage({ message: `${stateMsg}角色成功`, type: 'info', duration: 2 * 1000 })
+  // 重新查询列表
+  query()
+}
 
-    /**
-     * 删除角色
-     */
-    async deleteRole(row) {
-      // 二次确认
-      const error = await this.$confirm('确定删除吗？', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => false)
-        .catch(() => true)
-      if (error) return
-      // 删除角色
-      await RoleService.deleteRole({ roleNo: row.roleNo })
-      // 成功提示
-      this.$message({ message: '删除角色成功', type: 'info', duration: 2 * 1000 })
-      // 重新查询列表
-      this.query()
-    },
+/**
+ * 删除角色
+ */
+const deleteRole = async (row) => {
+  // 二次确认
+  const error = await ElMessageBox.confirm('确定删除吗？', '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 删除角色
+  await RoleService.deleteRole({ roleNo: row.roleNo })
+  // 成功提示
+  ElMessage({ message: '删除角色成功', type: 'info', duration: 2 * 1000 })
+  // 重新查询列表
+  query()
+}
 
-    /**
-     * 打开编辑对话框
-     */
-    openModifyDialog(row) {
-      this.showModifyDialog = true
-      this.currentRow = row
-    },
+/**
+ * 打开编辑对话框
+ */
+const openModifyDialog = (row) => {
+  showModifyDialog.value = true
+  currentRow.value = row
+}
 
-    /**
-     * 跳转至角色权限管理页
-     */
-    gotoPermissionManager({ roleNo }) {
-      this.$router.push({ path: 'role/permissions', query: { roleNo: roleNo } })
-    },
+/**
+ * 跳转至角色权限管理页
+ */
+const gotoPermissionManager = ({ roleNo }) => {
+  router.push({ path: 'role/permissions', query: { roleNo: roleNo } })
+}
 
-    /**
-     * pagination handler
-     */
-    handleSizeChange(val) {
-      this.pageSize = val
-      this.query()
-    },
+/**
+ * pagination handler
+ */
+const handleSizeChange = (val) => {
+  pageSize.value = val
+  query()
+}
 
-    /**
-     * pagination handler
-     */
-    handleCurrentChange(val) {
-      this.page = val
-      this.query()
-    }
-  }
+/**
+ * pagination handler
+ */
+const handleCurrentChange = (val) => {
+  page.value = val
+  query()
 }
 </script>
 
