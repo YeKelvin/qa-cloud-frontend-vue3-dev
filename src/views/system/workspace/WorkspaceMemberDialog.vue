@@ -45,13 +45,10 @@ const users = computed(() => {
   return data
 })
 
-watch(
-  () => props.row,
-  () => {
-    queryUserAll()
-    queryWorkspaceUserAll()
-  }
-)
+onMounted(() => {
+  queryUserAll()
+  queryWorkspaceUserAll()
+})
 
 /**
  * 查询所有用户

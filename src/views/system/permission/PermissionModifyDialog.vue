@@ -53,13 +53,9 @@ const formRules = reactive({
   endpoint: [{ required: true, message: '请求路由不能为空', trigger: 'blur' }]
 })
 
-watch(
-  () => props.row,
-  (val) => {
-    if (!val) return
-    formData.value = val
-  }
-)
+onMounted(() => {
+  formData.value = props.row
+})
 
 /**
  * 提交表单

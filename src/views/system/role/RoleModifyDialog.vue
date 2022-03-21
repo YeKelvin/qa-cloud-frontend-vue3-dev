@@ -50,13 +50,9 @@ const formRules = reactive({
   roleRank: [{ required: true, message: '角色等级不能为空', trigger: 'blur' }]
 })
 
-watch(
-  () => props.row,
-  (val) => {
-    if (!val) return
-    formData.value = val
-  }
-)
+onMounted(() => {
+  formData.value = props.row
+})
 
 /**
  * 提交表单

@@ -55,18 +55,11 @@ const formRules = reactive({
 })
 const roleList = ref([])
 
-watch(
-  () => props.row,
-  (val) => {
-    if (!val) return
-    // 除 roles 属性外其余赋值给 form
-    formData.value = _omit(val, ['roles'])
-    // 提取 roleNo
-    formData.value.roleNumberList = props.row.roles.map((item) => item.roleNo)
-  }
-)
-
 onMounted(() => {
+  // 除 roles 属性外其余赋值给 form
+  formData.value = _omit(props.row, ['roles'])
+  // 提取 roleNo
+  formData.value.roleNumberList = props.row.roles.map((item) => item.roleNo)
   // 查询所有角色
   RoleService.queryRoleAll().then((response) => {
     roleList.value = response.result

@@ -49,13 +49,9 @@ const formRules = reactive({
   workspaceScope: [{ required: true, message: '工作空间作用域不能为空', trigger: 'blur' }]
 })
 
-watch(
-  () => props.row,
-  (val) => {
-    if (!val) return
-    formData.value = val
-  }
-)
+onMounted(() => {
+  formData.value = props.row
+})
 
 /**
  * 提交表单
