@@ -6,7 +6,7 @@
     </div>
 
     <div class="three-column-flexbox" style="justify-content: center">
-      <WorkspaceSelect />
+      <WorkspaceSelect v-show="displayWorkspaceRoute.includes($route.path)" />
     </div>
 
     <div class="three-column-flexbox right-menu" style="justify-content: flex-end">
@@ -46,6 +46,11 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'Navbar',
+  data() {
+    return {
+      displayWorkspaceRoute: ['/script/editor', '/script/testplan', '/system/workspace']
+    }
+  },
   computed: {
     ...mapGetters(['sidebar', 'avatar', 'device'])
   },

@@ -96,7 +96,7 @@ onMounted(() => {
  * 查询
  */
 const query = () => {
-  WorkspaceService.queryWorkspaceList({ ...queryConditions.value, page: page.value, pageSize: pageSize.value }).then(
+  WorkspaceService.queryWorkspaceList({ ...queryConditions, page: page.value, pageSize: pageSize.value }).then(
     (response) => {
       tableData.value = response.result['data']
       total.value = response.result['total']

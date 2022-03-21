@@ -103,7 +103,7 @@ onMounted(() => {
  * 查询
  */
 const query = () => {
-  PermissionService.queryPermissionList({ ...queryConditions.value, page: page.value, pageSize: pageSize.value }).then(
+  PermissionService.queryPermissionList({ ...queryConditions, page: page.value, pageSize: pageSize.value }).then(
     (response) => {
       tableData.value = response.result['data']
       total.value = response.result['total']

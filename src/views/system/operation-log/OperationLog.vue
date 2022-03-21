@@ -71,12 +71,10 @@ const total = ref(0)
  * 查询
  */
 const query = () => {
-  LogService.queryActionLogList({ ...queryConditions.value, page: page.value, pageSize: pageSize.value }).then(
-    (response) => {
-      tableData.value = response.result['data']
-      total.value = response.result['total']
-    }
-  )
+  LogService.queryActionLogList({ ...queryConditions, page: page.value, pageSize: pageSize.value }).then((response) => {
+    tableData.value = response.result['data']
+    total.value = response.result['total']
+  })
 }
 
 /**

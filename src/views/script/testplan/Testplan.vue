@@ -188,7 +188,7 @@ onBeforeUpdate(() => {
  */
 const queryList = () => {
   TestplanService.queryTestplanList({
-    ...queryConditions.value,
+    ...queryConditions,
     workspaceNo: workspaceNo.value,
     page: page.value,
     pageSize: pageSize.value

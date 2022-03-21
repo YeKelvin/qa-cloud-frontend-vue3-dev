@@ -1,9 +1,6 @@
 import { createApp } from 'vue'
 import App from './App'
 
-// 全局样式
-import '@/styles/index.scss'
-
 // vue-store
 import Store from './store'
 
@@ -29,6 +26,9 @@ import DayJs from 'dayjs'
 
 // socket-io
 import SocketIO from '@/plugins/socketio'
+
+// 全局样式
+import '@/styles/index.scss'
 
 // 创建 vue 实例
 const app = createApp(App)

@@ -111,12 +111,10 @@ onMounted(() => {
  * 查询
  */
 const query = () => {
-  UserService.queryUserList({ ...queryConditions.value, page: page.value, pageSize: pageSize.value }).then(
-    (response) => {
-      tableData.value = response.result['data']
-      total.value = response.result['total']
-    }
-  )
+  UserService.queryUserList({ ...queryConditions, page: page.value, pageSize: pageSize.value }).then((response) => {
+    tableData.value = response.result['data']
+    total.value = response.result['total']
+  })
 }
 
 /**
