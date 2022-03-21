@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="编辑用户" width="50%" center>
+  <el-dialog title="编辑用户" width="50%" center @close="$emit('update:model-value', false)">
     <el-form
       ref="elformRef"
       label-width="100px"
