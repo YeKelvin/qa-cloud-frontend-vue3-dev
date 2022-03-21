@@ -107,12 +107,10 @@ onMounted(() => {
  * 查询
  */
 const query = () => {
-  RoleService.queryRoleList({ ...queryConditions, page: page.value, pageSize: pageSize.value }).then(
-    (response) => {
-      tableData.value = response.result['data']
-      total.value = response.result['total']
-    }
-  )
+  RoleService.queryRoleList({ ...queryConditions, page: page.value, pageSize: pageSize.value }).then((response) => {
+    tableData.value = response.result['data']
+    total.value = response.result['total']
+  })
 }
 
 /**

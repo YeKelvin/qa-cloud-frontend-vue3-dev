@@ -22,76 +22,69 @@
   </el-dialog>
 </template>
 
-<script>
+<script setup>
+import { ElMessage } from 'element-plus'
 import * as UserService from '@/api/usercenter/user'
 import * as WorkspaceService from '@/api/public/workspace'
 
-export default {
-  name: 'WorkspaceMemberDialog',
-  props: {
-    row: { type: Object, default: () => ({}) }
-  },
-  emits: ['update:model-value', 're-query'],
-  data() {
-    return {
-      userList: [],
-      memberList: []
-    }
-  },
-  computed: {
-    users() {
-      const data = []
-      this.userList.forEach((item) => {
-        data.push({
-          key: item.userNo,
-          label: item.userName,
-          disabled: item.state !== 'ENABLE'
-        })
-      })
-      return data
-    }
-  },
-  watch: {
-    row() {
-      this.queryUserAll()
-      this.queryWorkspaceUserAll()
-    }
-  },
-  methods: {
-    /**
-     * 查询所有用户
-     */
-    queryUserAll() {
-      UserService.queryUserAll().then((response) => {
-        this.userList = response.result
-      })
-    },
+const emit = defineEmits(['update:model-value', 're-query'])
+const props = defineProps({
+  row: { type: Object, default: () => ({}) }
+})
+const userList = ref([])
+const memberList = ref([])
+const users = computed(() => {
+  const data = []
+  userList.value.forEach((item) => {
+    data.push({
+      key: item.userNo,
+      label: item.userName,
+      disabled: item.state !== 'ENABLE'
+    })
+  })
+  return data
+})
 
-    /**
-     * 查询所有空间
-     */
-    queryWorkspaceUserAll() {
-      WorkspaceService.queryWorkspaceUserAll({ workspaceNo: this.row.workspaceNo }).then((response) => {
-        this.memberList = response.result.map((item) => item.userNo)
-      })
-    },
-
-    /**
-     * 修改空间成员
-     */
-    save() {
-      WorkspaceService.modifyWorkspaceUser({ workspaceNo: this.row.workspaceNo, userNumberList: this.memberList }).then(
-        () => {
-          // 成功提示
-          this.$message({ message: '编辑成功', type: 'info', duration: 2 * 1000 })
-          // 关闭dialog
-          this.$emit('update:model-value', false)
-          // 重新查询列表
-          this.$emit('re-query')
-        }
-      )
-    }
+watch(
+  () => props.row,
+  () => {
+    queryUserAll()
+    queryWorkspaceUserAll()
   }
+)
+
+/**
+ * 查询所有用户
+ */
+const queryUserAll = () => {
+  UserService.queryUserAll().then((response) => {
+    userList.value = response.result
+  })
+}
+
+/**
+ * 查询所有空间
+ */
+const queryWorkspaceUserAll = () => {
+  WorkspaceService.queryWorkspaceUserAll({ workspaceNo: props.row.workspaceNo }).then((response) => {
+    memberList.value = response.result.map((item) => item.userNo)
+  })
+}
+
+/**
+ * 修改空间成员
+ */
+const save = () => {
+  WorkspaceService.modifyWorkspaceUser({ workspaceNo: props.row.workspaceNo, userNumberList: memberList.value }).then(
+    () => {
+      // 成功提示
+      ElMessage({ message: '编辑成功', type: 'info', duration: 2 * 1000 })
+      // 关闭dialog
+      emit('update:model-value', false)
+      // 重新查询列表
+      emit('re-query')
+    }
+  )
 }
 </script>
 
