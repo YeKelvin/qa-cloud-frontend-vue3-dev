@@ -69,198 +69,169 @@
     </div>
 
     <div style="display: flex; justify-content: center; align-items: center">
-      <el-button type="primary" style="margin-bottom: 20px" @click="goBack">返回</el-button>
+      <el-button type="primary" style="margin-bottom: 20px" @click="goBack()">返回</el-button>
     </div>
   </div>
 </template>
 
 <script setup>
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { HttpMethods } from '@/api/enum'
 import * as RoleService from '@/api/usercenter/role'
 import ConditionInput from '@/components/query-condition/ConditionInput.vue'
 import ConditionSelect from '@/components/query-condition/ConditionSelect.vue'
 import useQueryConditions from '@/composables/useQueryConditions'
 
-// 查询条件
+const route = useRoute()
+const router = useRouter()
 const { queryConditions, resetQueryConditions } = useQueryConditions({
   permissionNo: '',
   permissionName: '',
   endpoint: '',
   method: ''
 })
-</script>
+const roleNo = ref(route.query.roleNo)
+const roleInfo = ref({})
+const tableData = ref([])
+const page = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+const multipleSelection = ref([])
+const editMode = ref('QUERY')
+const queryMode = computed(() => editMode.value === 'QUERY')
+const createMode = computed(() => editMode.value === 'CREATE')
+const deleteMode = computed(() => editMode.value === 'DELETE')
+const modifyMode = computed(() => createMode.value || deleteMode.value)
 
-<script>
-export default {
-  name: 'RolePermissions',
-  data() {
-    return {
-      roleNo: this.$route.query.roleNo,
-      roleInfo: {},
-      // 表格数据
-      tableData: [],
-      // 分页信息
-      page: 1,
-      pageSize: 10,
-      total: 0,
-      // 对话框打开关闭标识
-      showCreateDialog: false,
-      // 多选数据
-      multipleSelection: [],
-      // 编辑模式
-      editMode: 'QUERY'
-    }
-  },
+watch(editMode, () => {
+  page.value = 1
+  query()
+})
 
-  computed: {
-    queryMode() {
-      return this.editMode === 'QUERY'
-    },
-    createMode() {
-      return this.editMode === 'CREATE'
-    },
-    deleteMode() {
-      return this.editMode === 'DELETE'
-    },
-    modifyMode() {
-      return this.createMode || this.deleteMode
-    }
-  },
+onMounted(() => {
+  queryRoleData()
+  query()
+})
 
-  watch: {
-    editMode() {
-      this.page = 1
-      this.query()
-    }
-  },
-
-  mounted() {
-    this.queryRoleData()
-    this.query()
-  },
-
-  methods: {
-    /**
-     * 查询
-     */
-    query() {
-      if (this.createMode) {
-        RoleService.queryRolePermissionUnboundList({
-          ...this.queryConditions,
-          roleNo: this.roleNo,
-          page: this.page,
-          pageSize: this.pageSize
-        }).then((response) => {
-          this.tableData = response.result['data']
-          this.total = response.result['total']
-        })
-      } else {
-        RoleService.queryRolePermissionList({
-          ...this.queryConditions,
-          roleNo: this.roleNo,
-          page: this.page,
-          pageSize: this.pageSize
-        }).then((response) => {
-          this.tableData = response.result['data']
-          this.total = response.result['total']
-        })
-      }
-    },
-
-    /**
-     * 查询角色信息
-     */
-    queryRoleData() {
-      RoleService.queryRoleInfo({ roleNo: this.roleNo }).then((response) => {
-        this.roleInfo = response.result
-      })
-    },
-
-    /**
-     * 删除角色权限
-     */
-    deletePermission({ roleNo, permissionNo }) {
-      this.$confirm('确定删除吗？', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        RoleService.deleteRolePermission({ roleNo: roleNo, permissionNo: permissionNo }).then(() => {
-          this.$message({ message: '删除成功', type: 'info', duration: 2 * 1000 })
-          // 重新查询列表
-          this.query()
-        })
-      })
-    },
-
-    /**
-     * 批量创建角色权限
-     */
-    createPermissions() {
-      if (this.multipleSelection.length === 0) {
-        this.$message({ message: '请先勾选权限', type: 'error', duration: 2 * 1000 })
-        return
-      }
-      RoleService.createRolePermissions({
-        roleNo: this.roleNo,
-        permissionNumberList: this.multipleSelection.map((item) => item.permissionNo)
-      }).then(() => {
-        // 成功提示
-        this.$message({ message: '批量新增成功', type: 'info', duration: 2 * 1000 })
-        // 设置为查询模式
-        this.editMode = 'QUERY'
-      })
-    },
-
-    /**
-     * 批量删除角色权限
-     */
-    deletePermissions() {
-      if (this.multipleSelection.length === 0) {
-        this.$message({ message: '请先勾选权限', type: 'error', duration: 2 * 1000 })
-        return
-      }
-      RoleService.deleteRolePermissions({
-        roleNo: this.roleNo,
-        permissionNumberList: this.multipleSelection.map((item) => item.permissionNo)
-      }).then(() => {
-        // 成功提示
-        this.$message({ message: '批量删除成功', type: 'info', duration: 2 * 1000 })
-        // 设置为查询模式
-        this.editMode = 'QUERY'
-      })
-    },
-
-    /**
-     * 返回上一页
-     */
-    goBack() {
-      window.history.length > 1 ? this.$router.go(-1) : this.$router.push('/')
-    },
-
-    /**
-     * table handler
-     */
-    handleSelectionChange(val) {
-      this.multipleSelection = val
-    },
-
-    /**
-     * pagination handler
-     */
-    handleSizeChange(val) {
-      this.pageSize = val
-      this.query()
-    },
-
-    /**
-     * pagination handler
-     */
-    handleCurrentChange(val) {
-      this.page = val
-      this.query()
-    }
+/**
+ * 查询
+ */
+const query = () => {
+  if (createMode.value) {
+    RoleService.queryRolePermissionUnboundList({
+      ...queryConditions,
+      roleNo: roleNo.value,
+      page: page.value,
+      pageSize: pageSize.value
+    }).then((response) => {
+      tableData.value = response.result['data']
+      total.value = response.result['total']
+    })
+  } else {
+    RoleService.queryRolePermissionList({
+      ...queryConditions,
+      roleNo: roleNo.value,
+      page: page.value,
+      pageSize: pageSize.value
+    }).then((response) => {
+      tableData.value = response.result['data']
+      total.value = response.result['total']
+    })
   }
+}
+
+/**
+ * 查询角色信息
+ */
+const queryRoleData = () => {
+  RoleService.queryRoleInfo({ roleNo: roleNo.value }).then((response) => {
+    roleInfo.value = response.result
+  })
+}
+
+/**
+ * 删除角色权限
+ */
+const deletePermission = ({ roleNo, permissionNo }) => {
+  ElMessageBox.confirm('确定删除吗？', '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    RoleService.deleteRolePermission({ roleNo: roleNo, permissionNo: permissionNo }).then(() => {
+      ElMessage({ message: '删除成功', type: 'info', duration: 2 * 1000 })
+      // 重新查询列表
+      query()
+    })
+  })
+}
+
+/**
+ * 批量创建角色权限
+ */
+const createPermissions = () => {
+  if (multipleSelection.value.length === 0) {
+    ElMessage({ message: '请先勾选权限', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  RoleService.createRolePermissions({
+    roleNo: roleNo.value,
+    permissionNumberList: multipleSelection.value.map((item) => item.permissionNo)
+  }).then(() => {
+    // 成功提示
+    ElMessage({ message: '批量新增成功', type: 'info', duration: 2 * 1000 })
+    // 设置为查询模式
+    editMode.value = 'QUERY'
+  })
+}
+
+/**
+ * 批量删除角色权限
+ */
+const deletePermissions = () => {
+  if (multipleSelection.value.length === 0) {
+    ElMessage({ message: '请先勾选权限', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  RoleService.deleteRolePermissions({
+    roleNo: roleNo.value,
+    permissionNumberList: multipleSelection.value.map((item) => item.permissionNo)
+  }).then(() => {
+    // 成功提示
+    ElMessage({ message: '批量删除成功', type: 'info', duration: 2 * 1000 })
+    // 设置为查询模式
+    editMode.value = 'QUERY'
+  })
+}
+
+/**
+ * 返回上一页
+ */
+const goBack = () => {
+  window.history.length > 1 ? router.go(-1) : router.push('/')
+}
+
+/**
+ * table handler
+ */
+const handleSelectionChange = (val) => {
+  multipleSelection.value = val
+}
+
+/**
+ * pagination handler
+ */
+const handleSizeChange = (val) => {
+  pageSize.value = val
+  query()
+}
+
+/**
+ * pagination handler
+ */
+const handleCurrentChange = (val) => {
+  page.value = val
+  query()
 }
 </script>
 
