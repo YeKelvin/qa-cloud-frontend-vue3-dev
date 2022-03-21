@@ -66,9 +66,9 @@
     </div>
 
     <!-- 创建角色表单 -->
-    <CreateDialog v-model="showCreateDialog" destroy-on-close @re-query="query" />
+    <CreateDialog v-if="showCreateDialog" v-model="showCreateDialog" @re-query="query" />
     <!-- 编辑角色表单 -->
-    <ModifyDialog v-model="showModifyDialog" destroy-on-close :row="currentRow" @re-query="query" />
+    <ModifyDialog v-if="showModifyDialog" v-model="showModifyDialog" :row="currentRow" @re-query="query" />
   </div>
 </template>
 

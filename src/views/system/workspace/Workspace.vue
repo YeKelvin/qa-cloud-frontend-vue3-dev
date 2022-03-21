@@ -55,15 +55,16 @@
     </div>
 
     <!-- 创建空间表单 -->
-    <CreateDialog v-model="showCreateDialog" destroy-on-close @re-query="query" />
+    <CreateDialog v-if="showCreateDialog" v-model="showCreateDialog" @re-query="query" />
     <!-- 编辑空间表单 -->
-    <ModifyDialog v-model="showModifyDialog" destroy-on-close :row="currentRow" @re-query="query" />
+    <ModifyDialog v-if="showModifyDialog" v-model="showModifyDialog" :row="currentRow" @re-query="query" />
     <!-- 空间成员管理列表 -->
-    <MemberDialog v-model="showMemberDialog" destroy-on-close :row="currentRow" @re-query="query" />
+    <MemberDialog v-if="showMemberDialog" v-model="showMemberDialog" :row="currentRow" @re-query="query" />
   </div>
 </template>
 
 <script setup>
+import { ElMessage, ElMessageBox } from 'element-plus'
 import * as WorkspaceService from '@/api/public/workspace'
 import ConditionInput from '@/components/query-condition/ConditionInput.vue'
 import useQueryConditions from '@/composables/useQueryConditions'
@@ -78,96 +79,82 @@ const { queryConditions, resetQueryConditions } = useQueryConditions({
   workspaceScope: '',
   workspaceDesc: ''
 })
-</script>
+const tableData = ref([])
+const page = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+const currentRow = ref({})
+const showCreateDialog = ref(false)
+const showModifyDialog = ref(false)
+const showMemberDialog = ref(false)
 
-<script>
-export default {
-  name: 'Workspace',
-  data() {
-    return {
-      // 表格数据
-      tableData: [],
-      // 分页信息
-      page: 1,
-      pageSize: 10,
-      total: 0,
-      // 当前操作的行数据
-      currentRow: {},
-      // 对话框打开关闭标识
-      showCreateDialog: false,
-      showModifyDialog: false,
-      showMemberDialog: false
+onMounted(() => {
+  query()
+})
+
+/**
+ * 查询
+ */
+const query = () => {
+  WorkspaceService.queryWorkspaceList({ ...queryConditions.value, page: page.value, pageSize: pageSize.value }).then(
+    (response) => {
+      tableData.value = response.result['data']
+      total.value = response.result['total']
     }
-  },
-  mounted() {
-    this.query()
-  },
-  methods: {
-    /**
-     * 查询
-     */
-    query() {
-      WorkspaceService.queryWorkspaceList({ ...this.queryConditions, page: this.page, pageSize: this.pageSize }).then(
-        (response) => {
-          this.tableData = response.result['data']
-          this.total = response.result['total']
-        }
-      )
-    },
+  )
+}
 
-    /**
-     * 删除空间
-     */
-    async deleteWorkspace(row) {
-      // 二次确认
-      const error = await this.$confirm('确定删除吗?', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => false)
-        .catch(() => true)
-      if (error) return
-      // 删除空间
-      await WorkspaceService.deleteWorkspace({ workspaceNo: row.workspaceNo })
-      // 成功提示
-      this.$message({ message: '删除工作空间成功', type: 'info', duration: 2 * 1000 })
-      // 重新查询列表
-      this.query()
-    },
+/**
+ * 删除空间
+ */
+const deleteWorkspace = async (row) => {
+  // 二次确认
+  const error = await ElMessageBox.confirm('确定删除吗?', '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 删除空间
+  await WorkspaceService.deleteWorkspace({ workspaceNo: row.workspaceNo })
+  // 成功提示
+  ElMessage({ message: '删除工作空间成功', type: 'info', duration: 2 * 1000 })
+  // 重新查询列表
+  query()
+}
 
-    /**
-     * 打开编辑对话框
-     */
-    openModifyDialog(row) {
-      this.showModifyDialog = true
-      this.currentRow = row
-    },
+/**
+ * 打开编辑对话框
+ */
+const openModifyDialog = (row) => {
+  showModifyDialog.value = true
+  currentRow.value = row
+}
 
-    /**
-     * 打开成员管理对话框
-     */
-    openMemberDialog(row) {
-      this.showMemberDialog = true
-      this.currentRow = row
-    },
+/**
+ * 打开成员管理对话框
+ */
+const openMemberDialog = (row) => {
+  showMemberDialog.value = true
+  currentRow.value = row
+}
 
-    /**
-     * pagination handler
-     */
-    handleSizeChange(val) {
-      this.pageSize = val
-      this.query()
-    },
+/**
+ * pagination handler
+ */
+const handleSizeChange = (val) => {
+  pageSize.value = val
+  query()
+}
 
-    /**
-     * pagination handler
-     */
-    handleCurrentChange(val) {
-      this.page = val
-      this.query()
-    }
-  }
+/**
+ * pagination handler
+ */
+const handleCurrentChange = (val) => {
+  page.value = val
+  query()
 }
 </script>
 

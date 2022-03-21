@@ -69,13 +69,14 @@
     </div>
 
     <!-- 创建用户表单 -->
-    <CreateDialog v-model="showCreateDialog" destroy-on-close @re-query="query" />
+    <CreateDialog v-if="showCreateDialog" v-model="showCreateDialog" @re-query="query" />
     <!-- 编辑用户表单 -->
-    <ModifyDialog v-model="showModifyDialog" destroy-on-close :row="currentRow" @re-query="query" />
+    <ModifyDialog v-if="showModifyDialog" v-model="showModifyDialog" :row="currentRow" @re-query="query" />
   </div>
 </template>
 
 <script setup>
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { UserState } from '@/api/enum'
 import * as UserService from '@/api/usercenter/user'
 import ConditionInput from '@/components/query-condition/ConditionInput.vue'
@@ -94,128 +95,114 @@ const { queryConditions, resetQueryConditions } = useQueryConditions({
   state: '',
   roles: []
 })
-</script>
+const tableData = ref([])
+const page = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+const currentRow = ref({})
+const showCreateDialog = ref(false)
+const showModifyDialog = ref(false)
 
-<script>
-export default {
-  name: 'User',
-  data() {
-    return {
-      // 表格数据
-      tableData: [],
-      // 分页信息
-      page: 1,
-      pageSize: 10,
-      total: 0,
-      // 当前操作的行数据
-      currentRow: {},
-      // 对话框打开关闭标识
-      showCreateDialog: false,
-      showModifyDialog: false
+onMounted(() => {
+  query()
+})
+
+/**
+ * 查询
+ */
+const query = () => {
+  UserService.queryUserList({ ...queryConditions.value, page: page.value, pageSize: pageSize.value }).then(
+    (response) => {
+      tableData.value = response.result['data']
+      total.value = response.result['total']
     }
-  },
-  mounted() {
-    this.query()
-  },
-  methods: {
-    /**
-     * 查询
-     */
-    query() {
-      UserService.queryUserList({ ...this.queryConditions, page: this.page, pageSize: this.pageSize }).then(
-        (response) => {
-          this.tableData = response.result['data']
-          this.total = response.result['total']
-        }
-      )
-    },
+  )
+}
 
-    /**
-     * 修改用户状态
-     */
-    async modifyUserState(row, state) {
-      const message = state === 'DISABLE' ? '禁用' : '启用'
-      // 二次确认
-      const error = await this.$confirm(`确定${message}吗？`, '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => false)
-        .catch(() => true)
-      if (error) return
-      // 修改用户状态
-      await UserService.modifyUserState({ userNo: row.userNo, state: state })
-      // 成功提示
-      this.$message({ message: `${message}成功`, type: 'info', duration: 2 * 1000 })
-      // 重新查询列表
-      this.query()
-    },
+/**
+ * 修改用户状态
+ */
+const modifyUserState = async (row, state) => {
+  const message = state === 'DISABLE' ? '禁用' : '启用'
+  // 二次确认
+  const error = await ElMessageBox.confirm(`确定${message}吗？`, '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 修改用户状态
+  await UserService.modifyUserState({ userNo: row.userNo, state: state })
+  // 成功提示
+  ElMessage({ message: `${message}成功`, type: 'info', duration: 2 * 1000 })
+  // 重新查询列表
+  query()
+}
 
-    /**
-     * 重置用户密码
-     */
-    async resetPassword(row) {
-      // 二次确认
-      const error = await this.$confirm('确定重置密码吗？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => false)
-        .catch(() => true)
-      if (error) return
-      // 重置用户密码
-      await UserService.resetPassword({ userNo: row.userNo })
-      // 成功提示
-      this.$message({ message: '重置用户密码成功', type: 'info', duration: 2 * 1000 })
-    },
+/**
+ * 重置用户密码
+ */
+const resetPassword = async (row) => {
+  // 二次确认
+  const error = await ElMessageBox.confirm('确定重置密码吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 重置用户密码
+  await UserService.resetPassword({ userNo: row.userNo })
+  // 成功提示
+  ElMessage({ message: '重置用户密码成功', type: 'info', duration: 2 * 1000 })
+}
 
-    /**
-     * 删除用户
-     */
-    async deleteUser(row) {
-      // 二次确认
-      const error = await this.$confirm('确定删除吗？', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => false)
-        .catch(() => true)
-      if (error) return
-      // 删除用户
-      await UserService.deleteUser({ userNo: row.userNo })
-      // 成功提示
-      this.$message({ message: '删除用户成功', type: 'info', duration: 2 * 1000 })
-      // 重新查询列表
-      this.query()
-    },
+/**
+ * 删除用户
+ */
+const deleteUser = async (row) => {
+  // 二次确认
+  const error = await ElMessageBox.confirm('确定删除吗？', '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 删除用户
+  await UserService.deleteUser({ userNo: row.userNo })
+  // 成功提示
+  ElMessage({ message: '删除用户成功', type: 'info', duration: 2 * 1000 })
+  // 重新查询列表
+  query()
+}
 
-    /**
-     * 打开编辑对话框
-     */
-    openModifyDialog(row) {
-      this.showModifyDialog = true
-      this.currentRow = row
-    },
+/**
+ * 打开编辑对话框
+ */
+const openModifyDialog = (row) => {
+  showModifyDialog.value = true
+  currentRow.value = row
+}
 
-    /**
-     * pagination handler
-     */
-    handleSizeChange(val) {
-      this.pageSize = val
-      this.query()
-    },
+/**
+ * pagination handler
+ */
+const handleSizeChange = (val) => {
+  pageSize.value = val
+  query()
+}
 
-    /**
-     * pagination handler
-     */
-    handleCurrentChange(val) {
-      this.page = val
-      this.query()
-    }
-  }
+/**
+ * pagination handler
+ */
+const handleCurrentChange = (val) => {
+  page.value = val
+  query()
 }
 </script>
 

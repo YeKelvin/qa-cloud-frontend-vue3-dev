@@ -47,7 +47,6 @@ export default ({ mode }) =>
           entryFileNames: 'static/js/[name].[hash].js',
           assetFileNames: 'static/[ext]/[name].[hash].[ext]',
           manualChunks: {
-            vue: ['vue', 'vuex', 'vue-router'],
             echarts: ['echarts'],
             jsonWorker: ['monaco-editor/esm/vs/language/json/json.worker'],
             // cssWorker: ['monaco-editor/esm/vs/language/css/css.worker'],
