@@ -5,7 +5,7 @@
       <div class="conditions-container">
         <ConditionInput v-model="queryConditions.roleNo" label="角色编号" />
         <ConditionInput v-model="queryConditions.roleName" label="角色名称" />
-        <ConditionInput v-model="queryConditions.roleCode" label="角色名称" />
+        <ConditionInput v-model="queryConditions.roleCode" label="角色代码" />
         <ConditionInput v-model="queryConditions.roleDesc" label="角色备注" />
         <ConditionSelect v-model="queryConditions.state" :options="RoleState" label="角色状态" />
       </div>
