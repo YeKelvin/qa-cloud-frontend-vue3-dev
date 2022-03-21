@@ -6,7 +6,9 @@
     </div>
 
     <div class="three-column-flexbox" style="justify-content: center">
-      <WorkspaceSelect v-show="displayWorkspaceRoute.includes($route.path)" />
+      <span v-show="displayWorkspaceRoute.includes($route.path)">
+        <WorkspaceSelect />
+      </span>
     </div>
 
     <div class="three-column-flexbox right-menu" style="justify-content: flex-end">
