@@ -36,6 +36,7 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <!-- 删除按钮 -->
+                <el-dropdown-item @click="renameDataset(data)">重命名</el-dropdown-item>
                 <el-dropdown-item @click="duplicateDataset(data)">复制</el-dropdown-item>
                 <el-dropdown-item @click="copyDatasetToWorkspace(data)">复制到空间</el-dropdown-item>
                 <el-dropdown-item @click="moveDatasetToWorkspace(data)">移动到空间</el-dropdown-item>
@@ -56,12 +57,34 @@ import * as VariablesService from '@/api/script/variables'
 import useElTree from '@/composables/useElTree'
 import useWorkspaceState from '@/composables/useWorkspaceState'
 import usePyMeterState from '@/pymeter/composables/usePyMeterState'
+import NameInput from '@/pymeter/components/editor-aside/common/NameInput.vue'
 import WorkspaceTree from '@/pymeter/components/editor-aside/common/WorkspaceTree.vue'
 
 const { eltreeRef, hoveredNode, mouseenter, mouseleave, visibleChange } = useElTree()
 const { datasetList } = usePyMeterState()
 const { workspaceList } = useWorkspaceState()
 const store = useStore()
+
+/**
+ * 重命名变量集
+ */
+const renameDataset = async ({ datasetNo, datasetName }) => {
+  let newName = datasetName
+  // 弹出选择空间的对话框
+  const error = await ElMessageBox.confirm(null, {
+    title: '重命名变量集',
+    message: <NameInput initial={newName} onUpdate:modelValue={(val) => (newName = val)} />,
+    confirmButtonText: '确定',
+    cancelButtonText: '取消'
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 修改变量集
+  await VariablesService.modifyVariableDataset({ datasetNo: datasetNo, datasetName: newName })
+  // 成功提示
+  ElMessage({ message: '修改成功', type: 'info', duration: 2 * 1000 })
+}
 
 /**
  * 复制变量集

@@ -1,5 +1,5 @@
 <template>
-  <el-tree ref="tree" highlight-current :props="{ label: 'workspaceName' }" v-bind="$attrs">
+  <el-tree ref="tree" highlight-current :props="{ label: 'workspaceName' }">
     <template #default="{ node, data }">
       <!-- 空间名称 -->
       <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ node.label }}</span>
