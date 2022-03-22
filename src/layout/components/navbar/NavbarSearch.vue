@@ -4,15 +4,19 @@
     <el-select
       ref="headerSearchSelect"
       v-model="search"
-      :remote-method="querySearch"
+      remote
       filterable
       default-first-option
-      remote
-      placeholder="Search"
       class="header-search-select"
+      :remote-method="querySearch"
       @change="change"
     >
-      <el-option v-for="item in options" :key="item.path" :value="item" :label="item.title.join(' > ')" />
+      <el-option
+        v-for="option in options"
+        :key="option.item.path"
+        :value="option.item"
+        :label="option.item.title.join(' > ')"
+      />
     </el-select>
   </div>
 </template>
@@ -156,17 +160,17 @@ export default {
 
   .header-search-select {
     font-size: 18px;
-    transition: width 0.2s;
     width: 0;
+    transition: width 0.2s;
     overflow: hidden;
     background: transparent;
     border-radius: 0;
-    display: inline-block;
     vertical-align: middle;
 
     :deep(.el-input__inner) {
-      border-radius: 0;
+      --el-select-input-focus-border-color: #ffffff;
       border: 0;
+      border-radius: 0;
       padding-left: 0;
       padding-right: 0;
       box-shadow: none !important;
