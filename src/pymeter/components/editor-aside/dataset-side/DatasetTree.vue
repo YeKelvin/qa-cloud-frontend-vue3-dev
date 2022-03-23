@@ -84,6 +84,8 @@ const renameDataset = async ({ datasetNo, datasetName }) => {
   await VariablesService.modifyVariableDataset({ datasetNo: datasetNo, datasetName: newName })
   // 重新查询列表
   store.dispatch('pymeter/queryDatasetAll')
+  // 重命名tab
+  store.commit('pymeter/updateTab', { editorNo: datasetNo, editorName: newName })
   // 成功提示
   ElMessage({ message: '修改成功', type: 'info', duration: 2 * 1000 })
 }

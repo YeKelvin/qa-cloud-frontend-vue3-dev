@@ -80,6 +80,8 @@ const renameTemplate = async ({ templateNo, templateName }) => {
   await HeadersService.modifyHttpHeaderTemplate({ templateNo: templateNo, templateName: templateName })
   // 重新查询列表
   store.dispatch('pymeter/queryHttpHeaderTemplateAll')
+  // 重命名tab
+  store.commit('pymeter/updateTab', { editorNo: templateNo, editorName: newName })
   // 成功提示
   ElMessage({ message: '修改成功', type: 'info', duration: 2 * 1000 })
 }

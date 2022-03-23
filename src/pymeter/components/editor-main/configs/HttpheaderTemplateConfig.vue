@@ -2,24 +2,11 @@
   <div class="pymeter-component-container" style="padding-bottom: 40px">
     <!-- 模板名称和操作按钮 -->
     <div class="header-container">
-      <!-- 模板名称 -->
-      <el-form
-        ref="elformRef"
-        label-position="right"
-        label-width="100px"
-        style="flex-grow: 1; margin-right: 10px"
-        inline-message
-        :model="templateForm"
-        :rules="templateFormRules"
-      >
-        <el-form-item label="模板名称：" prop="templateName">
-          <span v-if="queryMode">{{ templateForm.templateName }}</span>
-          <el-input v-else v-model="templateForm.templateName" placeholder="请输入模板名称" clearable />
-        </el-form-item>
-      </el-form>
+      <!-- 搜索 -->
+      <el-input v-model="filterText" placeholder="请输入" style="margin-right: 10px" clearable />
 
       <!-- 操作按钮 -->
-      <span>
+      <span style="display: inline-flex">
         <template v-if="queryMode">
           <el-button type="text" :icon="Edit" @click="editNow()">批量编辑</el-button>
           <el-button type="text" :icon="Close" @click="closeTab()">关闭</el-button>
@@ -100,28 +87,31 @@
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Check, Close, Delete, Edit, Plus } from '@element-plus/icons-vue'
 import { isEmpty as _isEmpty, has as _has } from 'lodash-es'
+import { isBlank, isBlankAll, isNotBlank } from '@/utils/string-util'
 import editorProps from '@/pymeter/composables/editor.props'
 import useEditor from '@/pymeter/composables/useEditor'
-import useWorkspaceState from '@/composables/useWorkspaceState'
-import * as HttpHeadersService from '@/api/script/headers'
-import { isBlank, isBlankAll, isNotBlank } from '@/utils/string-util'
 import SimpleTextarea from '@/components/simple-textarea/SimpleTextarea.vue'
+import * as HttpHeadersService from '@/api/script/headers'
 
 const props = defineProps(editorProps)
 const { queryMode, createMode, editNow, setReadonly, closeTab, queryHttpHeaderTemplateAll } = useEditor(props)
-const { workspaceNo } = useWorkspaceState()
-const elformRef = ref()
 const eltableRef = ref()
 const templateNo = ref(props.editorNo)
-const templateForm = ref({
-  templateName: props.metadata.templateName,
-  templateDesc: props.metadata.templateDesc
-})
-const templateFormRules = reactive({
-  templateName: [{ required: true, message: '模板名称不能为空', trigger: 'blur' }]
-})
 const rows = ref([])
 const pendingDeletionList = ref([])
+const filterText = ref('')
+const filteredTableData = computed(() => {
+  if (isBlank(filterText.value)) {
+    return rows.value
+  } else {
+    return rows.value.filter(
+      (item) =>
+        item.headerName.indexOf(filterText.value.trim()) !== -1 ||
+        item.headerValue.indexOf(filterText.value.trim()) !== -1 ||
+        item.headerDesc.indexOf(filterText.value.trim()) !== -1
+    )
+  }
+})
 
 watch(queryMode, () => {
   // 动态显隐表格列后重新渲染表格
@@ -297,8 +287,6 @@ const saveHeaders = async () => {
   // 批量更新请求头
   await HttpHeadersService.modifyHttpHeaders({
     templateNo: templateNo.value,
-    templateName: templateForm.value.templateName,
-    templateDesc: templateForm.value.templateDesc,
     headerList: [...rows.value]
   })
 
@@ -319,8 +307,7 @@ const saveHeaders = async () => {
 const createHeaders = async () => {
   // 批量新增请求头
   await HttpHeadersService.createHttpHeaders({
-    workspaceNo: workspaceNo.value,
-    ...templateForm.value,
+    templateNo: templateNo.value,
     headerList: rows.value
   })
 

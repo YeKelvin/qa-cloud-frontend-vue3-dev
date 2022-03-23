@@ -17,15 +17,18 @@
   </div>
 </template>
 
-<script setup>
+<script lang="jsx" setup>
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
-import * as HeadersService from '@/api/script/headers'
+import useWorkspaceState from '@/composables/useWorkspaceState'
+import NameInput from '@/pymeter/components/editor-aside/common/NameInput.vue'
 import HttpheaderTemplateTree from './HttpheaderTemplateTree.vue'
+import * as HeadersService from '@/api/script/headers'
 
 const store = useStore()
 const templateTreeRef = ref()
 const filterText = ref('')
+const { workspaceNo } = useWorkspaceState()
 
 watch(filterText, (val) => {
   templateTreeRef.value.filter(val)
@@ -51,7 +54,7 @@ const createTemplate = async () => {
     return
   }
   // 修改请求头模板
-  await HeadersService.modifyHttpHeaderTemplate({ templateName: templateName })
+  await HeadersService.createHttpHeaderTemplate({ workspaceNo: workspaceNo.value, templateName: templateName })
   // 重新查询列表
   store.dispatch('pymeter/queryHttpHeaderTemplateAll')
   // 成功提示

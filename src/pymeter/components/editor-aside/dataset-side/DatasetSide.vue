@@ -28,15 +28,18 @@
   </div>
 </template>
 
-<script setup>
+<script lang="jsx" setup>
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
+import useWorkspaceState from '@/composables/useWorkspaceState'
+import NameInput from '@/pymeter/components/editor-aside/common/NameInput.vue'
+import DatasetTree from './DatasetTree.vue'
 import * as VariablesService from '@/api/script/variables'
-import DatasetTree from './DatasetTree'
 
 const store = useStore()
 const datasetTreeRef = ref()
 const filterText = ref('')
+const { workspaceNo } = useWorkspaceState()
 
 watch(filterText, (val) => {
   datasetTreeRef.value.filter(val)
@@ -62,7 +65,11 @@ const createEnvironmentDataset = async () => {
     return
   }
   // 修改变量集
-  await VariablesService.createVariableDataset({ datasetName: datasetName, datasetType: 'ENVIRONMENT' })
+  await VariablesService.createVariableDataset({
+    workspaceNo: workspaceNo.value,
+    datasetName: datasetName,
+    datasetType: 'ENVIRONMENT'
+  })
   // 重新查询列表
   store.dispatch('pymeter/queryDatasetAll')
   // 成功提示
@@ -89,7 +96,11 @@ const createCustomDataset = async () => {
     return
   }
   // 修改变量集
-  await VariablesService.createVariableDataset({ datasetName: datasetName, datasetType: 'CUSTOM' })
+  await VariablesService.createVariableDataset({
+    workspaceNo: workspaceNo.value,
+    datasetName: datasetName,
+    datasetType: 'CUSTOM'
+  })
   // 重新查询列表
   store.dispatch('pymeter/queryDatasetAll')
   // 成功提示

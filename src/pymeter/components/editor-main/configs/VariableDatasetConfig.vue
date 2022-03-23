@@ -2,24 +2,11 @@
   <div class="pymeter-component-container" style="padding-bottom: 40px">
     <!-- 变量集名称和操作按钮 -->
     <div class="header-container">
-      <!-- 变量集名称 -->
-      <el-form
-        ref="elformRef"
-        label-position="right"
-        label-width="120px"
-        style="flex-grow: 1; margin-right: 10px"
-        inline-message
-        :model="datasetForm"
-        :rules="datasetFormRules"
-      >
-        <el-form-item label="变量集名称：" prop="datasetName">
-          <span v-if="queryMode">{{ datasetForm.datasetName }}</span>
-          <el-input v-else v-model="datasetForm.datasetName" placeholder="请输入变量集名称" clearable />
-        </el-form-item>
-      </el-form>
+      <!-- 搜索 -->
+      <el-input v-model="filterText" placeholder="请输入" style="margin-right: 10px" clearable />
 
       <!-- 操作按钮 -->
-      <span>
+      <span style="display: inline-flex">
         <template v-if="queryMode">
           <el-button type="text" :icon="Edit" @click="editNow()">批量编辑</el-button>
           <el-button type="text" :icon="Close" @click="closeTab()">关 闭</el-button>
@@ -109,29 +96,31 @@
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Check, Close, Delete, Edit, Plus } from '@element-plus/icons-vue'
 import { isEmpty as _isEmpty, has as _has } from 'lodash-es'
+import { isBlank, isBlankAll, isNotBlank } from '@/utils/string-util'
 import editorProps from '@/pymeter/composables/editor.props'
 import useEditor from '@/pymeter/composables/useEditor'
-import useWorkspaceState from '@/composables/useWorkspaceState'
-import * as VariablesService from '@/api/script/variables'
-import { isBlank, isBlankAll, isNotBlank } from '@/utils/string-util'
 import SimpleTextarea from '@/components/simple-textarea/SimpleTextarea.vue'
+import * as VariablesService from '@/api/script/variables'
 
 const props = defineProps(editorProps)
 const { queryMode, createMode, editNow, setReadonly, closeTab, queryDatasetAll } = useEditor(props)
-const { workspaceNo } = useWorkspaceState()
-const elformRef = ref()
 const eltableRef = ref()
 const datasetNo = ref(props.editorNo)
-const datasetForm = ref({
-  datasetName: props.metadata.datasetName,
-  datasetType: props.metadata.datasetType,
-  datasetDesc: props.metadata.datasetDesc
-})
-const datasetFormRules = reactive({
-  datasetName: [{ required: true, message: '变量集名称不能为空', trigger: 'blur' }]
-})
 const rows = ref([])
 const pendingDeletionList = ref([])
+const filterText = ref('')
+const filteredTableData = computed(() => {
+  if (isBlank(filterText.value)) {
+    return rows.value
+  } else {
+    return rows.value.filter(
+      (item) =>
+        item.varName.indexOf(filterText.value.trim()) !== -1 ||
+        item.initialValue.indexOf(filterText.value.trim()) !== -1 ||
+        item.currentValue.indexOf(filterText.value.trim()) !== -1
+    )
+  }
+})
 
 watch(queryMode, () => {
   // 动态显隐表格列后重新渲染表格
@@ -309,8 +298,6 @@ const saveVariables = async () => {
   // 批量更新变量
   await VariablesService.modifyVariables({
     datasetNo: datasetNo.value,
-    datasetName: datasetForm.value.datasetName,
-    datasetDesc: datasetForm.value.datasetDesc,
     variableList: rows.value
   })
 
@@ -331,8 +318,7 @@ const saveVariables = async () => {
 const createVariables = async () => {
   // 批量新增变量
   await VariablesService.createVariables({
-    workspaceNo: workspaceNo.value,
-    ...datasetForm.value,
+    datasetNo: datasetNo.value,
     variableList: rows.value
   })
 
