@@ -5,7 +5,7 @@
       <el-input v-model="filterText" placeholder="请输入搜索内容" size="large" clearable>
         <!-- 新增请求头模板 -->
         <template #prepend>
-          <el-button type="text" :icon="Plus" style="padding: 6px 20px" @click="openNewTemplateTab" />
+          <el-button type="text" :icon="Plus" style="padding: 6px 20px" @click="createTemplate()" />
         </template>
       </el-input>
     </span>
@@ -18,7 +18,9 @@
 </template>
 
 <script setup>
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
+import * as HeadersService from '@/api/script/headers'
 import HttpheaderTemplateTree from './HttpheaderTemplateTree.vue'
 
 const store = useStore()
@@ -29,14 +31,31 @@ watch(filterText, (val) => {
   templateTreeRef.value.filter(val)
 })
 
-const openNewTemplateTab = () => {
-  store.commit({
-    type: 'pymeter/addTab',
-    editorNo: 'UNSAVED_HTTP_HEADERS_TEMPLATE',
-    editorName: 'New Template',
-    editorComponent: 'HttpHeadersTemplate',
-    editorMode: 'CREATE'
+/**
+ * 新增请求头模板
+ */
+const createTemplate = async () => {
+  let templateName = ''
+  // 弹出名称对话框
+  const error = await ElMessageBox.confirm(null, {
+    title: '新增请求头模板',
+    message: <NameInput onUpdate:modelValue={(val) => (templateName = val)} />,
+    confirmButtonText: '确定',
+    cancelButtonText: '取消'
   })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  if (templateName === '') {
+    ElMessage({ message: '名称不能为空', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 修改请求头模板
+  await HeadersService.modifyHttpHeaderTemplate({ templateName: templateName })
+  // 重新查询列表
+  store.dispatch('pymeter/queryHttpHeaderTemplateAll')
+  // 成功提示
+  ElMessage({ message: '新增成功', type: 'info', duration: 2 * 1000 })
 }
 </script>
 

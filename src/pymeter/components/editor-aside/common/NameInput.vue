@@ -9,7 +9,7 @@ import { ElInput } from 'element-plus'
 
 export default {
   props: {
-    initial: String
+    initial: { type: String, default: '' }
   },
   emits: ['update:modelValue'],
   data() {

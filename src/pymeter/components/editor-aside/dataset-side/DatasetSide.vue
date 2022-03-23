@@ -12,8 +12,8 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <!-- 新增按钮 -->
-                <el-dropdown-item @click="openNewEnvironmentTab">环境变量</el-dropdown-item>
-                <el-dropdown-item @click="openNewCustomTab">自定义变量</el-dropdown-item>
+                <el-dropdown-item @click="createEnvironmentDataset()">环境变量</el-dropdown-item>
+                <el-dropdown-item @click="createCustomDataset()">自定义变量</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -29,8 +29,9 @@
 </template>
 
 <script setup>
-import { useStore } from 'vuex'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
+import * as VariablesService from '@/api/script/variables'
 import DatasetTree from './DatasetTree'
 
 const store = useStore()
@@ -41,30 +42,58 @@ watch(filterText, (val) => {
   datasetTreeRef.value.filter(val)
 })
 
-const openNewEnvironmentTab = () => {
-  store.commit({
-    type: 'pymeter/addTab',
-    editorNo: 'UNSAVED_ENVIRONMENT_DATASET',
-    editorName: 'New Environment',
-    editorComponent: 'VariableDataset',
-    editorMode: 'CREATE',
-    metadata: {
-      datasetType: 'ENVIRONMENT'
-    }
+/**
+ * 新增环境变量集
+ */
+const createEnvironmentDataset = async () => {
+  let datasetName = ''
+  // 弹出名称对话框
+  const error = await ElMessageBox.confirm(null, {
+    title: '新增环境变量集',
+    message: <NameInput onUpdate:modelValue={(val) => (datasetName = val)} />,
+    confirmButtonText: '确定',
+    cancelButtonText: '取消'
   })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  if (datasetName === '') {
+    ElMessage({ message: '名称不能为空', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 修改变量集
+  await VariablesService.createVariableDataset({ datasetName: datasetName, datasetType: 'ENVIRONMENT' })
+  // 重新查询列表
+  store.dispatch('pymeter/queryDatasetAll')
+  // 成功提示
+  ElMessage({ message: '新增成功', type: 'info', duration: 2 * 1000 })
 }
 
-const openNewCustomTab = () => {
-  store.commit({
-    type: 'pymeter/addTab',
-    editorNo: 'UNSAVED_CUSTOM_DATASET',
-    editorName: 'New Custom',
-    editorComponent: 'VariableDataset',
-    editorMode: 'CREATE',
-    metadata: {
-      datasetType: 'CUSTOM'
-    }
+/**
+ * 新增自定义变量集
+ */
+const createCustomDataset = async () => {
+  let datasetName = ''
+  // 弹出名称对话框
+  const error = await ElMessageBox.confirm(null, {
+    title: '新增自定义变量集',
+    message: <NameInput onUpdate:modelValue={(val) => (datasetName = val)} />,
+    confirmButtonText: '确定',
+    cancelButtonText: '取消'
   })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  if (datasetName === '') {
+    ElMessage({ message: '名称不能为空', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 修改变量集
+  await VariablesService.createVariableDataset({ datasetName: datasetName, datasetType: 'CUSTOM' })
+  // 重新查询列表
+  store.dispatch('pymeter/queryDatasetAll')
+  // 成功提示
+  ElMessage({ message: '新增成功', type: 'info', duration: 2 * 1000 })
 }
 </script>
 

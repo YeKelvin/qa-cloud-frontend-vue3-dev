@@ -70,7 +70,7 @@ const store = useStore()
  */
 const renameDataset = async ({ datasetNo, datasetName }) => {
   let newName = datasetName
-  // 弹出选择空间的对话框
+  // 弹出名称对话框
   const error = await ElMessageBox.confirm(null, {
     title: '重命名变量集',
     message: <NameInput initial={newName} onUpdate:modelValue={(val) => (newName = val)} />,
@@ -82,6 +82,8 @@ const renameDataset = async ({ datasetNo, datasetName }) => {
   if (error) return
   // 修改变量集
   await VariablesService.modifyVariableDataset({ datasetNo: datasetNo, datasetName: newName })
+  // 重新查询列表
+  store.dispatch('pymeter/queryDatasetAll')
   // 成功提示
   ElMessage({ message: '修改成功', type: 'info', duration: 2 * 1000 })
 }

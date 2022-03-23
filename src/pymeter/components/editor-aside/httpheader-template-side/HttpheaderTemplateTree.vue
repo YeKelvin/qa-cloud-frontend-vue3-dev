@@ -66,7 +66,7 @@ const store = useStore()
  */
 const renameTemplate = async ({ templateNo, templateName }) => {
   let newName = templateName
-  // 弹出选择空间的对话框
+  // 弹出名称对话框
   const error = await ElMessageBox.confirm(null, {
     title: '重命名模板',
     message: <NameInput initial={newName} onUpdate:modelValue={(val) => (newName = val)} />,
@@ -78,6 +78,8 @@ const renameTemplate = async ({ templateNo, templateName }) => {
   if (error) return
   // 修改请求头模板
   await HeadersService.modifyHttpHeaderTemplate({ templateNo: templateNo, templateName: templateName })
+  // 重新查询列表
+  store.dispatch('pymeter/queryHttpHeaderTemplateAll')
   // 成功提示
   ElMessage({ message: '修改成功', type: 'info', duration: 2 * 1000 })
 }
