@@ -9,7 +9,6 @@
         v-model="selectedCollectionNumberList"
         style="flex-grow: 1"
         tag-type="danger"
-        effect="dark"
         size="large"
         filterable
         multiple

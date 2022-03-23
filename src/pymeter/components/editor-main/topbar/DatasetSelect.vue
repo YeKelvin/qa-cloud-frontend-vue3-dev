@@ -3,9 +3,9 @@
     v-model="selectedDatasetNumberList"
     placeholder="环境 / 变量"
     tag-type="danger"
-    effect="dark"
     multiple
     collapse-tags
+    collapse-tags-tooltip
     clearable
   >
     <el-option-group v-if="!isEmpty(customDatasetList)" key="custom" label="自定义">

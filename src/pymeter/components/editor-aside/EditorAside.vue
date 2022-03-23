@@ -1,7 +1,7 @@
 <template>
   <el-card shadow="hover" style="width: 100%">
     <template #header>
-      <el-select v-model="asideName" effect="dark" size="large" style="flex-grow: 1">
+      <el-select v-model="asideName" size="large" style="flex-grow: 1">
         <el-option label="脚本" value="ELEMENT" />
         <el-option label="环境 / 变量" value="DATASET" />
         <el-option label="HTTP请求头" value="HTTP_HEADER_TEMPLATE" />

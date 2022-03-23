@@ -11,7 +11,6 @@
         v-model="formData.datasetNumberList"
         placeholder="环境 / 变量"
         tag-type="danger"
-        effect="dark"
         style="width: 100%"
         multiple
         v-bind="$attrs"
