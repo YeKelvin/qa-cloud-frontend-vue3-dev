@@ -59,7 +59,7 @@
     "sass": "1.49.9",
     "svg-sprite-loader": "6.0.11",
     "unplugin-auto-import": "0.6.6",
-    "unplugin-vue-components": "0.18.3",
+    "unplugin-vue-components": "0.18.4",
     "vite": "2.8.6",
     "vite-plugin-style-import": "2.0.0",
     "vite-plugin-svg-icons": "1.1.0"
