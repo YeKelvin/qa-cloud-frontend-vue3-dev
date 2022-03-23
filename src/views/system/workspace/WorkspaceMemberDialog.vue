@@ -35,13 +35,9 @@ const userList = ref([])
 const memberList = ref([])
 const users = computed(() => {
   const data = []
-  userList.value.forEach((item) => {
-    data.push({
-      key: item.userNo,
-      label: item.userName,
-      disabled: item.state !== 'ENABLE'
-    })
-  })
+  userList.value.forEach((item) =>
+    data.push({ key: item.userNo, label: item.userName, disabled: item.state !== 'ENABLE' })
+  )
   return data
 })
 
