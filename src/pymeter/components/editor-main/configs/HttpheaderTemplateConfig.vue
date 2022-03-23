@@ -3,12 +3,14 @@
     <!-- 模板名称和操作按钮 -->
     <div class="header-container">
       <!-- 搜索 -->
-      <el-input v-model="filterText" placeholder="请输入" style="margin-right: 10px" clearable />
+      <span style="display: inline-flex; flex: 1; margin-right: 10px">
+        <el-input v-show="queryMode" v-model="filterText" placeholder="请输入" clearable />
+      </span>
 
       <!-- 操作按钮 -->
       <span style="display: inline-flex">
         <template v-if="queryMode">
-          <el-button type="text" :icon="Edit" @click="editNow()">批量编辑</el-button>
+          <el-button type="text" :icon="Edit" @click="batchEditNow()">批量编辑</el-button>
           <el-button type="text" :icon="Close" @click="closeTab()">关闭</el-button>
         </template>
         <template v-else-if="!createMode">
@@ -22,7 +24,7 @@
     </div>
 
     <!-- 请求头表格 -->
-    <el-table ref="eltableRef" :data="rows" fit stripe highlight-current-row>
+    <el-table ref="eltableRef" :data="filteredTableData" fit stripe highlight-current-row>
       <!-- 数据为空时显示添加按钮 -->
       <template #empty><el-empty description=" " /></template>
 
@@ -59,7 +61,7 @@
         <template #default="{ row, $index }">
           <!-- 编辑或新增模式下可用的按钮 -->
           <!-- 删除请求头按钮 -->
-          <el-button v-if="!queryMode" type="text" :icon="Close" @click="cancelHeader($index, row)" />
+          <el-button v-if="!queryMode" type="text" :icon="Close" @click="cancelHeader(row, $index)" />
           <!-- 查询模式下可用的按钮 -->
           <template v-if="queryMode">
             <template v-if="row.editing">
@@ -72,7 +74,7 @@
               <!-- 编辑单行请求头按钮 -->
               <el-button type="text" :icon="Edit" @click="row.editing = true" />
               <!-- 删除请求头按钮 -->
-              <el-button type="text" :icon="Delete" @click="removeHeader($index, row)" />
+              <el-button type="text" :icon="Delete" @click="removeHeader(row)" />
             </template>
           </template>
         </template>
@@ -134,6 +136,14 @@ onMounted(() => {
 })
 
 /**
+ * 切换为批量编辑模式
+ */
+const batchEditNow = () => {
+  filterText.value = ''
+  editNow()
+}
+
+/**
  * 最后一行不为空时，自动添加一行
  */
 const autoNewRow = () => {
@@ -182,7 +192,7 @@ const scrollToBottom = () => {
 /**
  * 根据索引号删除行
  */
-const cancelHeader = (index, row) => {
+const cancelHeader = (row, index) => {
   if (_has(row, 'headerNo')) {
     // 存在 headerNo 时，添加至待删除列表中，等待提交时调用批量删除请求头接口
     pendingDeletionList.value.push(row)
@@ -232,13 +242,14 @@ const submitSingleHeader = (row) => {
 /**
  * 根据索引号删除行
  */
-const removeHeader = async (index, row) => {
+const removeHeader = async (row) => {
   // 二次确认
   const error = await deletionComfirm(row.headerName)
   if (error) return
   // 删除请求头
   await HttpHeadersService.deleteHttpHeader({ headerNo: row.headerNo })
   // 删除请求头所在行数据
+  const index = rows.value.findIndex((item) => item.headerName === row.headerName)
   rows.value.splice(index, 1)
 }
 
@@ -272,22 +283,27 @@ const deletionComfirm = async (...args) => {
 
 /**
  * 保存编辑后的请求头
- * TODO: 提交前过滤空行
  */
 const saveHeaders = async () => {
-  // 待删除列表非空时，需要二次确认
+  // 手动清空的空行如果存在 headerNo 则加入待删除列表
+  rows.value
+    .filter((row) => isBlankRow(row))
+    .forEach((row) => {
+      if (_has(row, 'headerNo')) {
+        pendingDeletionList.value.push(row)
+      }
+    })
+
+  // 批量删除变量
   if (!_isEmpty(pendingDeletionList.value)) {
-    // 二次确认
-    const error = await deletionComfirm(...pendingDeletionList.value.map((item) => item.headerName))
-    if (error) return
-    // 批量删除请求头
     await HttpHeadersService.deleteHttpHeaders(pendingDeletionList.value.map((item) => item.headerNo))
   }
 
   // 批量更新请求头
+  const headers = rows.value.filter((row) => !isBlankRow(row))
   await HttpHeadersService.modifyHttpHeaders({
     templateNo: templateNo.value,
-    headerList: [...rows.value]
+    headerList: headers
   })
 
   // 成功提示
@@ -302,13 +318,19 @@ const saveHeaders = async () => {
 
 /**
  * 新增模板和请求头
- * TODO: 提交前过滤空行
  */
 const createHeaders = async () => {
+  // 过滤空行
+  const headers = rows.value.filter((row) => !isBlankRow(row))
+  if (_isEmpty(headers)) {
+    ElMessage({ message: '请求头不能为空', type: 'error', duration: 2 * 1000 })
+    return
+  }
+
   // 批量新增请求头
   await HttpHeadersService.createHttpHeaders({
     templateNo: templateNo.value,
-    headerList: rows.value
+    headerList: headers
   })
 
   // 成功提示
