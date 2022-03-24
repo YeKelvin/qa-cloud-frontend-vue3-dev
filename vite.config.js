@@ -1,9 +1,9 @@
 import { defineConfig, loadEnv } from 'vite'
+import path from 'path'
 import vue from '@vitejs/plugin-vue'
 import jsx from '@vitejs/plugin-vue-jsx'
-import SvgIcons from 'vite-plugin-svg-icons'
-import AutoImport from 'unplugin-auto-import/vite'
-import path from 'path'
+import autoImport from 'unplugin-auto-import/vite'
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import { visualizer } from 'rollup-plugin-visualizer'
 
 export default ({ mode }) =>
@@ -17,7 +17,7 @@ export default ({ mode }) =>
     plugins: [
       vue(),
       jsx(),
-      AutoImport({
+      autoImport({
         imports: ['vue', 'vuex', 'vue-router'],
         eslintrc: {
           enabled: true,
@@ -25,7 +25,7 @@ export default ({ mode }) =>
           globalsPropValue: true
         }
       }),
-      SvgIcons({
+      createSvgIconsPlugin({
         iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
         symbolId: 'icon-[dir]-[name]'
       }),

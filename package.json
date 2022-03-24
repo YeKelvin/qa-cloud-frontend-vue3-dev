@@ -62,7 +62,7 @@
     "unplugin-vue-components": "0.18.4",
     "vite": "2.8.6",
     "vite-plugin-style-import": "2.0.0",
-    "vite-plugin-svg-icons": "1.1.0"
+    "vite-plugin-svg-icons": "2.0.1"
   },
   "browserslist": [
     "> 1%",
