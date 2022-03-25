@@ -182,7 +182,7 @@
             <el-tag size="small" style="margin-right: 10px">sampler</el-tag>
           </el-descriptions-item>
         </el-descriptions>
-        <MonacoEditor ref="preCodeEditorRef" v-model="preCode" language="python" :read-only="queryMode" />
+        <PythonEditor ref="preCodeEditorRef" v-model="preCode" phase="PRE" type="HTTP" :read-only="queryMode" />
       </div>
 
       <!-- 测试脚本 -->
@@ -204,7 +204,13 @@
             <el-tag size="small" style="margin-right: 10px">stop_test_now()</el-tag>
           </el-descriptions-item>
         </el-descriptions>
-        <MonacoEditor ref="testsCodeEditorRef" v-model="testsCode" language="python" :read-only="queryMode" />
+        <PythonEditor
+          ref="testsCodeEditorRef"
+          v-model="testsCode"
+          phase="ASSERTION"
+          type="HTTP"
+          :read-only="queryMode"
+        />
       </div>
 
       <!-- 操作按钮 -->
@@ -235,12 +241,13 @@ import useHTTPBody from './useHTTPBody'
 import useHTTPBuiltin from './useHTTPBuiltin'
 import useHTTPHeader from './useHTTPHeader'
 import useHTTPQuery from './useHTTPQuery'
-import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 import HTTPMethodSelect from './HttpSamplerMethodSelect.vue'
 import HTTPHeaderTemplate from './HttpSamplerHeaderTemplate.vue'
 import HTTPHeaderTable from './HttpSamplerHeaderTable.vue'
 import HTTPQueryTable from './HttpSamplerQueryTable.vue'
 import HTTPFormTable from './HttpSamplerFormTable.vue'
+import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
+import PythonEditor from '@/pymeter/components/editor-main/common/PythonEditor.vue'
 
 const props = defineProps(editorProps)
 const {

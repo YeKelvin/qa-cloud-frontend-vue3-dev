@@ -35,7 +35,7 @@ export default {
   components: { MonacoEditor },
   props: {
     readOnly: Boolean,
-    phase: String, // PRE | SAMPLER | POST | ASSERT
+    phase: String, // PRE | SAMPLER | POST | ASSERTION
     type: String // PYTHON | HTTP
   },
   emits: ['update:modelValue'],
