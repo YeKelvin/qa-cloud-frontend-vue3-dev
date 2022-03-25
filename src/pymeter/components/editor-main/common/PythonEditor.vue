@@ -13,10 +13,15 @@
         <ul class="snippet-code-list">
           <li @click="getVarSnippet()">获取局部变量</li>
           <li @click="getPropSnippet()">获取全局变量</li>
-          <li @click="getResponseJsonSnippet()">获取Json响应</li>
+          <template v-if="type == 'HTTP' && phase == 'POST' && phase == 'ASSERT'">
+            <li @click="getResponseJsonSnippet()">获取Json响应</li>
+          </template>
           <li @click="setVarSnippet()">设置局部变量</li>
           <li @click="setPropSnippet()">设置全局变量</li>
           <li @click="outputLogInfo()">输出日志</li>
+          <template v-if="phase == 'ASSERT'">
+            <li @click="assertion()">断言</li>
+          </template>
         </ul>
       </el-scrollbar>
     </div>
@@ -29,7 +34,9 @@ import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 export default {
   components: { MonacoEditor },
   props: {
-    readOnly: Boolean
+    readOnly: Boolean,
+    phase: String, // PRE | SAMPLER | POST | ASSERT
+    type: String // PYTHON | HTTP
   },
   emits: ['update:modelValue'],
   computed: {
@@ -88,10 +95,14 @@ export default {
     outputLogInfo() {
       const selection = this.$refs.pythonEditor.getSelectionValue()
       if (selection) {
-        this.$refs.pythonEditor.insert(`log.info(f'{${selection}=}')`)
+        this.$refs.pythonEditor.insert(`log.info(f'{${selection}=}')\n`)
       } else {
-        this.$refs.pythonEditor.insertSnippet("log.info('${1:content}')")
+        this.$refs.pythonEditor.insertSnippet("log.info('${1:content}')\n")
       }
+      this.$refs.pythonEditor.focus()
+    },
+    assertion() {
+      this.$refs.pythonEditor.insertSnippet("assert ${1:condition}, '${2:message}'\n")
       this.$refs.pythonEditor.focus()
     }
   }
@@ -118,6 +129,7 @@ export default {
 .snippet-title {
   padding: 0 10px;
   color: #606266;
+  font-weight: bold;
 }
 
 .snippet-code-list {

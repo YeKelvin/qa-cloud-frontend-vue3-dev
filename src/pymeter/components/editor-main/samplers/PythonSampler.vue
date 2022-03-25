@@ -32,7 +32,13 @@
       </el-form-item>
 
       <!-- 元素脚本 -->
-      <PythonEditor ref="codeEditorRef" v-model="elementInfo.property.PythonSampler__script" :read-only="queryMode" />
+      <PythonEditor
+        ref="codeEditorRef"
+        v-model="elementInfo.property.PythonSampler__script"
+        phase="SAMPLER"
+        type="PYTHON"
+        :read-only="queryMode"
+      />
 
       <!-- 操作按钮 -->
       <el-form-item v-if="queryMode">
