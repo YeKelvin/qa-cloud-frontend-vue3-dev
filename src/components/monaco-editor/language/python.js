@@ -125,19 +125,17 @@ const PYTHON_KEYWORDS = [
   'False'
 ]
 
-const PYTHON_KEYWORDS_COMPLETION_PROVIDER = (range) => {
+const PYTHON_KEYWORDS_COMPLETION_ITEMS = (range) => {
   const keywords = []
   PYTHON_KEYWORDS.forEach((item) => {
     keywords.push({
       label: item,
       insertText: item,
       kind: monaco.languages.CompletionItemKind.Keyword,
-      range: range,
-      detail: '',
-      documentation: ''
+      range: range
     })
   })
   return keywords
 }
 
-export { PYTHON_LANGUAGE_DEFINE, PYTHON_TOKEN_COLORS, PYTHON_KEYWORDS_COMPLETION_PROVIDER }
+export { PYTHON_LANGUAGE_DEFINE, PYTHON_TOKEN_COLORS, PYTHON_KEYWORDS_COMPLETION_ITEMS }

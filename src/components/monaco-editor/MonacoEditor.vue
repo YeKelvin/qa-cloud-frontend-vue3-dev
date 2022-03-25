@@ -47,19 +47,34 @@ onUnmounted(() => {
  * 插入内容
  */
 const insert = (val) => {
-  const position = instance.getPosition()
+  const selection = instance.getSelection()
   instance.executeEdits('', [
     {
       range: {
-        startLineNumber: position.lineNumber,
-        startColumn: position.column,
-        endLineNumber: position.lineNumber,
-        endColumn: position.column
+        startLineNumber: selection.startLineNumber,
+        startColumn: selection.startColumn,
+        endLineNumber: selection.endLineNumber,
+        endColumn: selection.endColumn
       },
       text: val,
       forceMoveMarkers: true
     }
   ])
+}
+
+/**
+ * 插入内容
+ */
+const insertSnippet = (val) => {
+  const selection = instance.getSelection()
+  instance.getContribution('snippetController2').insert(val, {
+    range: {
+      startLineNumber: selection.startLineNumber,
+      startColumn: selection.startColumn,
+      endLineNumber: selection.endLineNumber,
+      endColumn: selection.endColumn
+    }
+  })
 }
 
 /**
@@ -79,8 +94,15 @@ const getValue = () => {
 /**
  * 获取选中的内容
  */
-const getSelection = () => {
-  return instance.getSelection()
+const getSelectionValue = () => {
+  return instance.getModel().getValueInRange(instance.getSelection())
+}
+
+/**
+ * 获取某一行的内容
+ */
+const getLineContent = (lineNumber) => {
+  return instance.getModel().getLineContent(lineNumber)
 }
 
 /**
@@ -120,9 +142,11 @@ const formatDocument = () => {
 
 defineExpose({
   insert,
+  insertSnippet,
   setValue,
   getValue,
-  getSelection,
+  getSelectionValue,
+  getLineContent,
   getCursorPosition,
   setCursorPosition,
   focus,

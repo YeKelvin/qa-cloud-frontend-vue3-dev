@@ -32,12 +32,7 @@
       </el-form-item>
 
       <!-- 元素脚本 -->
-      <MonacoEditor
-        ref="codeEditorRef"
-        v-model="elementInfo.property.PythonSampler__script"
-        language="python"
-        :read-only="queryMode"
-      />
+      <PythonEditor ref="codeEditorRef" v-model="elementInfo.property.PythonSampler__script" :read-only="queryMode" />
 
       <!-- 操作按钮 -->
       <el-form-item v-if="queryMode">
@@ -62,7 +57,7 @@ import { Check, Close, Edit } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
 import editorProps from '@/pymeter/composables/editor.props'
 import useEditor from '@/pymeter/composables/useEditor'
-import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
+import PythonEditor from '@/pymeter/components/editor-main/common/PythonEditor.vue'
 
 const props = defineProps(editorProps)
 const { queryMode, modifyMode, createMode, editNow, setReadonly, updateTabName, closeTab, refreshElementTree } =

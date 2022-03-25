@@ -27,8 +27,8 @@ import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
 // import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 
 import { LOG_LANGUAGE_DEFINE, LOG_TOKEN_COLORS } from './language/log'
-import { PYMETER_COMPLETION_PROVIDER, PYMETER_FUNCTION_COMPLETION_PROVIDER } from './language/pymeter'
-import { PYTHON_LANGUAGE_DEFINE, PYTHON_TOKEN_COLORS, PYTHON_KEYWORDS_COMPLETION_PROVIDER } from './language/python'
+import { PYMETER_COMPLETION_ITEMS, PYMETER_FUNCTION_COMPLETION_ITEMS } from './language/pymeter'
+import { PYTHON_LANGUAGE_DEFINE, PYTHON_TOKEN_COLORS, PYTHON_KEYWORDS_COMPLETION_ITEMS } from './language/python'
 
 self.MonacoEnvironment = {
   getWorker(_, label) {
@@ -77,9 +77,9 @@ monaco.languages.setMonarchTokensProvider('log', LOG_LANGUAGE_DEFINE)
 // * python
 // ********************************************************************************************************************
 monaco.languages.setMonarchTokensProvider('python', PYTHON_LANGUAGE_DEFINE)
-registerCompletion('python', PYTHON_KEYWORDS_COMPLETION_PROVIDER)
-registerCompletion('python', PYMETER_COMPLETION_PROVIDER)
-registerCompletion('python', PYMETER_FUNCTION_COMPLETION_PROVIDER)
+registerCompletion('python', PYTHON_KEYWORDS_COMPLETION_ITEMS)
+registerCompletion('python', PYMETER_COMPLETION_ITEMS)
+registerCompletion('python', PYMETER_FUNCTION_COMPLETION_ITEMS)
 
 // ********************************************************************************************************************
 // * theme
