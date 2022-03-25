@@ -22,6 +22,12 @@
           <template v-if="phase == 'ASSERT'">
             <li @click="assertion()">断言</li>
           </template>
+          <li @click="toJson()">Json序列化</li>
+          <li @click="fromJson()">Json反序列化</li>
+          <li @click="foreachList()">列表遍历</li>
+          <li @click="foreachDict()">字典遍历</li>
+          <li @click="listComprehensions()">列表推导式</li>
+          <li @click="dictComprehensions()">字典推导式</li>
         </ul>
       </el-scrollbar>
     </div>
@@ -103,6 +109,38 @@ export default {
     },
     assertion() {
       this.$refs.pythonEditor.insertSnippet("assert ${1:condition}, '${2:message}'\n")
+      this.$refs.pythonEditor.focus()
+    },
+    toJson() {
+      let selection = this.$refs.pythonEditor.getSelectionValue()
+      selection = selection || 'object'
+      this.$refs.pythonEditor.insertSnippet(`to_json('\${1:${selection}}')`)
+      this.$refs.pythonEditor.focus()
+    },
+    fromJson() {
+      let selection = this.$refs.pythonEditor.getSelectionValue()
+      selection = selection || 'json_str'
+      this.$refs.pythonEditor.insertSnippet(`from_json('\${1:${selection}}')`)
+      this.$refs.pythonEditor.focus()
+    },
+    foreachList() {
+      this.$refs.pythonEditor.insertSnippet('for ${2:item} in ${1:list_object}:\n    ${3:exp}')
+      this.$refs.pythonEditor.focus()
+    },
+    foreachDict() {
+      this.$refs.pythonEditor.insertSnippet('for ${2:key}, ${3:value} in ${1:dic_object}.items():\n    ${4:exp}')
+      this.$refs.pythonEditor.focus()
+    },
+    listComprehensions() {
+      this.$refs.pythonEditor.insertSnippet(
+        'comprehensions = [${3:out_exp} for ${2:item} in ${1:list_object} if ${4:condition}]\n'
+      )
+      this.$refs.pythonEditor.focus()
+    },
+    dictComprehensions() {
+      this.$refs.pythonEditor.insertSnippet(
+        'comprehensions = {${4:key}:${5:value} for ${2:key}, ${3:value} in ${1:dict_object}.items() if ${6:condition}}\n'
+      )
       this.$refs.pythonEditor.focus()
     }
   }
