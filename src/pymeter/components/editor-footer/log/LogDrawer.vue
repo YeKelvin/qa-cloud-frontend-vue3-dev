@@ -36,14 +36,18 @@ watch(
   logs,
   () => {
     if (!visible.value) return
-    logEditorRef.value && logEditorRef.value.setValue(logs.value.join(''))
+    if (!logEditorRef.value) return
+    logEditorRef.value.setValue(logs.value.join(''))
+    logEditorRef.value.scrollToBottom()
   },
   { deep: true }
 )
 watch(visible, () => {
   if (!visible.value) return
   nextTick(() => {
-    logEditorRef.value && logEditorRef.value.setValue(logs.value.join(''))
+    if (!logEditorRef.value) return
+    logEditorRef.value.setValue(logs.value.join(''))
+    logEditorRef.value.scrollToBottom()
   })
 })
 

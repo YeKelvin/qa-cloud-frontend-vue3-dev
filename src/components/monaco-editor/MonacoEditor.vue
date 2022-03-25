@@ -106,6 +106,13 @@ const getLineContent = (lineNumber) => {
 }
 
 /**
+ * 获取行数
+ */
+const getLineCount = () => {
+  return instance.getModel().getLineCount()
+}
+
+/**
  * 获取光标定位
  */
 const getCursorPosition = () => {
@@ -140,6 +147,13 @@ const formatDocument = () => {
     .then(() => instance.updateOptions({ readOnly: props.readOnly }))
 }
 
+/**
+ * 滚动至底部
+ */
+const scrollToBottom = () => {
+  instance.revealLine(instance.getModel().getLineCount() - 10)
+}
+
 defineExpose({
   insert,
   insertSnippet,
@@ -147,10 +161,12 @@ defineExpose({
   getValue,
   getSelectionValue,
   getLineContent,
+  getLineCount,
   getCursorPosition,
   setCursorPosition,
   focus,
-  formatDocument
+  formatDocument,
+  scrollToBottom
 })
 </script>
 
