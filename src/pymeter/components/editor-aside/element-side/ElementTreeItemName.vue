@@ -10,10 +10,12 @@
       <SvgIcon v-else-if="data.elementType == 'SAMPLER'" icon-name="pymeter-sampler" />
       <SvgIcon v-else-if="data.elementType == 'PRE_PROCESSOR'" icon-name="pymeter-pre-processor" />
       <SvgIcon v-else-if="data.elementType == 'POST_PROCESSOR'" icon-name="pymeter-post-processor" />
+      <SvgIcon v-else-if="data.elementClass == 'ForInController'" icon-name="pymeter-forin-controller" />
       <SvgIcon v-else-if="data.elementClass == 'IfController'" icon-name="pymeter-if-controller" />
       <SvgIcon v-else-if="data.elementClass == 'LoopController'" icon-name="pymeter-loop-controller" />
+      <SvgIcon v-else-if="data.elementClass == 'RetryController'" icon-name="pymeter-retry-controller" />
       <SvgIcon v-else-if="data.elementClass == 'TransactionController'" icon-name="pymeter-transaction-controller" />
-      <SvgIcon v-else-if="data.elementClass == 'WhileController'" icon-name="pymeter-loop-controller" />
+      <SvgIcon v-else-if="data.elementClass == 'WhileController'" icon-name="pymeter-while-controller" />
       <SvgIcon v-else-if="data.elementType == 'CONTROLLER'" icon-name="pymeter-controller" />
       <SvgIcon v-else-if="data.elementType == 'ASSERTION'" icon-name="pymeter-assertion" />
     </span>
