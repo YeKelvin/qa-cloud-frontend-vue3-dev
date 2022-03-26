@@ -1,8 +1,14 @@
 <template>
   <el-card shadow="hover">
     <div class="l-container">
-      <el-button type="primary" plain @click="showResultDrawer = !showResultDrawer">响应结果</el-button>
-      <el-button type="primary" plain @click="showLogDrawer = !showLogDrawer">运行日志</el-button>
+      <el-button type="primary" plain @click="showResultDrawer = !showResultDrawer">
+        <SvgIcon icon-name="pymeter-result" style="margin-right: 5px" />
+        <span>响应结果</span>
+      </el-button>
+      <el-button type="primary" plain @click="showLogDrawer = !showLogDrawer">
+        <SvgIcon icon-name="pymeter-log" style="margin-right: 5px" />
+        <span>运行日志</span>
+      </el-button>
     </div>
 
     <div class="r-container">
