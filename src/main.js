@@ -44,9 +44,8 @@ app.directive('permission', PermissionDirective)
 // 全局属性
 app.config.globalProperties.$dayjs = DayJs
 // 全局异常处理
-app.config.errorHandler = (err) => {
-  console.error(err)
-  ElMessage.error(err.toString() || '服务开小差')
+app.config.errorHandler = (err, vm, info) => {
+  console.error(`Catch error at ${info}:\n`, err)
 }
 
 // 挂载实例

@@ -75,7 +75,7 @@ service.interceptors.request.use(
     if (error.config.method !== 'get') {
       hideLoading()
     }
-    ElMessage({ message: error.message, type: 'error', duration: 2 * 1000 })
+    ElMessage.error({ message: error.message, duration: 2 * 1000 })
     return Promise.reject(error)
   }
 )
@@ -89,8 +89,9 @@ service.interceptors.response.use(
       hideLoading()
     }
     if (response.status !== 200) {
-      ElMessage({ message: response.statusText || 'Error!', type: 'error', duration: 2 * 1000 })
-      return Promise.reject(new Error(response.statusText || 'Error!'))
+      const message = response.statusText || '网络异常'
+      ElMessage.error({ message: message, duration: 2 * 1000 })
+      return Promise.reject(new Error(message))
     } else {
       // 判断用户 token 是否有效，无效或失效则转跳至登录页
       if (!data.success && data.errorCode === 'E401001') {
@@ -107,8 +108,9 @@ service.interceptors.response.use(
         return data
       }
       if (!data.success || data.errorCode) {
-        ElMessage({ message: data.errorMsg || 'Error!', type: 'error', duration: 2 * 1000 })
-        return Promise.reject(new Error(data.errorMsg || 'Error!'))
+        const message = data.errorMsg || '服务开小差'
+        ElMessage.error({ message: message, duration: 2 * 1000 })
+        return Promise.reject(new Error(message))
       }
       return data
     }
@@ -118,7 +120,7 @@ service.interceptors.response.use(
     if (error.config.method !== 'get') {
       hideLoading()
     }
-    ElMessage({ message: error.message, type: 'error', duration: 2 * 1000 })
+    ElMessage.error({ message: error.message, duration: 2 * 1000 })
     return Promise.reject(error)
   }
 )
