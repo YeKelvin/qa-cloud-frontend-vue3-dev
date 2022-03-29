@@ -12,7 +12,15 @@
     <!-- 参数值 -->
     <el-table-column label="参数值" width="auto">
       <template #default="{ row }">
-        <el-input v-if="!queryMode" v-model="row.value" type="textarea" rows="1" autosize :placeholder="row.default" />
+        <span v-if="useDefault">{{ row.default }}</span>
+        <el-input
+          v-else-if="!queryMode"
+          v-model="row.value"
+          type="textarea"
+          rows="1"
+          autosize
+          :placeholder="row.default"
+        />
         <span v-else>{{ row.value }}</span>
       </template>
     </el-table-column>
@@ -28,7 +36,8 @@
 
 <script setup>
 const props = defineProps({
-  editMode: { type: String, default: 'QUERY' }
+  editMode: { type: String, default: 'QUERY' },
+  useDefault: Boolean
 })
 const queryMode = computed(() => props.editMode === 'QUERY')
 </script>

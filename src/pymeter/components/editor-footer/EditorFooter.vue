@@ -9,10 +9,14 @@
         <SvgIcon icon-name="pymeter-log" style="margin-right: 5px" />
         <span>运行日志</span>
       </el-button>
+      <el-divider direction="vertical" style="margin-right: 20px" />
+      <el-button type="danger" plain circle @click="clearAll()">
+        <SvgIcon icon-name="pymeter-broom" />
+      </el-button>
     </div>
 
     <div class="r-container">
-      <el-button type="danger" plain circle @click="clearAll()"><SvgIcon icon-name="pymeter-broom" /></el-button>
+      <!-- 预留 -->
     </div>
 
     <!-- 运行结果 -->
@@ -24,7 +28,7 @@
 
 <script setup>
 import { assign as _assign } from 'lodash-es'
-import { ElNotification } from 'element-plus'
+import { ElMessage, ElNotification } from 'element-plus'
 import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 import useSocket from '@/composables/useSocket'
 import useSocketIO from '@/composables/useSocketIO'
@@ -104,6 +108,7 @@ onBeforeUnmount(() => {
 const clearAll = () => {
   results.value = []
   logs.value = []
+  ElMessage({ message: '清空成功', type: 'info', duration: 1 * 1000 })
 }
 </script>
 

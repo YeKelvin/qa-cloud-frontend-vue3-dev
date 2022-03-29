@@ -36,9 +36,21 @@
         </el-select>
       </el-form-item>
 
-      <el-tag v-if="showWarning" type="danger" style="margin-bottom: 10px">
-        重要提醒：片段参数定义已发生变更，请重新编辑
-      </el-tag>
+      <!-- 是否使用默认值 -->
+      <el-form-item label="使用默认值：">
+        <el-switch
+          v-model="elementInfo.property.useDefault"
+          active-color="#13ce66"
+          active-value="true"
+          inactive-value="false"
+          :disabled="queryMode"
+        />
+      </el-form-item>
+
+      <!-- 变更警告 -->
+      <template v-if="showWarning && !useDefault">
+        <el-tag type="danger" style="margin-bottom: 10px">重要提醒：片段参数定义已发生变更，请重新编辑</el-tag>
+      </template>
 
       <!-- 设置类 Tabs -->
       <el-tabs v-model="activeTabName">
@@ -47,7 +59,7 @@
 
       <!-- 参数设置 -->
       <div v-if="showParams">
-        <ArgumentTable :data="definedArgumentsData" :edit-mode="editMode" />
+        <ArgumentTable :data="definedArgumentsData" :use-default="useDefault" :edit-mode="editMode" />
       </div>
 
       <!-- 操作按钮 -->
@@ -68,14 +80,14 @@
 </template>
 
 <script setup>
-import { differenceBy as _differenceBy } from 'lodash-es'
 import { ElMessage } from 'element-plus'
 import { Check, Close, Edit } from '@element-plus/icons-vue'
-import * as ElementService from '@/api/script/element'
+import { differenceBy as _differenceBy } from 'lodash-es'
 import { isBlank } from '@/utils/string-util'
 import editorProps from '@/pymeter/composables/editor.props'
 import useEditor from '@/pymeter/composables/useEditor'
 import ArgumentTable from './SnippetSamplerArgumentTable.vue'
+import * as ElementService from '@/api/script/element'
 
 const props = defineProps(editorProps)
 const {
@@ -98,7 +110,8 @@ const elementInfo = ref({
   elementClass: 'SnippetSampler',
   property: {
     snippetNo: '',
-    arguments: []
+    arguments: [],
+    useDefault: 'false'
   }
 })
 const elementFormRules = reactive({
@@ -106,10 +119,11 @@ const elementFormRules = reactive({
   'property.snippetNo': [{ required: true, message: '片段不能为空', trigger: 'blur' }]
 })
 const activeTabName = ref('PARAMS')
-const showParams = computed(() => activeTabName.value === 'PARAMS')
 const snippets = ref([])
 const definedArgumentsData = ref([])
 const showWarning = ref(false)
+const showParams = computed(() => activeTabName.value === 'PARAMS')
+const useDefault = computed(() => elementInfo.value.property.useDefault === 'true')
 
 watch(
   () => elementInfo.value.property.snippetNo,
@@ -248,6 +262,7 @@ const createSamplerElement = async () => {
 
 // 设置元素属性
 const setElementProperty = () => {
+  if (useDefault.value) return
   elementInfo.value.property.arguments = definedArgumentsData.value.map((item) => ({
     name: item.name,
     value: item.value
