@@ -3,6 +3,7 @@ import path from 'path'
 import vue from '@vitejs/plugin-vue'
 import jsx from '@vitejs/plugin-vue-jsx'
 import autoImport from 'unplugin-auto-import/vite'
+import defineOptions from 'unplugin-vue-define-options/vite'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import { visualizer } from 'rollup-plugin-visualizer'
 
@@ -25,6 +26,7 @@ export default ({ mode }) =>
           globalsPropValue: true
         }
       }),
+      defineOptions(),
       createSvgIconsPlugin({
         iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
         symbolId: 'icon-[dir]-[name]'

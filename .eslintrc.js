@@ -12,7 +12,8 @@ module.exports = {
     localStorage: true,
     defineEmits: true,
     defineProps: true,
-    defineExpose: true
+    defineExpose: true,
+    defineOptions: true
   },
   plugins: ['prettier', 'import'],
   extends: [
@@ -24,7 +25,7 @@ module.exports = {
   parser: 'vue-eslint-parser',
   parserOptions: {
     sourceType: 'module',
-    ecmaVersion: 2021,
+    ecmaVersion: 'latest',
     ecmaFeatures: {
       jsx: true,
       tsx: true
