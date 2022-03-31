@@ -2,7 +2,9 @@
   <el-drawer custom-class="pymeter-footer-result-drawer" direction="btt" size="50%" :show-close="false">
     <template #title>
       <template v-if="_isEmpty(tabs)">
-        <span class="title-name">执行结果</span>
+        <span class="drawer-title__empty">
+          <span class="title-name">执行结果</span>
+        </span>
       </template>
       <template v-else>
         <span class="drawer-title">
@@ -120,6 +122,10 @@ const handleTabRemove = (tabName) => {
 </script>
 
 <style lang="scss" scoped>
+.drawer-title__empty {
+  padding: 10px;
+}
+
 .title-name {
   font-weight: bold;
   font-size: 16px;
