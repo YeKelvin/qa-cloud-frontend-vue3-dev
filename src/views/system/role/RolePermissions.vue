@@ -11,15 +11,15 @@
       <div style="display: flex; justify-content: space-between">
         <div />
         <div style="display: flex; justify-content: center">
-          <el-button type="primary" @click="query()">查 询</el-button>
-          <el-button @click="resetQueryConditions()">重 置</el-button>
+          <el-button type="primary" :icon="Search" @click="query()">查 询</el-button>
+          <el-button :icon="Refresh" @click="resetQueryConditions()">重 置</el-button>
         </div>
         <div>
-          <el-button v-if="!modifyMode" type="primary" @click="editMode = 'DELETE'">批量删除</el-button>
-          <el-button v-if="!modifyMode" type="primary" @click="editMode = 'CREATE'">批量新增</el-button>
-          <el-button v-if="modifyMode" @click="editMode = 'QUERY'">取 消</el-button>
-          <el-button v-if="createMode" type="danger" @click="createPermissions()">提 交</el-button>
-          <el-button v-if="deleteMode" type="danger" @click="deletePermissions()">提 交</el-button>
+          <el-button v-if="!modifyMode" type="primary" :icon="Plus" @click="editMode = 'DELETE'">批量删除</el-button>
+          <el-button v-if="!modifyMode" type="primary" :icon="Plus" @click="editMode = 'CREATE'">批量新增</el-button>
+          <el-button v-if="modifyMode" :icon="Close" @click="editMode = 'QUERY'">取 消</el-button>
+          <el-button v-if="createMode" type="danger" :icon="Check" @click="createPermissions()">提 交</el-button>
+          <el-button v-if="deleteMode" type="danger" :icon="Check" @click="deletePermissions()">提 交</el-button>
         </div>
       </div>
     </el-card>
@@ -69,13 +69,14 @@
     </div>
 
     <div style="display: flex; justify-content: center; align-items: center">
-      <el-button type="primary" style="margin-bottom: 20px" @click="goBack()">返回</el-button>
+      <el-button type="primary" style="margin-bottom: 20px" :icon="Back" @click="goBack()">返 回</el-button>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Search, Refresh, Plus, Check, Close, Back } from '@element-plus/icons-vue'
 import { HttpMethods } from '@/api/enum'
 import * as RoleService from '@/api/usercenter/role'
 import ConditionInput from '@/components/query-condition/ConditionInput.vue'

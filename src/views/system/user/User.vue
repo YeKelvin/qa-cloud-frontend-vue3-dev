@@ -13,10 +13,10 @@
       <div style="display: flex; justify-content: space-between">
         <div />
         <div style="display: flex; justify-content: center">
-          <el-button type="primary" @click="query()">查 询</el-button>
-          <el-button @click="resetQueryConditions()">重 置</el-button>
+          <el-button type="primary" :icon="Search" @click="query()">查 询</el-button>
+          <el-button :icon="Refresh" @click="resetQueryConditions()">重 置</el-button>
         </div>
-        <el-button type="primary" @click="showCreateDialog = true">新 增</el-button>
+        <el-button type="primary" :icon="Plus" @click="showCreateDialog = true">新 增</el-button>
       </div>
     </el-card>
 
@@ -77,6 +77,7 @@
 
 <script setup>
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Search, Refresh, Plus } from '@element-plus/icons-vue'
 import { UserState } from '@/api/enum'
 import * as UserService from '@/api/usercenter/user'
 import ConditionInput from '@/components/query-condition/ConditionInput.vue'

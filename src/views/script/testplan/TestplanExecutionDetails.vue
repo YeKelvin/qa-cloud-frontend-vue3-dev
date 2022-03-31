@@ -79,13 +79,14 @@
 
     <!-- 按钮 -->
     <div class="btn-wrapper">
-      <el-button v-if="details.reportNo" type="primary" @click="openReport()">报告</el-button>
-      <el-button style="margin-left: 10px" @click="goBack()">返回</el-button>
+      <el-button v-if="details.reportNo" type="primary" :icon="DataAnalysis" @click="openReport()">报 告</el-button>
+      <el-button style="margin-left: 10px" :icon="Back" @click="goBack()">返 回</el-button>
     </div>
   </div>
 </template>
 
 <script setup>
+import { Back, DataAnalysis } from '@element-plus/icons-vue'
 import { RunningState } from '@/api/enum'
 import * as TestplanService from '@/api/script/testplan'
 
