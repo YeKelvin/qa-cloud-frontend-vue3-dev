@@ -1,34 +1,39 @@
 <template>
   <el-drawer custom-class="pymeter-footer-result-drawer" direction="btt" size="50%" :show-close="false">
     <template #title>
-      <span class="drawer-title">
-        <el-tabs
-          v-model="activeTabNo"
-          type="card"
-          style="width: 100%"
-          closable
-          @tab-click="handleTabClick"
-          @tab-remove="handleTabRemove"
-        >
-          <el-tab-pane v-for="tab in tabs" :key="tab.id" :label="tab.name" :name="tab.id">
-            <template #label>
-              <SvgIcon
-                v-if="tab.running"
-                icon-name="pymeter-running"
-                style="width: 1.5em; height: 1.5em; margin-right: 5px"
-              />
-              <span>{{ tab.name }}</span>
-            </template>
-          </el-tab-pane>
-        </el-tabs>
-        <div v-show="!_isEmpty(tabs)" class="clean-btn-wrapper">
-          <el-button type="danger" :icon="Delete" circle plain @click="clean()" />
-        </div>
-      </span>
+      <template v-if="_isEmpty(tabs)">
+        <span class="title-name">执行结果</span>
+      </template>
+      <template v-else>
+        <span class="drawer-title">
+          <el-tabs
+            v-model="activeTabNo"
+            type="card"
+            style="width: 100%"
+            closable
+            @tab-click="handleTabClick"
+            @tab-remove="handleTabRemove"
+          >
+            <el-tab-pane v-for="tab in tabs" :key="tab.id" :label="tab.name" :name="tab.id">
+              <template #label>
+                <SvgIcon
+                  v-if="tab.running"
+                  icon-name="pymeter-running"
+                  style="width: 1.5em; height: 1.5em; margin-right: 5px"
+                />
+                <span>{{ tab.name }}</span>
+              </template>
+            </el-tab-pane>
+          </el-tabs>
+          <div class="clean-btn-wrapper">
+            <el-button type="danger" :icon="Delete" circle plain @click="clean()" />
+          </div>
+        </span>
+      </template>
     </template>
 
     <template v-if="_isEmpty(tabs)">
-      <el-empty description="暂无结果" />
+      <el-empty description="运行脚本以获取结果" />
     </template>
     <template v-else>
       <ResultCollector v-if="!activeTabLoading" :groups="activeTabDetails" />
@@ -115,6 +120,13 @@ const handleTabRemove = (tabName) => {
 </script>
 
 <style lang="scss" scoped>
+.title-name {
+  font-weight: bold;
+  font-size: 16px;
+  box-shadow: -4px 0 0 0 #f56c6c;
+  padding: 0 10px;
+}
+
 .drawer-title {
   display: inline-flex;
   flex: 1;
