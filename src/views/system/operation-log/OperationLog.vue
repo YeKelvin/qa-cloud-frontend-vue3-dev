@@ -11,8 +11,8 @@
         <ConditionDatetimePicker v-model="queryConditions.endTime" label="结束时间" />
       </div>
       <div style="display: flex; justify-content: center">
-        <el-button type="primary" @click="query()">查 询</el-button>
-        <el-button @click="resetQueryConditions()">重 置</el-button>
+        <el-button type="primary" :icon="Search" @click="query()">查 询</el-button>
+        <el-button :icon="Refresh" @click="resetQueryConditions()">重 置</el-button>
       </div>
     </el-card>
 
@@ -48,6 +48,7 @@
 </template>
 
 <script setup>
+import { Search, Refresh } from '@element-plus/icons-vue'
 import * as LogService from '@/api/system/log'
 import useQueryConditions from '@/composables/useQueryConditions'
 import ConditionInput from '@/components/query-condition/ConditionInput.vue'

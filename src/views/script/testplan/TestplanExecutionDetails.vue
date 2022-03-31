@@ -43,7 +43,7 @@
         <template #empty><el-empty /></template>
 
         <!-- 列定义 -->
-        <el-table-column type="index" label="序号" />
+        <el-table-column type="index" label="序号" align="center" width="60px" min-width="60px" />
         <el-table-column prop="elementNo" label="元素编号" />
         <el-table-column prop="elementName" label="集合名称" />
         <el-table-column v-if="details.reportNo" prop="runningState" label="执行状态">
