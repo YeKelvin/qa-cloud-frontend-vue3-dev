@@ -51,10 +51,6 @@
 import { Delete, Plus } from '@element-plus/icons-vue'
 import SimpleTextarea from '@/components/simple-textarea/SimpleTextarea.vue'
 
-defineOptions({
-  inheritAttrs: false
-})
-
 const props = defineProps({
   editMode: { type: String, default: 'QUERY' }
 })
@@ -67,6 +63,12 @@ const newHeader = () => {
 }
 const delHeader = (index) => {
   tableData.value.splice(index, 1)
+}
+</script>
+
+<script>
+export default {
+  inheritAttrs: false
 }
 </script>
 

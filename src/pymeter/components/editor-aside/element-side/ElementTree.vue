@@ -15,12 +15,12 @@
     @node-expand="handleNodeExpand"
     @node-collapse="handleNodeCollapse"
     @node-drop="handleNodeDrop"
-    @keyup.ctrl.x="handleCtrlKeyX"
-    @keyup.ctrl.c="handleCtrlKeyC"
-    @keyup.ctrl.v="handleCtrlKeyV"
-    @keyup.meta.x="handleMetaKeyX"
-    @keyup.meta.c="handleMetaKeyC"
-    @keyup.meta.v="handleMetaKeyV"
+    @keyup.ctrl.x="handleCtrlX"
+    @keyup.ctrl.c="handleCtrlC"
+    @keyup.ctrl.v="handleCtrlV"
+    @keyup.meta.x="handleMetaX"
+    @keyup.meta.c="handleMetaC"
+    @keyup.meta.v="handleMetaV"
   >
     <template #default="{ node, data }">
       <!-- 树结点 -->
@@ -160,6 +160,7 @@ const handleNodeDrop = (draggingNode, dropNode, dropType) => {
 
 /**
  * 判断节点能否被拖拽
+ * @param {*} draggingNode 拖曳的节点
  */
 const allowDrag = (draggingNode) => {
   // Collection 不允许拖拽
@@ -169,6 +170,9 @@ const allowDrag = (draggingNode) => {
 
 /**
  * 拖拽时判定目标节点能否被放置
+ * @param {*} draggingNode 拖曳的节点
+ * @param {*} dropNode 目标节点
+ * @param {*} type 放置类型
  */
 const allowDrop = (draggingNode, dropNode, type) => {
   // Element 只允许在 Collection 里插入，不允许在 Collection 前后放置
@@ -184,9 +188,11 @@ const allowDrop = (draggingNode, dropNode, type) => {
 
   // 拖拽 Controller
   if (draggingNode.data.elementType === 'CONTROLLER') {
+    // Controller 不允许在 TestCollection 前后放置和插入
+    if (dropNode.data.elementClass === 'TestCollection') return false
     // Controller 只允许在 Group 里插入，不允许在 Group 前后放置
     if (dropNode.data.elementType === 'GROUP' && (type === 'prev' || type === 'next')) return false
-    // Controller 只允许在以下元素类型的前后放置，不允许在向里插入
+    // Controller 只允许在以下元素类型的前后放置，不允许在元素里插入
     if (
       ['SAMPLER', 'CONFIG', 'TIMER', 'PRE_PROCESSOR', 'POST_PROCESSOR', 'ASSERTION', 'LISTENER'].includes(
         dropNode.data.elementType
@@ -194,9 +200,8 @@ const allowDrop = (draggingNode, dropNode, type) => {
       type === 'inner'
     )
       return false
-    // Controller 只允许在类型为 GROUP 或 CONTROLLER 的父级下前后放置
-    if (!['GROUP', 'CONTROLLER'].includes(dropNode.parent.data.elementType) && (type === 'prev' || type === 'next'))
-      return false
+    // Controller 只允许在父级类型为 GROUP 或 CONTROLLER 前后放置
+    if (['GROUP', 'CONTROLLER'].includes(dropNode.parent.data.elementType) && type === 'inner') return false
   }
 
   // TestCollection
@@ -204,6 +209,8 @@ const allowDrop = (draggingNode, dropNode, type) => {
   if (dropRootNode && dropRootNode.data.elementClass === 'TestCollection') {
     // 拖拽 Sampler
     if (draggingNode.data.elementType === 'SAMPLER') {
+      // Sampler 不允许在 TestCollection 前后放置和插入
+      if (dropNode.data.elementClass === 'TestCollection') return false
       // Sampler 只允许在 Group 里插入，不允许在 Group 前后放置
       if (dropNode.data.elementType === 'GROUP' && (type === 'prev' || type === 'next')) return false
       // Sampler 只允许在以下元素类型的前后放置，不允许在向里插入
@@ -214,7 +221,7 @@ const allowDrop = (draggingNode, dropNode, type) => {
         type === 'inner'
       )
         return false
-      // 前后放置时，Sampler 不允许移动到类型为 Sampler 的父级
+      // Sampler 前后放置时，不允许移动到父级类型为 Sampler 的前后
       if (dropNode.parent.data.elementType === 'SAMPLER' && (type === 'prev' || type === 'next')) return false
     }
   }
@@ -226,7 +233,7 @@ const allowDrop = (draggingNode, dropNode, type) => {
 /**
  * windows剪切元素快捷键
  */
-const handleCtrlKeyX = () => {
+const handleCtrlX = () => {
   if (!isWindows.value) return
   const data = eltreeRef.value.getCurrentNode()
   if (data.elementType === 'COLLECTION') return
@@ -237,7 +244,7 @@ const handleCtrlKeyX = () => {
 /**
  * windows复制元素快捷键
  */
-const handleCtrlKeyC = () => {
+const handleCtrlC = () => {
   if (!isWindows.value) return
   const data = eltreeRef.value.getCurrentNode()
   if (data.elementType === 'COLLECTION') return
@@ -248,7 +255,7 @@ const handleCtrlKeyC = () => {
 /**
  * windows粘贴元素快捷键
  */
-const handleCtrlKeyV = () => {
+const handleCtrlV = () => {
   if (!isWindows.value) return
   const target = eltreeRef.value.getCurrentNode()
   target &&
@@ -269,7 +276,7 @@ const handleCtrlKeyV = () => {
 /**
  * macos复制元素快捷键
  */
-const handleMetaKeyX = () => {
+const handleMetaX = () => {
   if (!isMacOS.value) return
   const data = eltreeRef.value.getCurrentNode()
   if (data.elementType === 'COLLECTION') return
@@ -280,7 +287,7 @@ const handleMetaKeyX = () => {
 /**
  * macos复制元素快捷键
  */
-const handleMetaKeyC = () => {
+const handleMetaC = () => {
   if (!isMacOS.value) return
   const data = eltreeRef.value.getCurrentNode()
   if (data.elementType === 'COLLECTION') return
@@ -291,7 +298,7 @@ const handleMetaKeyC = () => {
 /**
  * macos粘贴元素快捷键
  */
-const handleMetaKeyV = () => {
+const handleMetaV = () => {
   if (!isMacOS.value) return
   const target = eltreeRef.value.getCurrentNode()
   target &&
