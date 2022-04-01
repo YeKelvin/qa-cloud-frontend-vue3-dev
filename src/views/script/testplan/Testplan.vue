@@ -201,7 +201,7 @@ const queryList = () => {
 /**
  * 执行测试计划
  */
-const executeTestplan = async ({ planNo, testPhase }) => {
+const executeTestplan = async ({ planNo, planName }) => {
   let datasetNumberList = []
   let useCurrentValue = false
   // 弹出选择变量集的对话框
@@ -211,7 +211,7 @@ const executeTestplan = async ({ planNo, testPhase }) => {
       <TestplanDatasetSelect
         key={new Date().getTime()}
         workspaceNo={workspaceNo.value}
-        testPhase={TestPhase[testPhase]}
+        planName={planName}
         onChangeDatasetNumberList={(val) => (datasetNumberList = val)}
         onChangeUseCurrentValue={(val) => (useCurrentValue = val)}
       />

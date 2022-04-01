@@ -1,7 +1,7 @@
 <template>
   <el-form label-position="right" label-width="110px" style="width: 100%" :model="formData" :rules="formRules">
-    <el-form-item label="当前测试阶段：">
-      <b style="color: #f56c6c">{{ testPhase }}</b>
+    <el-form-item label="计划名称：">
+      <b style="color: #f56c6c">{{ planName }}</b>
     </el-form-item>
 
     <!-- 环境/变量 -->
@@ -57,7 +57,7 @@ import * as VariablesService from '@/api/script/variables'
 const emit = defineEmits(['change-dataset-number-list', 'change-use-current-value'])
 const props = defineProps({
   workspaceNo: { type: String, required: true },
-  testPhase: { type: String, required: true }
+  planName: { type: String, required: true }
 })
 const globalDatasetList = ref([])
 const environmentDatasetList = ref([])
