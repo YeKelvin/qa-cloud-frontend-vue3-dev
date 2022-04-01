@@ -12,10 +12,10 @@
       <div style="display: flex; justify-content: space-between">
         <div />
         <div style="display: flex; justify-content: center">
-          <el-button type="primary" @click="queryList()">查询</el-button>
-          <el-button @click="resetQueryConditions()">重置</el-button>
+          <el-button type="primary" :icon="Search" @click="queryList()">查询</el-button>
+          <el-button :icon="Refresh" @click="resetQueryConditions()">重置</el-button>
         </div>
-        <el-button type="primary" @click="gotoTestplanEditor(null)">创建测试计划</el-button>
+        <el-button type="primary" :icon="Plus" @click="gotoTestplanEditor(null)">创建测试计划</el-button>
       </div>
     </el-card>
 
@@ -141,7 +141,7 @@
 
 <script lang="jsx" setup>
 import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
-import { Edit } from '@element-plus/icons-vue'
+import { Edit, Search, Refresh, Plus } from '@element-plus/icons-vue'
 import { TestplanState, TestPhase } from '@/api/enum'
 import * as ExecutionService from '@/api/script/execution'
 import * as TestplanService from '@/api/script/testplan'
