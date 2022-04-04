@@ -4,6 +4,8 @@ export const queryDatabaseEngineList = (params) => request.get('/script/database
 
 export const queryDatabaseEngineAll = (params) => request.get('/script/database/engine/all', { params: params })
 
+export const queryDatabaseEngineInfo = (params) => request.get('/script/database/engine', { params: params })
+
 export const createDatabaseEngine = (data) => request.post('/script/database/engine', data)
 
 export const modifyDatabaseEngine = (data) => request.put('/script/database/engine', data)

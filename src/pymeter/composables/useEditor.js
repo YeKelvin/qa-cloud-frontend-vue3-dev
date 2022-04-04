@@ -63,6 +63,10 @@ export default function useEditor(props) {
     store.dispatch('pymeter/queryHttpHeaderTemplateAll')
   }
 
+  const queryDatabaseEngineAll = () => {
+    store.dispatch('pymeter/queryDatabaseEngineAll')
+  }
+
   return {
     editMode,
     queryMode,
@@ -75,6 +79,7 @@ export default function useEditor(props) {
     refreshCollections,
     refreshElementTree,
     queryDatasetAll,
-    queryHttpHeaderTemplateAll
+    queryHttpHeaderTemplateAll,
+    queryDatabaseEngineAll
   }
 }
