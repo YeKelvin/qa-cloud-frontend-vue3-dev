@@ -18,6 +18,8 @@ export default function usePyMeterState() {
 
   const httpHeaderTemplateList = computed(() => store.state.pymeter.httpHeaderTemplateList)
 
+  const databaseEngineList = computed(() => store.state.pymeter.databaseEngineList)
+
   const selectedDatasetNumberList = computed(() => store.state.pymeter.selectedDatasetNumberList)
   const useCurrentValue = computed(() => store.state.pymeter.useCurrentValue)
 
@@ -46,6 +48,7 @@ export default function usePyMeterState() {
     customDatasetList,
     datasetList,
     httpHeaderTemplateList,
+    databaseEngineList,
     selectedDatasetNumberList,
     useCurrentValue,
     showResultDrawer,

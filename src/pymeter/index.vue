@@ -30,6 +30,7 @@ export default {
   mounted() {
     this.$store.dispatch('pymeter/queryDatasetAll')
     this.$store.dispatch('pymeter/queryHttpHeaderTemplateAll')
+    this.$store.dispatch('pymeter/queryDatabaseEngineAll')
   }
 }
 </script>

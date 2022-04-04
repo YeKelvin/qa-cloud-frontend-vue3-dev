@@ -5,6 +5,7 @@
         <el-option label="脚本" value="ELEMENT" />
         <el-option label="环境 / 变量" value="DATASET" />
         <el-option label="HTTP请求头" value="HTTP_HEADER_TEMPLATE" />
+        <el-option label="数据库" value="DATABASE" />
       </el-select>
     </template>
 
@@ -19,7 +20,8 @@ const asideComponents = reactive({
   DATASET: markRaw(defineAsyncComponent(() => import('./dataset-side/DatasetSide.vue'))),
   HTTP_HEADER_TEMPLATE: markRaw(
     defineAsyncComponent(() => import('./httpheader-template-side/HttpheaderTemplateSide.vue'))
-  )
+  ),
+  DATABASE: markRaw(defineAsyncComponent(() => import('./database-side/DatabaseSide.vue')))
 })
 </script>
 

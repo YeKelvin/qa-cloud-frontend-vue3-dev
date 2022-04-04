@@ -2,6 +2,7 @@ import store from '@/store'
 import { isEmpty as _isEmpty } from 'lodash-es'
 import * as VariablesService from '@/api/script/variables'
 import * as HttpHeadersService from '@/api/script/headers'
+import * as DatabaseService from '@/api/script/database'
 
 /**
  * 移除 keepalive 缓存
@@ -79,7 +80,10 @@ const state = {
   showLogDrawer: false,
 
   // 请求头模板列表
-  httpHeaderTemplateList: []
+  httpHeaderTemplateList: [],
+
+  // 数据库引擎配置列表
+  databaseEngineList: []
 }
 
 const mutations = {
@@ -303,6 +307,15 @@ const actions = {
         state.httpHeaderTemplateList = response.result
       }
     )
+  },
+
+  /**
+   * 查询所有数据库引擎
+   */
+  queryDatabaseEngineAll({ state }) {
+    DatabaseService.queryDatabaseEngineAll({ workspaceNo: store.state.workspace.workspaceNo }).then((response) => {
+      state.databaseEngineList = response.result
+    })
   }
 }
 

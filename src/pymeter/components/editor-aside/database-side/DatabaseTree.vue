@@ -1,9 +1,9 @@
 <template>
   <el-tree
     ref="eltreeRef"
-    node-key="templateNo"
-    :props="{ label: 'templateName' }"
-    :data="httpHeaderTemplateList"
+    node-key="databaseNo"
+    :props="{ label: 'databaseName' }"
+    :data="databaseEngineList"
     :filter-node-method="filterNode"
     @node-click="handleNodeClick"
   >
@@ -12,9 +12,14 @@
         <!-- 树节点 -->
         <span class="tree-item-name-wrapper">
           <!-- 图标 -->
-          <SvgIcon icon-name="pymeter-httpheader-template" class-name="tree-item-icon" />
-          <!-- 变量集名称 -->
+          <SvgIcon icon-name="pymeter-database" class-name="tree-item-icon" />
+          <!-- 数据库引擎名称 -->
           <span class="tree-item-name">{{ node.label }}</span>
+          <!-- 类型标签 -->
+          <el-tag v-if="data.databaseType == 'ORACLE'" type="info" size="small">Oracle</el-tag>
+          <el-tag v-if="data.databaseType == 'MYSQL'" type="info" size="small">MySQL</el-tag>
+          <el-tag v-if="data.databaseType == 'POSTGRESQL'" type="info" size="small">PostgreSQL</el-tag>
+          <el-tag v-if="data.databaseType == 'SQL_SERVER'" type="info" size="small">SQL Server</el-tag>
         </span>
 
         <!-- 操作菜单 -->
@@ -31,12 +36,10 @@
             <!-- 菜单 -->
             <template #dropdown>
               <el-dropdown-menu>
-                <!-- 删除按钮 -->
-                <el-dropdown-item @click="renameTemplate(data)">重命名</el-dropdown-item>
-                <el-dropdown-item @click="duplicateTemplate(data)">复制</el-dropdown-item>
-                <el-dropdown-item @click="copyTemplateToWorkspace(data)">复制到空间</el-dropdown-item>
-                <el-dropdown-item @click="moveTemplateToWorkspace(data)">移动到空间</el-dropdown-item>
-                <el-dropdown-item @click="deleteTemplate(data)">删除</el-dropdown-item>
+                <el-dropdown-item @click="duplicateDatabaseEngine(data)">复制</el-dropdown-item>
+                <el-dropdown-item @click="copyDatabaseEngineToWorkspace(data)">复制到空间</el-dropdown-item>
+                <el-dropdown-item @click="moveDatabaseEngineToWorkspace(data)">移动到空间</el-dropdown-item>
+                <el-dropdown-item @click="deleteDatabaseEngine(data)">删除</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -49,47 +52,21 @@
 <script lang="jsx" setup>
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { More } from '@element-plus/icons-vue'
-import * as HeadersService from '@/api/script/headers'
+import * as DatabaseService from '@/api/script/database'
 import useElTree from '@/composables/useElTree'
 import useWorkspaceState from '@/composables/useWorkspaceState'
 import usePyMeterState from '@/pymeter/composables/usePyMeterState'
-import NameInput from '@/pymeter/components/editor-aside/common/NameInput.vue'
 import WorkspaceTree from '@/pymeter/components/editor-aside/common/WorkspaceTree.vue'
 
 const { eltreeRef, hoveredNode, mouseenter, mouseleave, visibleChange } = useElTree()
-const { httpHeaderTemplateList } = usePyMeterState()
+const { databaseEngineList } = usePyMeterState()
 const { workspaceList } = useWorkspaceState()
 const store = useStore()
 
 /**
- * 重命名请求头模板
+ * 复制数据库引擎
  */
-const renameTemplate = async ({ templateNo, templateName }) => {
-  let newName = templateName
-  // 弹出名称对话框
-  const error = await ElMessageBox.confirm(null, {
-    title: '重命名模板',
-    message: <NameInput initial={newName} onUpdate:modelValue={(val) => (newName = val)} />,
-    confirmButtonText: '确定',
-    cancelButtonText: '取消'
-  })
-    .then(() => false)
-    .catch(() => true)
-  if (error) return
-  // 修改请求头模板
-  await HeadersService.modifyHttpHeaderTemplate({ templateNo: templateNo, templateName: templateName })
-  // 重新查询列表
-  store.dispatch('pymeter/queryHttpHeaderTemplateAll')
-  // 重命名tab
-  store.commit('pymeter/updateTab', { editorNo: templateNo, editorName: newName })
-  // 成功提示
-  ElMessage({ message: '修改成功', type: 'info', duration: 2 * 1000 })
-}
-
-/**
- * 复制请求头模板
- */
-const duplicateTemplate = async ({ templateNo, templateName }) => {
+const duplicateDatabaseEngine = async ({ databaseNo, databaseName }) => {
   // 二次确认
   const error = await ElMessageBox.confirm(null, {
     type: 'warning',
@@ -97,31 +74,31 @@ const duplicateTemplate = async ({ templateNo, templateName }) => {
     cancelButtonText: '取消',
     title: '警告',
     message: (
-      <span style="white-space:normal; overflow:hidden; text-overflow:ellipsis;">确认复制 {templateName} 吗？</span>
+      <span style="white-space:normal; overflow:hidden; text-overflow:ellipsis;">确认复制 {databaseName} 吗？</span>
     )
   })
     .then(() => false)
     .catch(() => true)
   if (error) return
-  // 复制请求头模板
-  await HeadersService.duplicateHttpHeaderTemplate({ templateNo: templateNo })
-  //  重新查询列表
-  store.dispatch('pymeter/queryHttpHeaderTemplateAll')
+  // 复制数据库引擎
+  await DatabaseService.duplicateDatabaseEngine({ databaseNo: databaseNo })
+  // 重新查询列表
+  store.dispatch('pymeter/queryDatabaseEngineAll')
   // 成功提示
   ElMessage({ message: '复制成功', type: 'info', duration: 2 * 1000 })
 }
 
 /**
- * 复制请求头模板到指定空间
+ * 复制数据库引擎至指定空间
  */
-const copyTemplateToWorkspace = async ({ templateNo }) => {
+const copyDatabaseEngineToWorkspace = async ({ databaseNo }) => {
   let workspaceNo = null
   // 弹出选择空间的对话框
   const error = await ElMessageBox.confirm(null, {
-    title: '请选择工作空间',
+    title: '请选择复制的工作空间',
     message: (
       <WorkspaceTree
-        key={templateNo}
+        key={databaseNo}
         data={workspaceList.value}
         onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
       />
@@ -132,45 +109,45 @@ const copyTemplateToWorkspace = async ({ templateNo }) => {
     .then(() => false)
     .catch(() => true)
   if (error) return
-  // 复制请求头模板到指定空间
-  await HeadersService.copyHttpHeaderTemplateToWorkspace({ templateNo: templateNo, workspaceNo: workspaceNo })
-  //  成功提示
-  ElMessage({ message: '复制成功', type: 'info', duration: 1 * 1000 })
-}
-
-/**
- * 移动请求头模板到指定空间
- */
-const moveTemplateToWorkspace = async ({ templateNo }) => {
-  let workspaceNo = null
-  // 弹出选择空间的对话框
-  const error = await ElMessageBox.confirm(null, {
-    title: '请选择工作空间',
-    message: (
-      <WorkspaceTree
-        key={templateNo}
-        data={workspaceList.value}
-        onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
-      />
-    ),
-    confirmButtonText: '确定',
-    cancelButtonText: '取消'
-  })
-    .then(() => false)
-    .catch(() => true)
-  if (error) return
-  // 移动请求头模板到指定空间
-  await HeadersService.moveHttpHeaderTemplateToWorkspace({ templateNo: templateNo, workspaceNo: workspaceNo })
-  // 重新查询列表
-  store.dispatch('pymeter/queryHttpHeaderTemplateAll')
+  // 复制数据库引擎到指定的空间
+  await DatabaseService.copyDatabaseEngineToWorkspace({ databaseNo: databaseNo, workspaceNo: workspaceNo })
   // 成功提示
-  ElMessage({ message: '移动成功', type: 'info', duration: 1 * 1000 })
+  ElMessage({ message: '复制成功', type: 'info', duration: 2 * 1000 })
 }
 
 /**
- * 删除请求头模板
+ * 移动数据库引擎至指定空间
  */
-const deleteTemplate = async ({ templateNo, templateName }) => {
+const moveDatabaseEngineToWorkspace = async ({ databaseNo }) => {
+  let workspaceNo = null
+  // 弹出选择空间的对话框
+  const error = await ElMessageBox.confirm(null, {
+    title: '请选择移动的工作空间',
+    message: (
+      <WorkspaceTree
+        key={databaseNo}
+        data={workspaceList.value}
+        onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
+      />
+    ),
+    confirmButtonText: '确定',
+    cancelButtonText: '取消'
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 移动数据库引擎到指定的空间
+  await DatabaseService.moveDatabaseEngineToWorkspace({ databaseNo: databaseNo, workspaceNo: workspaceNo })
+  // 重新查询列表
+  store.dispatch('pymeter/queryDatabaseEngineAll')
+  // 成功提示
+  ElMessage({ message: '移动成功', type: 'info', duration: 2 * 1000 })
+}
+
+/**
+ * 删除数据库引擎
+ */
+const deleteDatabaseEngine = async ({ databaseNo, databaseName }) => {
   // 二次确认
   const error = await ElMessageBox.confirm(null, {
     type: 'warning',
@@ -178,18 +155,18 @@ const deleteTemplate = async ({ templateNo, templateName }) => {
     cancelButtonText: '取消',
     title: '警告',
     message: (
-      <span style="white-space:normal; overflow:hidden; text-overflow:ellipsis;">确认删除 {templateName} 吗？</span>
+      <span style="white-space:normal; overflow:hidden; text-overflow:ellipsis;">确认删除 {databaseName} 吗？</span>
     )
   })
     .then(() => false)
     .catch(() => true)
   if (error) return
-  // 删除请求头模板
-  await HeadersService.deleteHttpHeaderTemplate({ templateNo: templateNo })
+  // 删除数据库引擎
+  await DatabaseService.deleteDatabaseEngine({ databaseNo: databaseNo })
   // 重新查询列表
-  store.dispatch('pymeter/queryHttpHeaderTemplateAll')
+  store.dispatch('pymeter/queryDatabaseEngineAll')
   // 成功提示
-  ElMessage({ message: '删除成功', type: 'info', duration: 1 * 1000 })
+  ElMessage({ message: '删除成功', type: 'info', duration: 2 * 1000 })
 }
 
 /**
@@ -198,9 +175,9 @@ const deleteTemplate = async ({ templateNo, templateName }) => {
 const handleNodeClick = (data) => {
   store.commit({
     type: 'pymeter/addTab',
-    editorNo: data.templateNo,
-    editorName: data.templateName,
-    editorComponent: 'HttpHeadersTemplate',
+    editorNo: data.databaseNo,
+    editorName: data.databaseName,
+    editorComponent: 'DatabaseEngine',
     editorMode: 'QUERY'
   })
 }
@@ -210,7 +187,7 @@ const handleNodeClick = (data) => {
  */
 const filterNode = (value, data) => {
   if (!value) return true
-  return data.templateName.indexOf(value) !== -1
+  return data.databaseName.indexOf(value) !== -1
 }
 
 /**
@@ -241,8 +218,8 @@ defineExpose({
 }
 
 .tree-item-icon {
-  height: 1.8em !important;
-  width: 1.8em !important;
+  height: 1.6em !important;
+  width: 1.6em !important;
   padding-right: 5px;
 }
 
