@@ -51,6 +51,7 @@ const editors = reactive({
   TransactionController: markRaw(defineAsyncComponent(() => import('./controllers/TransactionController.vue'))),
   VariableDataset: markRaw(defineAsyncComponent(() => import('./configs/VariableDatasetConfig.vue'))),
   HttpHeadersTemplate: markRaw(defineAsyncComponent(() => import('./configs/HttpheaderTemplateConfig.vue'))),
+  DatabaseEngine: markRaw(defineAsyncComponent(() => import('./configs/DatabaseEngineConfig.vue'))),
   ConstantTimer: markRaw(defineAsyncComponent(() => import('./timers/ConstantTimer.vue')))
 })
 

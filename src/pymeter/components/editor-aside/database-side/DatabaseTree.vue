@@ -16,8 +16,8 @@
           <!-- 数据库引擎名称 -->
           <span class="tree-item-name">{{ node.label }}</span>
           <!-- 类型标签 -->
-          <el-tag v-if="data.databaseType == 'ORACLE'" type="info" size="small">Oracle</el-tag>
           <el-tag v-if="data.databaseType == 'MYSQL'" type="info" size="small">MySQL</el-tag>
+          <el-tag v-if="data.databaseType == 'ORACLE'" type="info" size="small">Oracle</el-tag>
           <el-tag v-if="data.databaseType == 'POSTGRESQL'" type="info" size="small">PostgreSQL</el-tag>
           <el-tag v-if="data.databaseType == 'SQL_SERVER'" type="info" size="small">SQL Server</el-tag>
         </span>
