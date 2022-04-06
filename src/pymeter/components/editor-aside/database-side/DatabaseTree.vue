@@ -175,8 +175,8 @@ const deleteDatabaseEngine = async ({ databaseNo, databaseName }) => {
 const handleNodeClick = (data) => {
   store.commit({
     type: 'pymeter/addTab',
-    editorNo: data.databaseNo,
-    editorName: data.databaseName,
+    editorNo: data.configNo,
+    editorName: data.configName,
     editorComponent: 'DatabaseEngine',
     editorMode: 'QUERY'
   })
