@@ -49,6 +49,7 @@ const componentNames = reactive({
   HTTPSampler: 'HTTP请求',
   PythonSampler: 'Python请求',
   SnippetSampler: 'Snippet请求',
+  SQLSampler: 'SQL请求',
   PythonPreProcessor: 'Python前置脚本',
   PythonPostProcessor: 'Python后置脚本',
   PythonAssertion: 'Python断言',

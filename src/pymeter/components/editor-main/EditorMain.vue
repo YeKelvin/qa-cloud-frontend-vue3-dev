@@ -40,6 +40,7 @@ const editors = reactive({
   HTTPSampler: markRaw(defineAsyncComponent(() => import('./samplers/http-sampler/HttpSampler.vue'))),
   PythonSampler: markRaw(defineAsyncComponent(() => import('./samplers/PythonSampler.vue'))),
   SnippetSampler: markRaw(defineAsyncComponent(() => import('./samplers/snippet-sampler/SnippetSampler.vue'))),
+  SQLSampler: markRaw(defineAsyncComponent(() => import('./samplers/SQLSampler.vue'))),
   PythonPreProcessor: markRaw(defineAsyncComponent(() => import('./pre-processors/PythonPreProcessor.vue'))),
   PythonPostProcessor: markRaw(defineAsyncComponent(() => import('./post-processors/PythonPostProcessor.vue'))),
   PythonAssertion: markRaw(defineAsyncComponent(() => import('./assertions/PythonAssertion.vue'))),

@@ -54,3 +54,10 @@ export const TestPhase = {
   ACCEPTANCE_TESTING: '验收测试',
   COMPLETED: '测试结束'
 }
+
+export const DatabaseType = {
+  ORACLE: 'Oracle',
+  MYSQL: 'MySQL',
+  POSTGRESQL: 'PostgreSQL',
+  Microsoft_SQL_SERVER: 'Microsoft SQL Server'
+}

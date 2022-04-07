@@ -27,16 +27,11 @@
       <!-- 数据库类型 -->
       <el-form-item label="数据库类型：" prop="databaseType">
         <el-select v-model="engineInfo.databaseType" :disabled="queryMode" style="width: 100%">
-          <el-option label="Oracle" value="oracle" />
-          <el-option label="MySQL" value="mysql" />
-          <el-option label="PostgreSQL" value="postgresql" />
-          <el-option label="Microsoft SQL Server" value="mssql" />
+          <el-option label="Oracle" value="ORACLE" />
+          <el-option label="MySQL" value="MYSQL" />
+          <el-option label="PostgreSQL" value="POSTGRESQL" />
+          <el-option label="Microsoft SQL Server" value="Microsoft_SQL_SERVER" />
         </el-select>
-      </el-form-item>
-
-      <!-- 驱动名称 -->
-      <el-form-item label="驱动名称：" prop="driver">
-        <el-input v-model="engineInfo.driver" placeholder="驱动名称" clearable disabled />
       </el-form-item>
 
       <!-- 用户名称 -->
@@ -112,7 +107,6 @@ const engineInfo = ref({
   configName: 'DatabaseEngine',
   configDesc: '',
   databaseType: '',
-  driver: '',
   username: '',
   password: '',
   host: '',
@@ -126,7 +120,6 @@ const engineFormRules = reactive({
   configName: [{ required: true, message: '配置名称不能为空', trigger: 'blur' }],
   variableName: [{ required: true, message: '变量名称不能为空', trigger: 'blur' }],
   databaseType: [{ required: true, message: '数据库类型不能为空', trigger: 'blur' }],
-  driver: [{ required: true, message: '驱动名称不能为空', trigger: 'blur' }],
   username: [{ required: true, message: '用户名称不能为空', trigger: 'blur' }],
   password: [{ required: true, message: '用户密码不能为空', trigger: 'blur' }],
   host: [{ required: true, message: '主机不能为空', trigger: 'blur' }],
@@ -137,23 +130,19 @@ const engineFormRules = reactive({
 watch(
   () => engineInfo.value.databaseType,
   (val) => {
-    if (val === 'mysql') {
-      engineInfo.value.driver = 'mysqldb'
-      engineInfo.value.port = '3306'
-      return
-    }
-    if (val === 'oracle') {
-      engineInfo.value.driver = 'cx_oracle'
+    if (val === 'ORACLE') {
       engineInfo.value.port = '1521'
       return
     }
-    if (val === 'postgresql') {
-      engineInfo.value.driver = 'psycopg2'
+    if (val === 'MYSQL') {
+      engineInfo.value.port = '3306'
+      return
+    }
+    if (val === 'POSTGRESQL') {
       engineInfo.value.port = '5432'
       return
     }
-    if (val === 'mssql') {
-      engineInfo.value.driver = 'pyodbc'
+    if (val === 'Microsoft_SQL_SERVER') {
       engineInfo.value.port = '1433'
       return
     }
