@@ -2,7 +2,7 @@
   <el-tree
     ref="eltreeRef"
     node-key="databaseNo"
-    :props="{ label: 'databaseName' }"
+    :props="{ label: 'configName' }"
     :data="databaseEngineList"
     :filter-node-method="filterNode"
     @node-click="handleNodeClick"

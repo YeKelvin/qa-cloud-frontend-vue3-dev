@@ -7,6 +7,7 @@
       <SvgIcon v-else-if="data.elementType == 'GROUP'" icon-name="pymeter-group" />
       <SvgIcon v-else-if="data.elementClass == 'PythonSampler'" icon-name="pymeter-python" />
       <SvgIcon v-else-if="data.elementClass == 'SnippetSampler'" icon-name="pymeter-snippet" />
+      <SvgIcon v-else-if="data.elementClass == 'SQLSampler'" icon-name="pymeter-sql" />
       <SvgIcon v-else-if="data.elementType == 'SAMPLER'" icon-name="pymeter-sampler" />
       <SvgIcon v-else-if="data.elementType == 'PRE_PROCESSOR'" icon-name="pymeter-pre-processor" />
       <SvgIcon v-else-if="data.elementType == 'POST_PROCESSOR'" icon-name="pymeter-post-processor" />

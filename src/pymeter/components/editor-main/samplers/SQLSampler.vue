@@ -3,7 +3,7 @@
     <el-form
       ref="elformRef"
       label-position="right"
-      label-width="100px"
+      label-width="120px"
       style="width: 100%"
       inline-message
       :model="elementInfo"
@@ -20,27 +20,32 @@
       </el-form-item>
 
       <!-- 数据库引擎下拉框 -->
-      <el-form-item label="数据库引擎：" prop="SQLSampler__engine_no">
-        <el-select v-model="elementInfo.property.SQLSampler__engine_no" style="width: 100%" :disabled="queryMode">
-          <el-option v-for="item in engineList" :key="item.configNo" :label="item.configName" :value="item.configNo" />
+      <el-form-item label="数据库引擎：" prop="property.engineNo">
+        <el-select v-model="elementInfo.property.engineNo" style="width: 100%" :disabled="queryMode">
+          <el-option v-for="item in engineList" :key="item.configNo" :label="item.configName" :value="item.configNo">
+            <span class="database-type-option">
+              <span>{{ item.configName }}</span>
+              <el-tag type="danger" size="small">{{ DatabaseType[item.databaseType] }}</el-tag>
+            </span>
+          </el-option>
         </el-select>
       </el-form-item>
 
       <!-- 结果变量名称 -->
-      <el-form-item label="结果名称：" prop="SQLSampler__result_name">
+      <el-form-item label="结果名称：" prop="property.SQLSampler__result_name">
         <el-input
           v-model="elementInfo.property.SQLSampler__result_name"
-          placeholder="结果变量名称"
+          placeholder="查询结果变量名称，默认：rows"
           clearable
           :readonly="queryMode"
         />
       </el-form-item>
 
       <!-- 超时时间 -->
-      <el-form-item label="超时时间：" prop="SQLSampler__query_timeout">
+      <el-form-item label="超时时间：" prop="property.SQLSampler__query_timeout">
         <el-input
           v-model="elementInfo.property.SQLSampler__query_timeout"
-          placeholder="执行超时时间"
+          placeholder="查询超时时间，默认：10000"
           clearable
           :readonly="queryMode"
         >
@@ -76,7 +81,7 @@
 <script setup>
 import { ElMessage } from 'element-plus'
 import { Check, Close, Edit } from '@element-plus/icons-vue'
-import { DatabaseType } from '@/api/script/enum'
+import { DatabaseType } from '@/api/enum'
 import * as ElementService from '@/api/script/element'
 import * as DatabaseService from '@/api/script/database'
 import editorProps from '@/pymeter/composables/editor.props'
@@ -96,7 +101,7 @@ const elementInfo = ref({
   elementType: 'SAMPLER',
   elementClass: 'SQLSampler',
   property: {
-    SQLSampler__engine_no: '',
+    engineNo: '',
     SQLSampler__statement: '',
     SQLSampler__result_name: '',
     SQLSampler__query_timeout: ''
@@ -104,7 +109,7 @@ const elementInfo = ref({
 })
 const elementFormRules = reactive({
   elementName: [{ required: true, message: '元素名称不能为空', trigger: 'blur' }],
-  'property.SQLSampler__engine_no': [{ required: true, message: '数据库引擎编号不能为空', trigger: 'blur' }],
+  'property.engineNo': [{ required: true, message: '数据库引擎编号不能为空', trigger: 'blur' }],
   'property.SQLSampler__statement': [{ required: true, message: 'SQL不能为空', trigger: 'blur' }]
 })
 const engineList = ref([])
@@ -178,6 +183,12 @@ const createSamplerElement = async () => {
 </script>
 
 <style lang="scss" scoped>
+.database-type-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 :deep(.el-textarea.is-disabled .el-textarea__inner) {
   cursor: auto;
 }

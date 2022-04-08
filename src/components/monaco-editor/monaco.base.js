@@ -7,6 +7,7 @@ import 'monaco-editor/esm/vs/language/html/monaco.contribution.js'
 import 'monaco-editor/esm/vs/language/json/monaco.contribution.js'
 import 'monaco-editor/esm/vs/language/typescript/monaco.contribution.js'
 import 'monaco-editor/esm/vs/basic-languages/python/python.contribution.js'
+import 'monaco-editor/esm/vs/basic-languages/sql/sql.contribution.js'
 
 import 'monaco-editor/esm/vs/editor/standalone/browser/accessibilityHelp/accessibilityHelp.js'
 // import 'monaco-editor/esm/vs/editor/standalone/browser/iPadShowKeyboard/iPadShowKeyboard.js'

@@ -44,7 +44,7 @@ const { showResultDrawer, showLogDrawer } = usePyMeterState()
 onBeforeMount(() => {
   socket.on('pymeter_start', (data) => {
     ElNotification.success({ message: '开始执行脚本', duration: 2 * 1000 })
-    results.value.push(data.result)
+    results.value.push(data)
   })
   socket.on('pymeter_result_summary', (data) => {
     const result = results.value.find((result) => result.id === data.resultId)

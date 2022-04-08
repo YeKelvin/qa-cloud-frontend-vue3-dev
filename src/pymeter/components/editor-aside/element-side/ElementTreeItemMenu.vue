@@ -23,6 +23,7 @@
             新增HTTP请求
           </el-dropdown-item>
           <el-dropdown-item @click="openNewPythonSamplerTab(node)">新增Python请求</el-dropdown-item>
+          <el-dropdown-item @click="openNewSQLSamplerTab(node)">新增SQL请求</el-dropdown-item>
           <el-dropdown-item @click="openNewSnippetSamplerTab(node)">新增Snippet请求</el-dropdown-item>
         </template>
 
@@ -197,6 +198,23 @@ const openNewPythonSamplerTab = (node) => {
     editorNo: 'UNSAVED_PYTHON_SAMPLER',
     editorName: 'New Python',
     editorComponent: 'PythonSampler',
+    editorMode: 'CREATE',
+    metadata: {
+      rootNo: props.node.data.rootNo,
+      parentNo: props.node.data.elementNo
+    }
+  })
+}
+
+/**
+ * 打开新增 SQLSampler 的标签页
+ */
+const openNewSQLSamplerTab = (node) => {
+  store.commit({
+    type: 'pymeter/addTab',
+    editorNo: 'UNSAVED_SQL_SAMPLER',
+    editorName: 'New SQL',
+    editorComponent: 'SQLSampler',
     editorMode: 'CREATE',
     metadata: {
       rootNo: props.node.data.rootNo,
