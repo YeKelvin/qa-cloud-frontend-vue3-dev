@@ -41,6 +41,16 @@
         />
       </el-form-item>
 
+      <!-- 结果数限制 -->
+      <el-form-item label="结果数限制：" prop="property.SQLSampler__limit">
+        <el-input
+          v-model="elementInfo.property.SQLSampler__limit"
+          placeholder="查询结果行数限制大小，默认=10"
+          clearable
+          :readonly="queryMode"
+        />
+      </el-form-item>
+
       <!-- 超时时间 -->
       <el-form-item label="超时时间：" prop="property.SQLSampler__query_timeout">
         <el-input
@@ -103,6 +113,7 @@ const elementInfo = ref({
   property: {
     engineNo: '',
     SQLSampler__statement: '',
+    SQLSampler__limit: '',
     SQLSampler__result_name: '',
     SQLSampler__query_timeout: ''
   }
