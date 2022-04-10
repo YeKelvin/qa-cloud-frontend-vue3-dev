@@ -41,35 +41,52 @@
         />
       </el-form-item>
 
-      <!-- 结果数限制 -->
-      <el-form-item label="结果数限制：" prop="property.SQLSampler__limit">
-        <el-input
-          v-model="elementInfo.property.SQLSampler__limit"
-          placeholder="查询结果行数限制大小，默认=10"
-          clearable
-          :readonly="queryMode"
-        />
-      </el-form-item>
+      <el-tabs v-model="activeTabName">
+        <el-tab-pane name="STATEMENT">
+          <template #label>
+            <el-badge :hidden="hiddenStatementDot" type="success" is-dot>SQL声明</el-badge>
+          </template>
+        </el-tab-pane>
+        <el-tab-pane name="SETTINGS">
+          <template #label>
+            <el-badge :hidden="hiddenSettingsDot" type="success" is-dot>SQL配置</el-badge>
+          </template>
+        </el-tab-pane>
+      </el-tabs>
 
-      <!-- 超时时间 -->
-      <el-form-item label="超时时间：" prop="property.SQLSampler__query_timeout">
-        <el-input
-          v-model="elementInfo.property.SQLSampler__query_timeout"
-          placeholder="查询超时时间，默认：10000"
-          clearable
-          :readonly="queryMode"
-        >
-          <template #append>ms</template>
-        </el-input>
-      </el-form-item>
+      <div v-show="showSettingsTab">
+        <!-- 结果数限制 -->
+        <el-form-item label="结果数限制：" prop="property.SQLSampler__limit">
+          <el-input
+            v-model="elementInfo.property.SQLSampler__limit"
+            placeholder="查询结果行数限制大小，默认=10"
+            clearable
+            :readonly="queryMode"
+          />
+        </el-form-item>
+
+        <!-- 超时时间 -->
+        <el-form-item label="超时时间：" prop="property.SQLSampler__query_timeout">
+          <el-input
+            v-model="elementInfo.property.SQLSampler__query_timeout"
+            placeholder="查询超时时间，默认=10000"
+            clearable
+            :readonly="queryMode"
+          >
+            <template #append>ms</template>
+          </el-input>
+        </el-form-item>
+      </div>
 
       <!-- SQL语句 -->
-      <MonacoEditor
-        ref="codeEditorRef"
-        v-model="elementInfo.property.SQLSampler__statement"
-        language="sql"
-        :read-only="queryMode"
-      />
+      <div v-show="showStatementTab">
+        <MonacoEditor
+          ref="codeEditorRef"
+          v-model="elementInfo.property.SQLSampler__statement"
+          language="sql"
+          :read-only="queryMode"
+        />
+      </div>
 
       <!-- 操作按钮 -->
       <el-form-item v-if="queryMode">
@@ -125,6 +142,15 @@ const elementFormRules = reactive({
 })
 const engineList = ref([])
 const codeEditorRef = ref()
+const activeTabName = ref('STATEMENT')
+const showStatementTab = computed(() => activeTabName.value === 'STATEMENT')
+const showSettingsTab = computed(() => activeTabName.value === 'SETTINGS')
+const hiddenStatementDot = computed(() => elementInfo.value.property.SQLSampler__statement === '')
+const hiddenSettingsDot = computed(() => {
+  return (
+    elementInfo.value.property.SQLSampler__limit === '' && elementInfo.value.property.SQLSampler__query_timeout === ''
+  )
+})
 
 onMounted(() => {
   // 查询所有数据库引擎
@@ -202,5 +228,13 @@ const createSamplerElement = async () => {
 
 :deep(.el-textarea.is-disabled .el-textarea__inner) {
   cursor: auto;
+}
+
+:deep(.el-badge__content) {
+  top: 20px;
+}
+
+:deep(.el-badge__content.is-fixed.is-dot) {
+  right: -4px;
 }
 </style>

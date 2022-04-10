@@ -30,14 +30,16 @@
         />
       </el-form-item>
 
-      <!-- 延迟 -->
-      <el-form-item label="延迟ms：" prop="property.TestCollection__delay">
+      <!-- 间隔时间 -->
+      <el-form-item label="间隔时间：" prop="property.TestCollection__delay">
         <el-input
           v-model="elementInfo.property.TestCollection__delay"
-          placeholder="延迟运行"
+          placeholder="间隔运行时间"
           clearable
           :disabled="true"
-        />
+        >
+          <template #append>ms</template>
+        </el-input>
       </el-form-item>
 
       <!-- 操作按钮 -->

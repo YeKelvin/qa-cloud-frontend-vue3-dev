@@ -66,7 +66,12 @@
 
       <!-- 超时时间 -->
       <el-form-item label="超时时间：" prop="connectTimeout">
-        <el-input v-model="engineInfo.connectTimeout" placeholder="连接超时时间（ms）" clearable :readonly="queryMode">
+        <el-input
+          v-model="engineInfo.connectTimeout"
+          placeholder="连接超时时间，默认=10000"
+          clearable
+          :readonly="queryMode"
+        >
           <template #append>ms</template>
         </el-input>
       </el-form-item>
@@ -113,7 +118,7 @@ const engineInfo = ref({
   port: '',
   query: '',
   database: '',
-  connectTimeout: '10000',
+  connectTimeout: '',
   variableName: ''
 })
 const engineFormRules = reactive({
