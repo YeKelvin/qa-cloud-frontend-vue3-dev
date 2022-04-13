@@ -43,7 +43,7 @@
     </el-card>
 
     <!-- 结果数据详情 -->
-    <el-card :body-style="{ padding: '0' }" shadow="hover" style="margin-left: 10px; width: 100%">
+    <el-card class="result-details" shadow="hover">
       <el-empty v-if="!showing" description=" " />
       <el-tabs v-else v-model="activeTabName" style="width: 100%; padding: 0 10px" @tab-click="handleTabClick">
         <el-tab-pane key="SUMMARY" label="信息" name="SUMMARY" />
@@ -91,7 +91,28 @@
 
       <!-- 响应体 -->
       <template v-if="showing && showResponseCode">
-        <MonacoEditor ref="responseEditorRef" language="json" :read-only="true" />
+        <!-- 按钮组 -->
+        <span style="display: flex; align-items: center; padding: 5px">
+          <el-radio-group v-model="responseDisplayType" style="margin-right: 20px" size="small">
+            <el-radio-button label="pretty">Pretty</el-radio-button>
+            <el-radio-button label="raw">Raw</el-radio-button>
+          </el-radio-group>
+          <el-select v-model="responseContentType" style="width: 80px; margin-right: 20px" size="small">
+            <el-option label="JSON" value="json" />
+            <el-option label="XML" value="xml" />
+            <el-option label="HTML" value="html" />
+            <el-option label="Text" value="text" />
+          </el-select>
+          <el-button size="small" :type="responseWordWrap == 'on' ? 'primary' : ''" @click="toggleResponseWordWrap()">
+            <SvgIcon icon-name="pymeter-wordwrap" />
+          </el-button>
+        </span>
+        <MonacoEditor
+          ref="responseEditorRef"
+          :language="responseDisplayType == 'pretty' ? responseContentType : ''"
+          :word-wrap="responseWordWrap"
+          :read-only="true"
+        />
       </template>
 
       <!-- 失败断言 -->
@@ -160,6 +181,9 @@ const responseHeaders = computed(() => {
   })
   return data
 })
+const responseDisplayType = ref('pretty')
+const responseContentType = ref('json')
+const responseWordWrap = ref('on')
 
 const handleNodeClick = (data, node) => {
   if (node.level === 1) return
@@ -210,6 +234,10 @@ const setFailedAssertionCode = (code) => {
     assertionEditorRef.value && assertionEditorRef.value.setValue(code)
   })
 }
+
+const toggleResponseWordWrap = () => {
+  responseWordWrap.value = responseWordWrap.value === 'on' ? 'off' : 'on'
+}
 </script>
 
 <style lang="scss" scoped>
@@ -248,13 +276,21 @@ const setFailedAssertionCode = (code) => {
   line-height: 20px;
 }
 
-:deep(.el-card__body) {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-
+.result-details {
+  margin-left: 10px;
   width: 100%;
-  height: 100%;
+
+  :deep(.el-card__body) {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+
+    width: 100%;
+    height: 100%;
+
+    padding: 0;
+  }
 }
 
 :deep(.el-tabs__header) {

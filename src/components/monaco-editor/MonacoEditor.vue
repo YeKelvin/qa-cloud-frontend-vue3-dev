@@ -11,16 +11,27 @@ import monacoOptions from './monaco.options'
 
 const emit = defineEmits(['update:modelValue'])
 const props = defineProps({
-  fontSize: { type: Number, default: 14 },
   language: { type: String, required: true },
+  fontSize: { type: Number, default: 14 },
   readOnly: { type: Boolean, default: false },
-  theme: { type: String, default: 'vs' }
+  theme: { type: String, default: 'vs' },
+  wordWrap: { type: String, default: 'on' }
 })
 const editorRef = ref()
 
 watch(
+  () => props.language,
+  (val) => {
+    monaco.editor.setModelLanguage(instance.getModel(), val)
+  }
+)
+watch(
   () => props.readOnly,
   (val) => instance.updateOptions({ readOnly: val })
+)
+watch(
+  () => props.wordWrap,
+  (val) => instance.updateOptions({ wordWrap: val })
 )
 
 let instance
@@ -29,6 +40,7 @@ onMounted(() => {
     fontSize: props.fontSize,
     language: props.language,
     readOnly: props.readOnly,
+    wordWrap: props.wordWrap,
     theme: props.theme,
     value: props.modelValue,
     ...monacoOptions

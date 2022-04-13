@@ -21,6 +21,7 @@ const DEFAULT_OPTIONS = {
   formatOnPaste: true,
   // 输入时格式化
   formatOnType: true,
+  // 开启折叠
   folding: true,
   foldingHighlight: true,
   fixedOverflowWidgets: true,
@@ -63,8 +64,6 @@ const DEFAULT_OPTIONS = {
   unicodeHighlight: { ambiguousCharacters: false },
   // 在制表位后插入和删除空格
   useTabStops: false,
-  // 折行显示
-  wordWrap: 'on',
   wrappingIndent: 'same'
 }
 
