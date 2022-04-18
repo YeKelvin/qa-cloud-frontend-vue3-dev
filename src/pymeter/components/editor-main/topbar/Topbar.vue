@@ -53,7 +53,8 @@ const componentNames = reactive({
   PythonPreProcessor: 'Python前置脚本',
   PythonPostProcessor: 'Python后置脚本',
   PythonAssertion: 'Python断言',
-  ConstantTimer: '固定定时器'
+  ConstantTimer: '固定定时器',
+  DatabaseEngine: '数据库配置器'
 })
 // 是否显示变量详情视图
 const showVariablesDialog = ref(false)
