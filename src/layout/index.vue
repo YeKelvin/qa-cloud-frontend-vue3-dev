@@ -25,7 +25,8 @@ const classObj = computed(() => {
   return {
     hideSidebar: !sidebar.value.opened,
     openSidebar: sidebar.value.opened,
-    withoutAnimation: sidebar.value.withoutAnimation
+    withoutAnimation: sidebar.value.withoutAnimation,
+    mobile: device.value === 'mobile'
   }
 })
 
