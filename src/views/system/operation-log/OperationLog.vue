@@ -3,12 +3,12 @@
     <el-card shadow="hover" style="margin-bottom: 10px">
       <template #header><span>查询条件</span></template>
       <div class="conditions-container">
-        <ConditionInput v-model="queryConditions.actionDesc" label="操作描述" />
-        <ConditionInput v-model="queryConditions.actionMethod" label="操作方法" />
-        <ConditionInput v-model="queryConditions.actionEndpoint" label="操作路由" />
-        <ConditionInput v-model="queryConditions.createdBy" label="操作人" />
         <ConditionDatetimePicker v-model="queryConditions.startTime" label="开始时间" />
         <ConditionDatetimePicker v-model="queryConditions.endTime" label="结束时间" />
+        <ConditionInput v-model="queryConditions.operationMethod" label="操作方法" />
+        <ConditionInput v-model="queryConditions.operationEndpoint" label="操作路由" />
+        <ConditionInput v-model="queryConditions.operationName" label="操作描述" />
+        <ConditionInput v-model="queryConditions.operationBy" label="操作人" />
       </div>
       <div style="display: flex; justify-content: center">
         <el-button type="primary" :icon="Search" @click="query()">查 询</el-button>
@@ -22,13 +22,16 @@
         <!-- 空数据提示 -->
         <template #empty><el-empty /></template>
         <!-- 列定义 -->
-        <el-table-column prop="actionDesc" label="操作描述" min-width="150" />
-        <el-table-column prop="actionMethod" label="请求方法" min-width="150" />
-        <el-table-column prop="actionEndpoint" label="请求路由" min-width="150" />
-        <el-table-column prop="oldValue" label="旧值" min-width="150" />
-        <el-table-column prop="newValue" label="新值" min-width="150" />
-        <el-table-column prop="createdBy" label="操作人" min-width="150" />
-        <el-table-column prop="createdTime" label="操作时间" min-width="150" />
+        <el-table-column prop="operationMethod" label="请求方法" min-width="150" />
+        <el-table-column prop="operationEndpoint" label="请求路由" min-width="150" />
+        <el-table-column prop="operationName" label="操作描述" min-width="150" />
+        <el-table-column prop="operationBy" label="操作人" min-width="150" />
+        <el-table-column prop="operationTime" label="操作时间" min-width="150" />
+        <el-table-column fixed="right" label="操作" min-width="60" width="60">
+          <template #default="{ row }">
+            <el-button type="text">详情</el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </el-card>
 
@@ -56,10 +59,10 @@ import ConditionDatetimePicker from '@/components/query-condition/ConditionDatet
 
 // 查询条件
 const { queryConditions, resetQueryConditions } = useQueryConditions({
-  actionDesc: '',
-  actionMethod: '',
-  actionEndpoint: '',
-  createdBy: '',
+  operationMethod: '',
+  operationEndpoint: '',
+  operationName: '',
+  operationBy: '',
   startTime: '',
   endTime: ''
 })
@@ -72,10 +75,12 @@ const total = ref(0)
  * 查询
  */
 const query = () => {
-  LogService.queryActionLogList({ ...queryConditions, page: page.value, pageSize: pageSize.value }).then((response) => {
-    tableData.value = response.result['data']
-    total.value = response.result['total']
-  })
+  LogService.queryOperationLogList({ ...queryConditions, page: page.value, pageSize: pageSize.value }).then(
+    (response) => {
+      tableData.value = response.result['data']
+      total.value = response.result['total']
+    }
+  )
 }
 
 /**
