@@ -39,7 +39,7 @@
         <el-input
           v-model="elementInfo.property.TestGroup__main_controller.property.LoopController__loops"
           clearable
-          disabled
+          :disabled="queryMode"
         />
       </el-form-item>
 
@@ -128,7 +128,7 @@ const checkLoops = (_, value, callback) => {
     return callback(new Error('循环次数必须为整数'))
   } else {
     if (val < 1 || val > 999) {
-      return callback(new Error('循环次数仅支持[1-999]'))
+      return callback(new Error('循环次数仅支持[1-10]'))
     } else {
       return callback()
     }

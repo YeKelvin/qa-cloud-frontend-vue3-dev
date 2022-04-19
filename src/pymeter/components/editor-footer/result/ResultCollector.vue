@@ -1,15 +1,12 @@
 <template>
   <div class="result-collector-container">
     <!-- 结果列表 -->
-    <el-card
-      :body-style="{ padding: '0' }"
-      shadow="hover"
-      style="min-width: 400px; max-width: 400px; width: 400px; height: 100%; overflow: hidden"
-    >
+    <el-card shadow="hover" class="result-tree">
       <el-scrollbar style="width: 100%; height: 100%" wrap-style="overflow-x:auto;" view-style="padding:10px;">
         <el-tree
           default-expand-all
           highlight-current
+          style="padding-bottom: 50px"
           :data="groups"
           :props="{ label: 'name', children: 'children' }"
           :expand-on-click-node="false"
@@ -44,7 +41,7 @@
 
     <!-- 结果数据详情 -->
     <el-card class="result-details" shadow="hover">
-      <el-empty v-if="!showing" description=" " />
+      <el-empty v-if="!showing" description=" " style="width: 100%" />
       <el-tabs v-else v-model="activeTabName" style="width: 100%; padding: 0 10px" @tab-click="handleTabClick">
         <el-tab-pane key="SUMMARY" label="信息" name="SUMMARY" />
         <el-tab-pane v-if="requestHeaders.length > 0" key="REQUEST_HEADERS" label="请求头" name="REQUEST_HEADERS" />
@@ -250,6 +247,20 @@ const toggleResponseWordWrap = () => {
   padding-top: 0;
 }
 
+.result-tree {
+  min-width: 400px;
+  max-width: 400px;
+  width: 400px;
+  height: 100%;
+  overflow: hidden;
+
+  :deep(.el-card__body) {
+    padding: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
 .tree-item {
   display: inline-flex;
   align-items: center;
@@ -261,6 +272,7 @@ const toggleResponseWordWrap = () => {
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  padding-right: 10px;
 }
 
 .element-name {
