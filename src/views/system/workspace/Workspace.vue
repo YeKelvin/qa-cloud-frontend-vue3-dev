@@ -26,7 +26,9 @@
         <!-- 列定义 -->
         <el-table-column prop="workspaceNo" label="空间编号" min-width="150" />
         <el-table-column prop="workspaceName" label="空间名称" min-width="150" />
-        <el-table-column prop="workspaceScope" label="空间作用域" min-width="150" />
+        <el-table-column prop="workspaceScope" label="空间作用域" min-width="150">
+          <template #default="{ row }">{{ WorkspaceScope[row.workspaceScope] }}</template>
+        </el-table-column>
         <el-table-column prop="workspaceDesc" label="空间描述" min-width="150" />
         <el-table-column fixed="right" label="操作" min-width="150">
           <template #default="{ row }">
@@ -66,12 +68,13 @@
 <script setup>
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus } from '@element-plus/icons-vue'
-import * as WorkspaceService from '@/api/public/workspace'
+import { WorkspaceScope } from '@/api/enum'
 import ConditionInput from '@/components/query-condition/ConditionInput.vue'
 import useQueryConditions from '@/composables/useQueryConditions'
 import CreateDialog from './WorkspaceCreateDialog.vue'
 import ModifyDialog from './WorkspaceModifyDialog.vue'
 import MemberDialog from './WorkspaceMemberDialog.vue'
+import * as WorkspaceService from '@/api/public/workspace'
 
 // 查询条件
 const { queryConditions, resetQueryConditions } = useQueryConditions({

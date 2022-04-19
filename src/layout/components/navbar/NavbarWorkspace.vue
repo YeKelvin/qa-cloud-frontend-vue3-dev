@@ -26,13 +26,13 @@
         <span class="workspace-name">{{ node.label }}</span>
         <!-- 标签 -->
         <template v-if="data.workspaceScope == 'PRIVATE'">
-          <el-tag size="small" type="danger" style="margin-left: 5px">private</el-tag>
+          <el-tag size="small" type="danger" style="margin-left: 5px">私有</el-tag>
         </template>
         <template v-if="data.workspaceScope == 'PROTECTED'">
-          <el-tag size="small" type="warning" style="margin-left: 5px">protected</el-tag>
+          <el-tag size="small" type="warning" style="margin-left: 5px">保护</el-tag>
         </template>
         <template v-if="data.workspaceScope == 'PUBLIC'">
-          <el-tag size="small" type="success" style="margin-left: 5px">public</el-tag>
+          <el-tag size="small" type="success" style="margin-left: 5px">公共</el-tag>
         </template>
       </template>
     </el-tree>

@@ -85,7 +85,8 @@ onMounted(() => {
 
 :deep(.el-input__inner) {
   border: 0;
-  border-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
   box-shadow: none;
 }
 

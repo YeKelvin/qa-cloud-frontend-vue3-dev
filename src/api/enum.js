@@ -20,14 +20,14 @@ export const PermissionState = {
 
 export const HttpMethods = {
   GET: 'GET',
-  HEAD: 'HEAD',
   POST: 'POST',
   PUT: 'PUT',
+  PATCH: 'PATCH',
   DELETE: 'DELETE',
-  CONNECT: 'CONNECT',
   OPTIONS: 'OPTIONS',
-  TRACE: 'TRACE',
-  PATCH: 'PATCH'
+  HEAD: 'HEAD',
+  CONNECT: 'CONNECT',
+  TRACE: 'TRACE'
 }
 
 export const RunningState = {
@@ -60,4 +60,10 @@ export const DatabaseType = {
   MYSQL: 'MySQL',
   POSTGRESQL: 'PostgreSQL',
   Microsoft_SQL_SERVER: 'Microsoft SQL Server'
+}
+
+export const WorkspaceScope = {
+  PRIVATE: '私有',
+  PROTECTED: '保护',
+  PUBLIC: '公共'
 }
