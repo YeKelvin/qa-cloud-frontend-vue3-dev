@@ -16,6 +16,7 @@
           <template v-if="type == 'HTTP' && phase == 'POST' && phase == 'ASSERT'">
             <li @click="getResponseJsonSnippet()">获取Json响应</li>
           </template>
+          <li @click="getTableData()">获取表数据</li>
           <li @click="setVarSnippet()">设置局部变量</li>
           <li @click="setPropSnippet()">设置全局变量</li>
           <li @click="outputLogInfo()">输出日志</li>
@@ -84,6 +85,10 @@ export default {
     },
     getResponseJsonSnippet() {
       this.$refs.pythonEditor.insert('res = result.json\n')
+      this.$refs.pythonEditor.focus()
+    },
+    getTableData() {
+      this.$refs.pythonEditor.insertSnippet("val = vars.get('rows')[0]['${1:colunmName}']\n")
       this.$refs.pythonEditor.focus()
     },
     setVarSnippet() {
