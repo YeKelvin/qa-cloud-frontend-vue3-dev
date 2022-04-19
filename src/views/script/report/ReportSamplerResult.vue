@@ -21,37 +21,44 @@
 
     <!-- 请求部分 tabs -->
     <el-tabs v-model="requestActiveTabName" @tab-click="handleRequestTabClick">
-      <!-- 请求头 -->
-      <el-tab-pane key="HEADERS" label="请求头" name="HEADERS">
-        <el-table :data="requestHeadersData" :show-header="false" max-height="220" style="width: 100%">
-          <el-table-column prop="name" />
-          <el-table-column prop="value" />
-        </el-table>
-      </el-tab-pane>
-      <!-- 请求体 -->
-      <el-tab-pane key="DATA" label="请求数据" name="DATA">
-        <MonacoEditor ref="requestEditorRef" language="json" style="height: 220px" :read-only="true" />
-      </el-tab-pane>
+      <el-tab-pane key="HEADERS" label="请求头" name="HEADERS" />
+      <el-tab-pane key="DATA" label="请求数据" name="DATA" />
     </el-tabs>
+
+    <!-- 请求头 -->
+    <div v-show="showRequestHeaders">
+      <el-table :data="requestHeadersData" :show-header="false" max-height="300" style="width: 100%">
+        <el-table-column prop="name" />
+        <el-table-column prop="value" />
+      </el-table>
+    </div>
+    <!-- 请求体 -->
+    <div v-show="showRequestData">
+      <MonacoEditor ref="requestEditorRef" language="json" style="height: 300px" :read-only="true" />
+    </div>
 
     <!-- 响应部分 -->
     <el-tabs v-model="responseActiveTabName" @tab-click="handleResponseTabClick">
-      <!-- 响应头 -->
-      <el-tab-pane key="HEADERS" label="响应头" name="HEADERS">
-        <el-table :data="responseHeadersData" :show-header="false" max-height="220" style="width: 100%">
-          <el-table-column prop="name" />
-          <el-table-column prop="value" />
-        </el-table>
-      </el-tab-pane>
-      <!-- 响应体 -->
-      <el-tab-pane key="DATA" label="响应数据" name="DATA">
-        <MonacoEditor ref="responseEditorRef" language="json" style="height: 220px" :read-only="true" />
-      </el-tab-pane>
-      <!-- 断言 -->
-      <el-tab-pane v-if="details.failedAssertion" key="ASSERTION" label="断言" name="ASSERTION">
-        <MonacoEditor ref="assertionEditorRef" language="log" style="height: 220px" :read-only="true" />
-      </el-tab-pane>
+      <el-tab-pane key="HEADERS" label="响应头" name="HEADERS" />
+      <el-tab-pane key="DATA" label="响应数据" name="DATA" />
+      <el-tab-pane v-if="details.failedAssertion" key="ASSERTION" label="断言" name="ASSERTION" />
     </el-tabs>
+
+    <!-- 响应头 -->
+    <div v-show="showResponseHeaders">
+      <el-table :data="responseHeadersData" :show-header="false" max-height="300" style="width: 100%">
+        <el-table-column prop="name" />
+        <el-table-column prop="value" />
+      </el-table>
+    </div>
+    <!-- 响应体 -->
+    <div v-show="showResponseData">
+      <MonacoEditor ref="responseEditorRef" language="json" style="height: 300px" :read-only="true" />
+    </div>
+    <!-- 断言 -->
+    <div v-show="showResponseAssertion">
+      <MonacoEditor ref="assertionEditorRef" language="log" style="height: 300px" :read-only="true" />
+    </div>
   </div>
 </template>
 
@@ -65,6 +72,11 @@ const props = defineProps({
 const details = ref({})
 const requestActiveTabName = ref('DATA')
 const responseActiveTabName = ref('DATA')
+const showRequestHeaders = computed(() => requestActiveTabName.value == 'HEADERS')
+const showRequestData = computed(() => requestActiveTabName.value == 'DATA')
+const showResponseHeaders = computed(() => responseActiveTabName.value == 'HEADERS')
+const showResponseData = computed(() => responseActiveTabName.value == 'DATA')
+const showResponseAssertion = computed(() => responseActiveTabName.value == 'ASSERTION')
 const requestHeadersData = computed(() => {
   if (!details.value.requestHeaders) return []
   return getHeadersFromJson(details.value.requestHeaders)
@@ -171,6 +183,20 @@ const getHeadersFromJson = (val) => {
 
   .el-descriptions-item__label {
     margin-right: 5px;
+  }
+}
+
+:deep(.el-tabs__header) {
+  margin: 0 0 5px;
+}
+
+:deep(.el-tabs__active-bar) {
+  height: 1px;
+}
+
+:deep(.el-tabs__nav-wrap) {
+  &:after {
+    height: 0;
   }
 }
 </style>
