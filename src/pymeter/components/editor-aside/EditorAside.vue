@@ -44,6 +44,10 @@ const asideComponents = reactive({
     font-size: 16px;
     font-weight: bold;
   }
+
+  .el-input__wrapper {
+    box-shadow: none;
+  }
 }
 
 :deep(.el-card__body) {

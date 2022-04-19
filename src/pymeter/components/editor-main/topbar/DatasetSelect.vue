@@ -74,18 +74,22 @@ onMounted(() => {
     text-overflow: ellipsis;
   }
 
-  :deep(.el-tag__close) {
-    display: none;
+  :deep(.el-select-dropdown__item span) {
+    padding-right: 10px;
   }
 }
 
-:deep(.el-select-dropdown__item span) {
-  padding-right: 10px;
+:deep(.el-input__wrapper) {
+  box-shadow: none;
 }
 
 :deep(.el-input__inner) {
   border: 0;
   border-radius: 0;
   box-shadow: none;
+}
+
+:deep(.el-tag__close) {
+  display: none;
 }
 </style>
