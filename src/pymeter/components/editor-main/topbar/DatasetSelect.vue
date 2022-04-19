@@ -92,4 +92,8 @@ onMounted(() => {
 :deep(.el-tag__close) {
   display: none;
 }
+
+:deep(.el-tag.is-closable) {
+  padding-right: 9px;
+}
 </style>
