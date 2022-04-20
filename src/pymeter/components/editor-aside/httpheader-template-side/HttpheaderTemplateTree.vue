@@ -77,7 +77,7 @@ const renameTemplate = async ({ templateNo, templateName }) => {
     .catch(() => true)
   if (error) return
   // 修改请求头模板
-  await HeadersService.modifyHttpHeaderTemplate({ templateNo: templateNo, templateName: templateName })
+  await HeadersService.modifyHttpHeaderTemplate({ templateNo: templateNo, templateName: newName })
   // 重新查询列表
   store.dispatch('pymeter/queryHttpHeaderTemplateAll')
   // 重命名tab
