@@ -108,9 +108,9 @@ const filteredTableData = computed(() => {
   } else {
     return rows.value.filter(
       (item) =>
-        item.headerName.indexOf(filterText.value.trim()) !== -1 ||
-        item.headerValue.indexOf(filterText.value.trim()) !== -1 ||
-        item.headerDesc.indexOf(filterText.value.trim()) !== -1
+        (item.headerName && item.headerName.indexOf(filterText.value.trim())) !== -1 ||
+        (item.headerValue && item.headerValue.indexOf(filterText.value.trim())) !== -1 ||
+        (item.headerDesc && item.headerDesc.indexOf(filterText.value.trim())) !== -1
     )
   }
 })

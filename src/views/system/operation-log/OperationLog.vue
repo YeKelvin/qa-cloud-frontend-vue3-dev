@@ -22,12 +22,12 @@
         <!-- 空数据提示 -->
         <template #empty><el-empty /></template>
         <!-- 列定义 -->
-        <el-table-column prop="operationMethod" label="请求方法" min-width="150" />
+        <el-table-column prop="operationMethod" label="请求方法" min-width="100" width="100" />
         <el-table-column prop="operationEndpoint" label="请求路由" min-width="150" />
         <el-table-column prop="operationName" label="操作描述" min-width="150" />
         <el-table-column prop="operationBy" label="操作人" min-width="150" />
         <el-table-column prop="operationTime" label="操作时间" min-width="150" />
-        <el-table-column fixed="right" label="操作" min-width="60" width="60">
+        <el-table-column fixed="right" label="操作" min-width="80" width="80" align="center">
           <template #default="{ row }">
             <el-button type="text">详情</el-button>
           </template>
@@ -70,6 +70,10 @@ const tableData = ref([])
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
+
+onMounted(() => {
+  query()
+})
 
 /**
  * 查询

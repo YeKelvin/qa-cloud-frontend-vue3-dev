@@ -199,4 +199,8 @@ const getHeadersFromJson = (val) => {
     height: 0;
   }
 }
+
+:deep(.el-table td, .el-table th) {
+  padding: 0;
+}
 </style>

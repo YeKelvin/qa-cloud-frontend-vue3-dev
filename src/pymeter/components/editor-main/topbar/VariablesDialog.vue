@@ -16,7 +16,7 @@
         </div>
       </template>
 
-      <el-input v-model="filterText" style="padding: 10px" placeholder="请输入" />
+      <el-input v-model="filterText" style="padding: 10px" placeholder="请输入" clearable />
 
       <!-- 滚动条 -->
       <el-scrollbar
@@ -98,11 +98,12 @@ const filteredTableData = computed(() => {
   if (isBlank(filterText.value)) {
     return rows.value
   } else {
+    const text = filterText.value.trim()
     return rows.value.filter(
       (item) =>
-        item.varName.indexOf(filterText.value.trim()) !== -1 ||
-        item.initialValue.indexOf(filterText.value.trim()) !== -1 ||
-        item.currentValue.indexOf(filterText.value.trim()) !== -1
+        (item.varName && item.varName.indexOf(text) !== -1) ||
+        (item.initialValue && item.initialValue.indexOf(text) !== -1) ||
+        (item.currentValue && item.currentValue.indexOf(text) !== -1)
     )
   }
 })
@@ -124,12 +125,10 @@ watch(activeTabNo, () => {
 })
 
 onMounted(() => {
-  // 激活第一个 tab 页
+  // 激活第一个 tab 页，并触发wacth，查询变量集
   if (!_isEmpty(selectedDatasetNumberList.value)) {
     activeTabNo.value = selectedDatasetNumberList.value[0]
   }
-  // 查询第一个变量集
-  queryVariables()
   // 计算 backtop 位置
   nextTick(() => {
     const dialog = document.querySelector('#topbar-variables-dialog').querySelector('.el-dialog')
