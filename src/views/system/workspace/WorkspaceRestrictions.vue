@@ -20,7 +20,12 @@
     </el-card>
 
     <el-card shadow="hover" class="table-container">
-      <template #header><span>查询结果</span></template>
+      <template #header>
+        <span>
+          <b style="color: #f56c6c">{{ workspaceName }}</b>
+          的限制项
+        </span>
+      </template>
       <el-table :data="tableData" style="width: 100%; height: 100%" fit border stripe highlight-current-row>
         <!-- 空数据提示 -->
         <template #empty><el-empty /></template>
@@ -55,10 +60,10 @@
           <template #default="{ row }">
             <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
             <template v-if="row.state === 'ENABLE'">
-              <el-button type="text" @click="enableRestriction(row)">禁用</el-button>
+              <el-button type="text" @click="disableRestriction(row)">禁用</el-button>
             </template>
             <template v-else>
-              <el-button type="text" @click="disableRestriction(row)">启用</el-button>
+              <el-button type="text" @click="enableRestriction(row)">启用</el-button>
             </template>
             <el-button type="text" @click="deleteRestriction(row)">删除</el-button>
           </template>
@@ -104,6 +109,7 @@ import ModifyDialog from './WorkspaceRestrictionModifyDialog.vue'
 const route = useRoute()
 const router = useRouter()
 const workspaceNo = ref(route.query.workspaceNo)
+const workspaceName = ref('')
 // 查询条件
 const { queryConditions, resetQueryConditions } = useQueryConditions({
   workspaceNo: workspaceNo.value,
@@ -124,6 +130,7 @@ const showModifyDialog = ref(false)
 onMounted(() => {
   if (!workspaceNo.value) goBack()
   query()
+  queryWorkspaceInfo()
 })
 
 /**
@@ -141,11 +148,23 @@ const query = () => {
 }
 
 /**
+ * 查询工作空间信息
+ */
+const queryWorkspaceInfo = () => {
+  WorkspaceService.queryWorkspaceInfo({ workspaceNo: workspaceNo.value }).then((response) => {
+    workspaceName.value = response.result.workspaceName
+  })
+}
+
+/**
  * 启用
  */
 const enableRestriction = ({ restrictionNo }) => {
   WorkspaceService.enableWorkspaceRestriction({ restrictionNo: restrictionNo }).then(() => {
+    // 成功提示
     ElMessage({ message: '启用成功', type: 'info', duration: 2 * 1000 })
+    // 重新查询列表
+    query()
   })
 }
 
@@ -154,7 +173,10 @@ const enableRestriction = ({ restrictionNo }) => {
  */
 const disableRestriction = ({ restrictionNo }) => {
   WorkspaceService.disableWorkspaceRestriction({ restrictionNo: restrictionNo }).then(() => {
+    // 成功提示
     ElMessage({ message: '禁用成功', type: 'info', duration: 2 * 1000 })
+    // 重新查询列表
+    query()
   })
 }
 

@@ -4,6 +4,8 @@ export const queryWorkspaceList = params => request.get('/public/workspace/list'
 
 export const queryWorkspaceAll = params => request.get('/public/workspace/all', { params: params })
 
+export const queryWorkspaceInfo = params => request.get('/public/workspace/info', { params: params })
+
 export const createWorkspace = data => request.post('/public/workspace', data)
 
 export const modifyWorkspace = data => request.put('/public/workspace', data)
