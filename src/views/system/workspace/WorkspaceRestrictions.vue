@@ -23,7 +23,7 @@
       <template #header>
         <span>
           <b style="color: #f56c6c">{{ workspaceName }}</b>
-          的限制项
+          的空间限制
         </span>
       </template>
       <el-table :data="tableData" style="width: 100%; height: 100%" fit border stripe highlight-current-row>
