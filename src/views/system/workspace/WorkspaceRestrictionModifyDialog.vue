@@ -71,7 +71,7 @@ onMounted(() => {
   formData.value.matchType = props.row.matchType
   formData.value.matchContent = props.row.matchContent
   formData.value.exemptionUserNumberedList = props.row.exemptionUserList.map((item) => item.userNo)
-  formData.value.exemptionGroupNumberedList = props.row.exemptionUserList.map((item) => item.groupNo)
+  formData.value.exemptionGroupNumberedList = props.row.exemptionGroupList.map((item) => item.groupNo)
   queryUserAll()
 })
 
