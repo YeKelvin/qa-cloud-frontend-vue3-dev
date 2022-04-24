@@ -137,6 +137,12 @@ export const asyncRoutes = [
         meta: { title: '角色权限', activeMenu: '/system/role' }
       },
       {
+        path: 'group',
+        name: 'Group',
+        component: () => import('@/views/system/group/Group.vue'),
+        meta: { title: '分组管理', icon: 'sidebar-group' }
+      },
+      {
         path: 'workspace',
         name: 'Workspace',
         component: () => import('@/views/system/workspace/Workspace.vue'),

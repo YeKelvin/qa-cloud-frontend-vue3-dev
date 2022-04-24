@@ -18,6 +18,11 @@ export const PermissionState = {
   DISABLE: '禁用'
 }
 
+export const GroupState = {
+  ENABLE: '启用',
+  DISABLE: '禁用'
+}
+
 export const HttpMethods = {
   GET: 'GET',
   POST: 'POST',
