@@ -143,6 +143,13 @@ export const asyncRoutes = [
         meta: { title: '空间管理', icon: 'sidebar-workspace' }
       },
       {
+        path: 'workspace/restrictions',
+        name: 'WorkspaceRestrictions',
+        hidden: true,
+        component: () => import('@/views/system/workspace/WorkspaceRestrictions.vue'),
+        meta: { title: '空间管理', activeMenu: '/system/workspace' }
+      },
+      {
         path: 'operation/log',
         name: 'OperationLog',
         component: () => import('@/views/system/operation-log/OperationLog.vue'),

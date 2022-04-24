@@ -27,7 +27,7 @@ import { ElMessage } from 'element-plus'
 import * as UserService from '@/api/usercenter/user'
 import * as WorkspaceService from '@/api/public/workspace'
 
-const emit = defineEmits(['update:model-value', 're-query'])
+const emit = defineEmits(['update:model-value'])
 const props = defineProps({
   row: { type: Object, default: () => ({}) }
 })
@@ -74,8 +74,6 @@ const save = () => {
       ElMessage({ message: '编辑成功', type: 'info', duration: 2 * 1000 })
       // 关闭dialog
       emit('update:model-value', false)
-      // 重新查询列表
-      emit('re-query')
     }
   )
 }

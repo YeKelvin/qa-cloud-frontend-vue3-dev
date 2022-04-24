@@ -67,3 +67,24 @@ export const WorkspaceScope = {
   PROTECTED: '保护',
   PUBLIC: '公共'
 }
+
+export const MatchMethod = {
+  POST: 'POST',
+  PUT: 'PUT',
+  PATCH: 'PATCH',
+  DELETE: 'DELETE'
+}
+
+export const MatchType = {
+  ALL: '所有',
+  IN: '包含',
+  NOTIN: '不包含',
+  STARTWITH: '开始于',
+  ENDWITH: '结束于',
+  PATTERN: '正则'
+}
+
+export const RestrictionState = {
+  ENABLE: '启用',
+  DISABLE: '禁用'
+}

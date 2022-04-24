@@ -30,12 +30,13 @@
           <template #default="{ row }">{{ WorkspaceScope[row.workspaceScope] }}</template>
         </el-table-column>
         <el-table-column prop="workspaceDesc" label="空间描述" min-width="200" />
-        <el-table-column fixed="right" label="操作" min-width="180" width="180">
+        <el-table-column fixed="right" label="操作" min-width="250" width="250">
           <template #default="{ row }">
             <template v-if="row.workspaceScope == 'PROTECTED'">
               <el-button type="text" @click="openMemberDialog(row)">成员管理</el-button>
             </template>
             <template v-if="row.workspaceScope != 'PRIVATE'">
+              <el-button type="text" @click="gotoRestrictionManager(row)">权限管理</el-button>
               <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
               <el-button type="text" @click="deleteWorkspace(row)">删除</el-button>
             </template>
@@ -61,7 +62,7 @@
     <!-- 编辑空间表单 -->
     <ModifyDialog v-if="showModifyDialog" v-model="showModifyDialog" :row="currentRow" @re-query="query" />
     <!-- 空间成员管理列表 -->
-    <MemberDialog v-if="showMemberDialog" v-model="showMemberDialog" :row="currentRow" @re-query="query" />
+    <MemberDialog v-if="showMemberDialog" v-model="showMemberDialog" :row="currentRow" />
   </div>
 </template>
 
@@ -76,6 +77,7 @@ import ModifyDialog from './WorkspaceModifyDialog.vue'
 import MemberDialog from './WorkspaceMemberDialog.vue'
 import * as WorkspaceService from '@/api/public/workspace'
 
+const router = useRouter()
 // 查询条件
 const { queryConditions, resetQueryConditions } = useQueryConditions({
   workspaceNo: '',
@@ -127,6 +129,13 @@ const deleteWorkspace = async (row) => {
   ElMessage({ message: '删除工作空间成功', type: 'info', duration: 2 * 1000 })
   // 重新查询列表
   query()
+}
+
+/**
+ * 跳转至空间权限页
+ */
+const gotoRestrictionManager = ({ workspaceNo }) => {
+  router.push({ path: 'workspace/restrictions', query: { workspaceNo: workspaceNo } })
 }
 
 /**

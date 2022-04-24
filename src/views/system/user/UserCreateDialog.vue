@@ -3,7 +3,7 @@
     <el-form
       ref="elformRef"
       label-width="100px"
-      style="width: 100%"
+      style="width: 100%; padding-right: 30px"
       inline-message
       :model="formData"
       :rules="formRules"
