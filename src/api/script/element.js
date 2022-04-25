@@ -15,7 +15,7 @@ export const queryElementsChildren = (params) =>
     paramsSerializer: (params) => qs.stringify(params, { arrayFormat: 'repeat' })
   })
 
-export const createElement = (data) => request.post('/script/element', data)
+export const createCollection = (data) => request.post('/script/collection', data)
 
 export const createElementChildren = (data) => request.post('/script/element/children', data)
 

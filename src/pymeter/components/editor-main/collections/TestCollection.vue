@@ -167,7 +167,7 @@ const createCollectionElement = async () => {
     return
   }
   // 新增元素
-  await ElementService.createElement({ workspaceNo: workspaceNo.value, ...elementInfo.value })
+  await ElementService.createCollection({ workspaceNo: workspaceNo.value, ...elementInfo.value })
   // 成功提示
   ElMessage({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
   // 关闭tab
