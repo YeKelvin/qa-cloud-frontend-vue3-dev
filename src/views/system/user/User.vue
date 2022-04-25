@@ -44,7 +44,7 @@
         <el-table-column prop="state" label="状态" min-width="60" width="60">
           <template #default="{ row }">{{ UserState[row.state] }}</template>
         </el-table-column>
-        <el-table-column fixed="right" label="操作" min-width="150">
+        <el-table-column fixed="right" label="操作" min-width="160" width="160">
           <template #default="{ row }">
             <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
             <el-button type="text" @click="resetPassword(row)">重置密码</el-button>

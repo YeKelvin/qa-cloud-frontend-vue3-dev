@@ -36,7 +36,7 @@
         <el-table-column prop="state" label="状态" min-width="60" width="60">
           <template #default="{ row }">{{ RoleState[row.state] }}</template>
         </el-table-column>
-        <el-table-column fixed="right" label="操作" min-width="150">
+        <el-table-column fixed="right" label="操作" min-width="180" width="180">
           <template #default="{ row }">
             <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
             <el-button type="text" @click="gotoPermissionManager(row)">权限管理</el-button>

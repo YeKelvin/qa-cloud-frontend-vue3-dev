@@ -37,7 +37,7 @@
         <el-table-column prop="state" label="状态" min-width="60" width="60">
           <template #default="{ row }">{{ GroupState[row.state] }}</template>
         </el-table-column>
-        <el-table-column fixed="right" label="操作" min-width="100" width="100">
+        <el-table-column fixed="right" label="操作" min-width="120" width="120">
           <template #default="{ row }">
             <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
             <template v-if="row.state === 'ENABLE'">

@@ -5,9 +5,9 @@
       <div class="conditions-container">
         <ConditionInput v-model="queryConditions.permissionNo" label="权限编号" />
         <ConditionInput v-model="queryConditions.permissionName" label="权限名称" />
-        <ConditionInput v-model="queryConditions.permissionDesc" label="权限描述" />
-        <ConditionInput v-model="queryConditions.endpoint" label="请求路由" />
         <ConditionSelect v-model="queryConditions.method" :options="HttpMethods" label="请求方法" />
+        <ConditionInput v-model="queryConditions.endpoint" label="请求路由" />
+        <ConditionInput v-model="queryConditions.permissionDesc" label="权限描述" />
         <ConditionSelect v-model="queryConditions.state" :options="PermissionState" label="权限状态" />
       </div>
       <div style="display: flex; justify-content: space-between">
@@ -28,13 +28,13 @@
         <!-- 列定义 -->
         <el-table-column prop="permissionNo" label="权限编号" min-width="180" width="180" />
         <el-table-column prop="permissionName" label="权限名称" min-width="150" />
-        <el-table-column prop="endpoint" label="请求路由" min-width="150" />
         <el-table-column prop="method" label="请求方法" min-width="100" width="100" />
+        <el-table-column prop="endpoint" label="请求路由" min-width="150" />
         <el-table-column prop="permissionDesc" label="权限描述" min-width="150" />
         <el-table-column prop="state" label="状态" min-width="60" width="60">
           <template #default="{ row }">{{ PermissionState[row.state] }}</template>
         </el-table-column>
-        <el-table-column fixed="right" label="操作" min-width="150">
+        <el-table-column fixed="right" label="操作" min-width="160" width="160">
           <template #default="{ row }">
             <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
             <template v-if="row.state === 'ENABLE'">
