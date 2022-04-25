@@ -23,9 +23,14 @@
       <el-form-item label="邮箱：" prop="email">
         <el-input v-model="formData.email" clearable />
       </el-form-item>
-      <el-form-item label="用户角色：" prop="roleNumberList">
-        <el-select v-model="formData.roleNumberList" multiple clearable placeholder="用户角色" style="width: 100%">
+      <el-form-item label="用户角色：" prop="roleNumberedList">
+        <el-select v-model="formData.roleNumberedList" multiple clearable tag-type="danger" style="width: 100%">
           <el-option v-for="role in roleList" :key="role.roleNo" :label="role.roleName" :value="role.roleNo" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="用户分组：" prop="groupNumberedList">
+        <el-select v-model="formData.groupNumberedList" multiple clearable tag-type="danger" style="width: 100%">
+          <el-option v-for="group in groupList" :key="group.groupNo" :label="group.groupName" :value="group.groupNo" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -38,6 +43,7 @@
 
 <script setup>
 import { ElMessage } from 'element-plus'
+import * as GroupService from '@/api/usercenter/group'
 import * as RoleService from '@/api/usercenter/role'
 import * as UserService from '@/api/usercenter/user'
 
@@ -49,7 +55,8 @@ const formData = ref({
   password: '',
   mobileNo: '',
   email: '',
-  roleNumberList: []
+  roleNumberedList: [],
+  groupNumberedList: []
 })
 const formRules = reactive({
   userName: [{ required: true, message: '用户名称不能为空', trigger: 'blur' }],
@@ -58,13 +65,19 @@ const formRules = reactive({
     { required: true, message: '密码不能为空', trigger: 'blur' },
     { min: 6, max: 16, message: '长度在 6 到 16 个字符', trigger: 'blur' }
   ],
-  roleNumberList: [{ required: true, message: '用户角色不能为空', trigger: 'blur' }]
+  roleNumberedList: [{ required: true, message: '用户角色不能为空', trigger: 'blur' }]
 })
+const groupList = ref([])
 const roleList = ref([])
 
 onMounted(() => {
+  // 查询所有角色
   RoleService.queryRoleAll().then((response) => {
     roleList.value = response.result
+  })
+  // 查询所有分组
+  GroupService.queryGroupAll().then((response) => {
+    groupList.value = response.result
   })
 })
 

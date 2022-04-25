@@ -6,7 +6,7 @@
         <ConditionInput v-model="queryConditions.roleNo" label="角色编号" />
         <ConditionInput v-model="queryConditions.roleName" label="角色名称" />
         <ConditionInput v-model="queryConditions.roleCode" label="角色代码" />
-        <ConditionInput v-model="queryConditions.roleDesc" label="角色备注" />
+        <ConditionInput v-model="queryConditions.roleDesc" label="角色描述" />
         <ConditionSelect v-model="queryConditions.state" :options="RoleState" label="角色状态" />
       </div>
       <div style="display: flex; justify-content: space-between">
@@ -25,15 +25,15 @@
         <!-- 空数据提示 -->
         <template #empty><el-empty /></template>
         <!-- 列定义 -->
-        <el-table-column prop="roleNo" label="角色编号" min-width="150" />
+        <el-table-column prop="roleNo" label="角色编号" min-width="180" width="180" />
         <el-table-column prop="roleName" label="角色名称" min-width="150" />
         <el-table-column prop="roleCode" label="角色代码" min-width="150" />
         <el-table-column prop="roleRank" label="角色等级" min-width="150" />
-        <el-table-column prop="roleDesc" label="角色备注" min-width="150" />
+        <el-table-column prop="roleDesc" label="角色描述" min-width="150" />
         <el-table-column prop="roleType" label="角色类型" min-width="150">
           <template #default="{ row }">{{ RoleType[row.roleType] }}</template>
         </el-table-column>
-        <el-table-column prop="state" label="状态" min-width="150">
+        <el-table-column prop="state" label="状态" min-width="60" width="60">
           <template #default="{ row }">{{ RoleState[row.state] }}</template>
         </el-table-column>
         <el-table-column fixed="right" label="操作" min-width="150">

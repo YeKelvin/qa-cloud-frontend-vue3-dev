@@ -26,18 +26,23 @@
         <!-- 空数据提示 -->
         <template #empty><el-empty /></template>
         <!-- 列定义 -->
-        <el-table-column prop="userNo" label="用户编号" min-width="150" />
+        <el-table-column prop="userNo" label="用户编号" min-width="180" width="180" />
         <el-table-column prop="userName" label="用户名称" min-width="150" />
         <el-table-column prop="loginName" label="登录账号" min-width="150" />
         <el-table-column prop="mobileNo" label="手机号" min-width="150" />
         <el-table-column prop="email" label="邮箱" min-width="150" />
-        <el-table-column prop="state" label="状态" min-width="150">
-          <template #default="{ row }">{{ UserState[row.state] }}</template>
-        </el-table-column>
         <el-table-column prop="roles" label="角色" min-width="150">
           <template #default="{ row }">
-            <el-tag v-for="role in row.roles" :key="role.roleNo">{{ role.roleName }}</el-tag>
+            <el-tag v-for="role in row.roles" :key="role.roleNo" type="danger">{{ role.roleName }}</el-tag>
           </template>
+        </el-table-column>
+        <el-table-column prop="groups" label="分组" min-width="150">
+          <template #default="{ row }">
+            <el-tag v-for="group in row.groups" :key="group.groupNo" type="danger">{{ group.groupName }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="state" label="状态" min-width="60" width="60">
+          <template #default="{ row }">{{ UserState[row.state] }}</template>
         </el-table-column>
         <el-table-column fixed="right" label="操作" min-width="150">
           <template #default="{ row }">

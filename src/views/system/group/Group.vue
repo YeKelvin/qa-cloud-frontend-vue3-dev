@@ -5,7 +5,7 @@
       <div class="conditions-container">
         <ConditionInput v-model="queryConditions.groupNo" label="分组编号" />
         <ConditionInput v-model="queryConditions.groupName" label="分组名称" />
-        <ConditionInput v-model="queryConditions.groupDesc" label="分组备注" />
+        <ConditionInput v-model="queryConditions.groupDesc" label="分组描述" />
         <ConditionSelect v-model="queryConditions.state" :options="GroupState" label="分组状态" />
       </div>
       <div style="display: flex; justify-content: space-between">
@@ -24,9 +24,9 @@
         <!-- 空数据提示 -->
         <template #empty><el-empty /></template>
         <!-- 列定义 -->
-        <el-table-column prop="groupNo" label="分组编号" min-width="150" />
+        <el-table-column prop="groupNo" label="分组编号" min-width="180" width="180" />
         <el-table-column prop="groupName" label="分组名称" min-width="150" />
-        <el-table-column prop="groupDesc" label="分组备注" min-width="150" />
+        <el-table-column prop="groupDesc" label="分组描述" min-width="150" />
         <el-table-column prop="roles" label="分组角色" min-width="150">
           <template #default="{ row }">
             <div class="group-roles-wrapper">
@@ -34,10 +34,10 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="state" label="分组状态" min-width="150">
+        <el-table-column prop="state" label="状态" min-width="60" width="60">
           <template #default="{ row }">{{ GroupState[row.state] }}</template>
         </el-table-column>
-        <el-table-column fixed="right" label="操作" min-width="150">
+        <el-table-column fixed="right" label="操作" min-width="100" width="100">
           <template #default="{ row }">
             <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
             <template v-if="row.state === 'ENABLE'">
