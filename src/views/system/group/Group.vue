@@ -37,7 +37,7 @@
         <el-table-column prop="state" label="状态" min-width="60" width="60">
           <template #default="{ row }">{{ GroupState[row.state] }}</template>
         </el-table-column>
-        <el-table-column fixed="right" label="操作" min-width="120" width="120">
+        <el-table-column fixed="right" label="操作" min-width="160" width="160">
           <template #default="{ row }">
             <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
             <template v-if="row.state === 'ENABLE'">
@@ -46,7 +46,7 @@
             <template v-else>
               <el-button type="text" @click="modifyGroupState(row, 'ENABLE')">启用</el-button>
             </template>
-            <el-button v-if="row.groupType == 'CUSTOM'" type="text" @click="deleteGroup(row)">删除</el-button>
+            <el-button type="text" @click="deleteGroup(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
