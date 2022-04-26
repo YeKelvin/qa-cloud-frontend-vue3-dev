@@ -100,7 +100,7 @@ const percentage = computed(() => {
     // 统计迭代的进度
     const percentage = details.value.iterationCount / details.value.iterations
     if (!percentage) return 0
-    return percentage * 100
+    return parseInt(percentage * 100)
   } else {
     // 统计执行进度（需要保存测试报告的计划）
     const total = tableData.value.length
@@ -112,7 +112,7 @@ const percentage = computed(() => {
     })
     const percentage = completedTotal / total
     if (!percentage) return 0
-    return percentage * 100
+    return parseInt(percentage * 100)
   }
 })
 
