@@ -93,6 +93,7 @@ import useRunnableElement from '@/pymeter/composables/useRunnableElement'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
 const props = defineProps(editorProps)
+const store = useStore()
 const { queryMode, modifyMode, createMode, editNow, setReadonly, updateTabName, closeTab, refreshCollections } =
   useEditor(props)
 const { workspaceNo } = useWorkspaceState()
@@ -167,13 +168,15 @@ const createCollectionElement = async () => {
     return
   }
   // 新增元素
-  await ElementService.createCollection({ workspaceNo: workspaceNo.value, ...elementInfo.value })
+  const response = await ElementService.createCollection({ workspaceNo: workspaceNo.value, ...elementInfo.value })
   // 成功提示
   ElMessage({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
   // 关闭tab
   closeTab()
   // 重新查询集合列表
   refreshCollections()
+  // 新增成功后立即在列表中展示
+  store.commit('pymeter/addSelectedCollectionNumberedList', response.result.elementNo)
 }
 
 /**

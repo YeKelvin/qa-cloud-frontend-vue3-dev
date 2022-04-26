@@ -47,10 +47,11 @@
       <el-button
         :loading="loading"
         type="primary"
+        size="large"
         style="width: 100%; margin-bottom: 30px"
         @click.prevent="handleLogin"
       >
-        Login
+        登 录
       </el-button>
     </el-form>
   </div>

@@ -32,6 +32,17 @@
           <el-option v-for="user in userList" :key="user.userNo" :label="user.userName" :value="user.userNo" />
         </el-select>
       </el-form-item>
+      <el-form-item label="豁免分组：" prop="exemptionGroupNumberedList">
+        <el-select
+          v-model="formData.exemptionGroupNumberedList"
+          style="width: 100%"
+          tag-type="danger"
+          filterable
+          multiple
+        >
+          <el-option v-for="group in groupList" :key="group.groupNo" :label="group.groupName" :value="group.groupNo" />
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="danger" @click="submitForm()">保 存</el-button>
         <el-button @click="$emit('update:model-value', false)">取 消</el-button>
@@ -43,6 +54,7 @@
 <script setup>
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { MatchMethod, MatchType } from '@/api/enum'
+import * as GroupService from '@/api/usercenter/group'
 import * as UserService from '@/api/usercenter/user'
 import * as WorkspaceService from '@/api/public/workspace'
 
@@ -50,7 +62,6 @@ const emit = defineEmits(['update:model-value', 're-query'])
 const props = defineProps({
   row: { type: Object, default: () => ({}) }
 })
-const userList = ref([])
 const formData = ref({
   restrictionNo: '',
   matchMethod: '',
@@ -64,6 +75,8 @@ const formRules = reactive({
   matchType: [{ required: true, message: '匹配类型不能为空', trigger: 'blur' }]
 })
 const elformRef = ref()
+const userList = ref([])
+const groupList = ref([])
 
 onMounted(() => {
   formData.value.restrictionNo = props.row.restrictionNo
@@ -72,17 +85,15 @@ onMounted(() => {
   formData.value.matchContent = props.row.matchContent
   formData.value.exemptionUserNumberedList = props.row.exemptionUserList.map((item) => item.userNo)
   formData.value.exemptionGroupNumberedList = props.row.exemptionGroupList.map((item) => item.groupNo)
-  queryUserAll()
-})
-
-/**
- * 查询所有用户
- */
-const queryUserAll = () => {
+  // 查询所有用户
   UserService.queryUserAll().then((response) => {
     userList.value = response.result
   })
-}
+  // 查询所有分组
+  GroupService.queryGroupAll().then((response) => {
+    groupList.value = response.result
+  })
+})
 
 /**
  * 提交表单

@@ -24,8 +24,11 @@
         </div>
         <template #dropdown>
           <el-dropdown-menu class="user-dropdown">
-            <el-dropdown-item @click="logout">
-              <span style="display: block">Log Out</span>
+            <el-dropdown-item>
+              <span>{{ name }}</span>
+            </el-dropdown-item>
+            <el-dropdown-item divided @click="logout">
+              <span style="display: block">退出登录</span>
             </el-dropdown-item>
           </el-dropdown-menu>
         </template>
@@ -54,7 +57,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['sidebar', 'avatar', 'device'])
+    ...mapGetters(['sidebar', 'avatar', 'device', 'name'])
   },
   methods: {
     toggleSideBar() {

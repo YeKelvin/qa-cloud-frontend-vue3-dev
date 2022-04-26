@@ -32,7 +32,7 @@ const mutations = {
     // 重新查询变量集列表
     store.dispatch('pymeter/queryDatasetAll')
     // 清空已选择的变量集列表
-    store.dispatch('pymeter/setSelectedDatasetNumberList', [])
+    store.dispatch('pymeter/setSelectedDatasetNumberedList', [])
     // 重新查询 http 请求头模板列表
     store.dispatch('pymeter/queryHttpHeaderTemplateAll')
   },
@@ -69,7 +69,7 @@ const actions = {
         }
       } else {
         // 如果当前未选择工作空间，清空已选择的脚本列表
-        localStorage.removeItem('selectedCollectionNumberList')
+        localStorage.removeItem('selectedCollectionNumberedList')
       }
     })
   }

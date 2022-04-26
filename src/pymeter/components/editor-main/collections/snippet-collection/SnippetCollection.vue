@@ -140,6 +140,7 @@ import ArgumentTable from './SnippetCollectionArgumentTable.vue' // 实参
 import ParameterTable from './SnippetCollectionParameterTable.vue' // 形参
 
 const props = defineProps(editorProps)
+const store = useStore()
 const {
   editMode,
   queryMode,
@@ -247,13 +248,15 @@ const createCollectionElement = async () => {
   // 校验参数名称不能为空
   if (!checkParameter()) return
   // 新增元素
-  await ElementService.createCollection({ workspaceNo: workspaceNo.value, ...elementInfo.value })
+  const response = await ElementService.createCollection({ workspaceNo: workspaceNo.value, ...elementInfo.value })
   // 成功提示
   ElMessage({ message: '新增元素成功', type: 'info', duration: 2 * 1000 })
   // 关闭tab
   closeTab()
   // 重新查询集合列表
   refreshCollections()
+  // 新增成功后立即在列表中展示
+  store.commit('pymeter/addSelectedCollectionNumberedList', response.result.elementNo)
 }
 
 /**

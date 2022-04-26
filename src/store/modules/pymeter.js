@@ -71,7 +71,7 @@ const state = {
   useCurrentValue: localStorage.getItem('useCurrentValue') ? localStorage.getItem('useCurrentValue') === 'true' : true,
 
   // 当前选中的集合编号列表
-  selectedCollectionNumberList: JSON.parse(localStorage.getItem('selectedCollectionNumberList')) || [],
+  selectedCollectionNumberedList: JSON.parse(localStorage.getItem('selectedCollectionNumberedList')) || [],
 
   // 显示执行结果视图
   showResultDrawer: false,
@@ -179,7 +179,7 @@ const mutations = {
     state.refreshElementTree += 1
   },
 
-  setSelectedDatasetNumberList: (state, data) => {
+  setSelectedDatasetNumberedList: (state, data) => {
     state.selectedDatasetNumberList = data
     localStorage.setItem('selectedDatasetNumberList', JSON.stringify(data))
   },
@@ -189,9 +189,13 @@ const mutations = {
     localStorage.setItem('useCurrentValue', data)
   },
 
-  setSelectedCollectionNumberList: (state, data) => {
-    state.selectedCollectionNumberList = data
-    localStorage.setItem('selectedCollectionNumberList', JSON.stringify(data))
+  setSelectedCollectionNumberedList: (state, data) => {
+    state.selectedCollectionNumberedList = data
+    localStorage.setItem('selectedCollectionNumberedList', JSON.stringify(data))
+  },
+  addSelectedCollectionNumberedList: (state, collectionNo) => {
+    state.selectedCollectionNumberedList.push(collectionNo)
+    localStorage.setItem('selectedCollectionNumberedList', JSON.stringify(state.selectedCollectionNumberedList))
   },
 
   setShowResultDrawer: (state, data) => {
@@ -259,7 +263,7 @@ const actions = {
       if (!datasetNumberList.includes(state.selectedDatasetNumberList[i])) {
         // 删除无效数据
         state.selectedDatasetNumberList.splice(i, 1)
-        commit('setSelectedDatasetNumberList', state.selectedDatasetNumberList)
+        commit('setSelectedDatasetNumberedList', state.selectedDatasetNumberList)
       }
     }
 
@@ -269,8 +273,8 @@ const actions = {
   /**
    * 设置当前选中的变量集列表
    */
-  setSelectedDatasetNumberList({ dispatch, commit }, data) {
-    commit('setSelectedDatasetNumberList', data)
+  setSelectedDatasetNumberedList({ dispatch, commit }, data) {
+    commit('setSelectedDatasetNumberedList', data)
     dispatch('disableOtherUnselectedEnvironmentDataset')
   },
 

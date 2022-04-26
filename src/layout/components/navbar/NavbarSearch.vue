@@ -167,6 +167,10 @@ export default {
     border-radius: 0;
     vertical-align: middle;
 
+    :deep(.el-input__wrapper) {
+      --el-select-input-focus-border-color: none;
+    }
+
     :deep(.el-input__inner) {
       --el-select-input-focus-border-color: #ffffff;
       border: 0;

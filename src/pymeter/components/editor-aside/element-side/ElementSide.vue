@@ -6,7 +6,7 @@
     <!-- 脚本集合列表 -->
     <span v-if="!loading" class="collection-list-container">
       <el-select
-        v-model="selectedCollectionNumberList"
+        v-model="selectedCollectionNumberedList"
         style="flex-grow: 1"
         tag-type="danger"
         size="large"
@@ -14,6 +14,20 @@
         multiple
         :teleported="false"
       >
+        <!-- 下拉框顶部的新增脚本按钮 -->
+        <el-option-group key="new-operation" label="新增">
+          <el-option value="NEW_COLLECTION">
+            <el-button type="text" :icon="Plus" style="width: 100%" @click.stop="openNewCollectionTab()">
+              新增集合
+            </el-button>
+          </el-option>
+          <el-option value="NEW_SNIPPET">
+            <el-button type="text" :icon="Plus" style="width: 100%" @click.stop="openNewSnippetTab()">
+              新增片段
+            </el-button>
+          </el-option>
+        </el-option-group>
+
         <!-- 脚本集合 -->
         <el-option-group key="collections" label="集合">
           <el-option
@@ -33,7 +47,7 @@
         </el-option-group>
 
         <!-- 脚本片段 -->
-        <el-option-group key="snippets" label="片段">
+        <el-option-group key="snippets" label="片段" style="padding-bottom: 50px">
           <el-option
             v-for="snippet in snippets"
             :key="snippet.elementNo"
@@ -44,25 +58,11 @@
             <span>{{ snippet.elementName }}</span>
           </el-option>
         </el-option-group>
-
-        <!-- 下拉框底部的新增脚本按钮 -->
-        <el-option-group key="new-operation" label="新增">
-          <el-option value="NEW_COLLECTION">
-            <el-button type="text" :icon="Plus" style="width: 100%" @click.stop="openNewCollectionTab()">
-              新增集合
-            </el-button>
-          </el-option>
-          <el-option value="NEW_SNIPPET">
-            <el-button type="text" :icon="Plus" style="width: 100%" @click.stop="openNewSnippetTab()">
-              新增片段
-            </el-button>
-          </el-option>
-        </el-option-group>
       </el-select>
     </span>
 
     <!-- 选择脚本后才显示 -->
-    <template v-if="!loading && !_isEmpty(selectedCollectionNumberList)">
+    <template v-if="!loading && !_isEmpty(selectedCollectionNumberedList)">
       <!-- 元素操作按钮 -->
       <div class="operation-container" style="margin-top: 5px">
         <!-- 展开节点按钮 -->
@@ -87,12 +87,12 @@
       <el-divider />
       <!-- 脚本内容 -->
       <el-scrollbar style="width: 100%; height: 100%" wrap-style="overflow-x:auto;" view-style="padding:10px;">
-        <ElementTree ref="elementTreeRef" :collection-number-list="selectedCollectionNumberList" />
+        <ElementTree ref="elementTreeRef" :collection-number-list="selectedCollectionNumberedList" />
       </el-scrollbar>
     </template>
 
     <!-- 没有选择脚本时给出提示 -->
-    <el-empty v-if="!loading && _isEmpty(selectedCollectionNumberList)" description="请选择脚本" />
+    <el-empty v-if="!loading && _isEmpty(selectedCollectionNumberedList)" description="请选择脚本" />
   </div>
 </template>
 
@@ -111,12 +111,12 @@ const loading = ref(false)
 const collections = ref([])
 const snippets = ref([])
 const elementTreeRef = ref()
-const selectedCollectionNumberList = computed({
+const selectedCollectionNumberedList = computed({
   get() {
-    return store.state.pymeter.selectedCollectionNumberList
+    return store.state.pymeter.selectedCollectionNumberedList
   },
   set(val) {
-    if (!loading.value) store.commit('pymeter/setSelectedCollectionNumberList', val)
+    if (!loading.value) store.commit('pymeter/setSelectedCollectionNumberedList', val)
   }
 })
 
@@ -125,7 +125,7 @@ watch(workspaceNo, (val) => {
   // 重新查询集合列表
   queryCollections()
   // 清空已选择的集合
-  selectedCollectionNumberList.value = []
+  selectedCollectionNumberedList.value = []
 })
 watch(refreshCollections, () => queryCollections())
 
@@ -161,9 +161,9 @@ const queryCollections = async () => {
   // 提取集合编号
   const collectionNumberList = [...collections.value, ...snippets.value].map((item) => item.elementNo)
   // 遍历取消选择无效的集合
-  for (let i = selectedCollectionNumberList.value.length - 1; i >= 0; i--) {
-    if (!collectionNumberList.includes(selectedCollectionNumberList.value[i])) {
-      selectedCollectionNumberList.value.splice(i, 1)
+  for (let i = selectedCollectionNumberedList.value.length - 1; i >= 0; i--) {
+    if (!collectionNumberList.includes(selectedCollectionNumberedList.value[i])) {
+      selectedCollectionNumberedList.value.splice(i, 1)
     }
   }
 }
@@ -249,5 +249,10 @@ const expandAll = (expand) => {
 
 :deep(.el-select-dropdown__wrap) {
   max-height: 400px;
+}
+
+:deep(.el-select-group__title) {
+  font-size: 14px;
+  font-weight: bold;
 }
 </style>

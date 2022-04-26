@@ -52,7 +52,7 @@ const selectedDatasetNumberList = computed({
     return store.state.pymeter.selectedDatasetNumberList
   },
   set(val) {
-    if (props.show) store.dispatch('pymeter/setSelectedDatasetNumberList', val)
+    if (props.show) store.dispatch('pymeter/setSelectedDatasetNumberedList', val)
   }
 })
 
