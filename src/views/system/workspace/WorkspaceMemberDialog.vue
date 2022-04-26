@@ -85,4 +85,8 @@ const save = () => {
   max-width: 400px;
   width: 300px;
 }
+
+:deep(.el-transfer__buttons) {
+  display: flex;
+}
 </style>

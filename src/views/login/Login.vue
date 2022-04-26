@@ -227,5 +227,9 @@ $cursor: #fff;
   .el-input__inner {
     box-shadow: none !important;
   }
+  .el-input__wrapper {
+    background-color: inherit;
+    box-shadow: none;
+  }
 }
 </style>
