@@ -307,7 +307,10 @@ const saveVariables = async () => {
 
   // 批量删除变量
   if (!_isEmpty(pendingDeletionList.value)) {
-    await VariablesService.deleteVariables(pendingDeletionList.value.map((item) => item.varNo))
+    await VariablesService.deleteVariables({
+      datasetNo: datasetNo.value,
+      variableNumberedList: pendingDeletionList.value.map((item) => item.varNo)
+    })
   }
 
   // 批量更新变量

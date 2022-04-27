@@ -296,7 +296,10 @@ const saveHeaders = async () => {
 
   // 批量删除变量
   if (!_isEmpty(pendingDeletionList.value)) {
-    await HttpHeadersService.deleteHttpHeaders(pendingDeletionList.value.map((item) => item.headerNo))
+    await HttpHeadersService.deleteHttpHeaders({
+      templateNo: templateNo.value,
+      headerNumberedList: pendingDeletionList.value.map((item) => item.headerNo)
+    })
   }
 
   // 批量更新请求头
