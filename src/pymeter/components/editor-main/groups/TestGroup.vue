@@ -127,8 +127,8 @@ const checkLoops = (_, value, callback) => {
   if (!Number.isInteger(val)) {
     return callback(new Error('循环次数必须为整数'))
   } else {
-    if (val < 1 || val > 999) {
-      return callback(new Error('循环次数仅支持[1-50]'))
+    if (val < 1 || val >= 100) {
+      return callback(new Error('循环次数仅支持[1-100]'))
     } else {
       return callback()
     }
