@@ -31,7 +31,7 @@ import Topbar from './topbar/Topbar.vue'
 
 const editors = reactive({
   TestCollection: markRaw(defineAsyncComponent(() => import('./collections/TestCollection.vue'))),
-  TestSnippets: markRaw(defineAsyncComponent(() => import('./collections/snippet-collection/SnippetCollection.vue'))),
+  SnippetCollection: markRaw(defineAsyncComponent(() => import('./collections/snippet-collection/SnippetCollection.vue'))),
   TestGroup: markRaw(defineAsyncComponent(() => import('./groups/TestGroup.vue'))),
   SetupGroup: markRaw(defineAsyncComponent(() => import('./groups/SetupGroup.vue'))),
   TeardownGroup: markRaw(defineAsyncComponent(() => import('./groups/TeardownGroup.vue'))),

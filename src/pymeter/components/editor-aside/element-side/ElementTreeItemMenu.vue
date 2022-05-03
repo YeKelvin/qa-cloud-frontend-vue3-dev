@@ -12,14 +12,14 @@
           <el-dropdown-item @click="openNewTeardownGroupTab(node)">新增后置分组</el-dropdown-item>
         </template>
 
-        <template v-if="data.elementClass == 'TestSnippets'">
+        <template v-if="data.elementClass == 'SnippetCollection'">
           <el-dropdown-item @click="openNewSetupGroupDebugerTab(node)">新增前置分组调试器</el-dropdown-item>
           <el-dropdown-item @click="openNewTeardownGroupDebugerTab(node)">新增后置分组调试器</el-dropdown-item>
         </template>
 
         <!-- Sampler -->
         <template v-if="isShowSampler(node)">
-          <el-dropdown-item :divided="data.elementClass == 'TestSnippets'" @click="openNewHttpSamplerTab(node)">
+          <el-dropdown-item :divided="data.elementClass == 'SnippetCollection'" @click="openNewHttpSamplerTab(node)">
             新增HTTP请求
           </el-dropdown-item>
           <el-dropdown-item @click="openNewPythonSamplerTab(node)">新增Python请求</el-dropdown-item>
@@ -87,10 +87,10 @@ const store = useStore()
 const { workspaceNo, workspaceList } = useWorkspaceState()
 
 const isShowSampler = ({ data }) => {
-  return data.elementType == 'GROUP' || data.elementType == 'CONTROLLER' || data.elementClass == 'TestSnippets'
+  return data.elementType == 'GROUP' || data.elementType == 'CONTROLLER' || data.elementClass == 'SnippetCollection'
 }
 const isShowController = ({ data }) => {
-  return data.elementType == 'GROUP' || data.elementType == 'CONTROLLER' || data.elementClass == 'TestSnippets'
+  return data.elementType == 'GROUP' || data.elementType == 'CONTROLLER' || data.elementClass == 'SnippetCollection'
 }
 
 /**

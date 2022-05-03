@@ -25,7 +25,7 @@
     <!-- 集合标识 -->
     <el-tag v-if="data.elementClass == 'TestCollection'" size="small">集合</el-tag>
     <!-- 片段标识 -->
-    <el-tag v-if="data.elementClass == 'TestSnippets'" size="small">片段</el-tag>
+    <el-tag v-if="data.elementClass == 'SnippetCollection'" size="small">片段</el-tag>
     <!-- 禁用标识 -->
     <el-tag v-if="!data.enabled" type="danger" size="small">禁用</el-tag>
     <!-- Setup标识 -->

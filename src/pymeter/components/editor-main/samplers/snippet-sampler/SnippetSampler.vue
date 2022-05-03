@@ -155,7 +155,7 @@ const querySnippets = () => {
   ElementService.queryElementAll({
     workspaceNo: props.metadata.workspaceNo,
     elementType: 'COLLECTION',
-    elementClass: 'TestSnippets'
+    elementClass: 'SnippetCollection'
   }).then((response) => {
     snippets.value = response.result
   })

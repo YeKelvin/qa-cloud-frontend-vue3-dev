@@ -160,7 +160,7 @@ const elementInfo = ref({
   elementName: 'Snippet',
   elementRemark: '',
   elementType: 'COLLECTION',
-  elementClass: 'TestSnippets',
+  elementClass: 'SnippetCollection',
   property: {
     arguments: [],
     useHTTPSession: 'false'

@@ -34,7 +34,7 @@ const props = defineProps({
 // 组件名称
 const componentNames = reactive({
   TestCollection: '测试集合',
-  TestSnippets: '测试片段',
+  SnippetCollection: '测试片段',
   TestGroup: '测试分组',
   SetupGroup: '前置分组',
   TeardownGroup: '后置分组',

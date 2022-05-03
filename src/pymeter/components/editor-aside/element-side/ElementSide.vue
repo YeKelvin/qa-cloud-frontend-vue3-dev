@@ -148,12 +148,12 @@ const queryCollections = async () => {
       elementClass: 'TestCollection'
     })
   ).result
-  // 查询 TestSnippets
+  // 查询 SnippetCollection
   snippets.value = (
     await ElementService.queryElementAll({
       workspaceNo: workspaceNo.value,
       elementType: 'COLLECTION',
-      elementClass: 'TestSnippets'
+      elementClass: 'SnippetCollection'
     })
   ).result
   // 加载完成
@@ -189,14 +189,14 @@ const openNewCollectionTab = () => {
 }
 
 /**
- * 打开新增 TestSnippets 的标签页
+ * 打开新增 SnippetCollection 的标签页
  */
 const openNewSnippetTab = () => {
   store.commit({
     type: 'pymeter/addTab',
     editorNo: 'UNSAVED_SNIPPET',
     editorName: 'New Snippet',
-    editorComponent: 'TestSnippets',
+    editorComponent: 'SnippetCollection',
     editorMode: 'CREATE'
   })
 }
