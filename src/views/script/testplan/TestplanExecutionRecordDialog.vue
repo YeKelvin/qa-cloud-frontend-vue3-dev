@@ -14,9 +14,14 @@
       <el-table-column prop="runningState" label="执行状态">
         <template #default="{ row }">{{ RunningState[row.runningState] }}</template>
       </el-table-column>
-      <el-table-column prop="createdTime" label="执行时间" min-width="100">
+      <el-table-column prop="startTime" label="执行时间" min-width="100">
         <template #default="{ row }">
-          {{ row.createdTime ? $dayjs(row.createdTime).format('YYYY-MM-DD HH:mm:ss') : '' }}
+          {{ row.startTime ? $dayjs(row.startTime).format('YYYY-MM-DD HH:mm:ss') : '' }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="endTime" label="完成时间" min-width="100">
+        <template #default="{ row }">
+          {{ row.endTime ? $dayjs(row.endTime).format('YYYY-MM-DD HH:mm:ss') : '' }}
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" min-width="100" width="100">
