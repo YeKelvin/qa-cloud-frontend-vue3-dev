@@ -162,7 +162,7 @@ const elementInfo = ref({
   elementType: 'COLLECTION',
   elementClass: 'SnippetCollection',
   property: {
-    arguments: [],
+    parameters: [],
     useHTTPSession: 'false'
   }
 })
@@ -191,8 +191,8 @@ onMounted(() => {
   if (createMode.value) return
   ElementService.queryElementInfo({ elementNo: elementNo.value }).then((response) => {
     elementInfo.value = response.result
-    parametersData.value = response.result.property.arguments
-    argumentsData.value = response.result.property.arguments
+    parametersData.value = response.result.property.parameters
+    argumentsData.value = response.result.property.parameters
   })
 })
 
@@ -263,7 +263,7 @@ const createCollectionElement = async () => {
  * 更新元素属性
  */
 const updateElementProperty = () => {
-  elementInfo.value.property.arguments = parametersData.value.filter(
+  elementInfo.value.property.parameters = parametersData.value.filter(
     (item) => !isBlankAll(item.name, item.default, item.desc)
   )
 }
@@ -273,7 +273,7 @@ const updateElementProperty = () => {
  */
 const checkParameter = () => {
   let pass = true
-  elementInfo.value.property.arguments.forEach((item) => {
+  elementInfo.value.property.parameters.forEach((item) => {
     if (isBlank(item.name)) {
       pass = false
       return

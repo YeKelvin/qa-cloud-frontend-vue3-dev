@@ -59,7 +59,7 @@
 
       <!-- 参数设置 -->
       <div v-if="showParams">
-        <ArgumentTable :data="definedArgumentsData" :use-default="useDefault" :edit-mode="editMode" />
+        <ArgumentTable :data="argumentsData" :use-default="useDefault" :edit-mode="editMode" />
       </div>
 
       <!-- 操作按钮 -->
@@ -120,7 +120,7 @@ const elementFormRules = reactive({
 })
 const activeTabName = ref('PARAMS')
 const snippets = ref([])
-const definedArgumentsData = ref([])
+const argumentsData = ref([])
 const showWarning = ref(false)
 const showParams = computed(() => activeTabName.value === 'PARAMS')
 const useDefault = computed(() => elementInfo.value.property.useDefault === 'true')
@@ -130,7 +130,7 @@ watch(
   (val) => {
     if (!val) return
     // 清空原有的参数
-    definedArgumentsData.value = []
+    argumentsData.value = []
     // 查询选中的片段信息
     querySnippet(val)
   }
@@ -167,8 +167,8 @@ const querySnippets = () => {
 const querySnippet = (snippetNo) => {
   ElementService.queryElementInfo({ elementNo: snippetNo }).then((response) => {
     // 将片段参数定义添加至表格
-    response.result.property.arguments.forEach((item) => {
-      definedArgumentsData.value.push({
+    response.result.property.parameters.forEach((item) => {
+      argumentsData.value.push({
         name: item.name,
         value: item.default,
         desc: item.desc,
@@ -177,7 +177,7 @@ const querySnippet = (snippetNo) => {
     })
     // 非新增模式下，将请求参数合并至表格中，如果请求参数不在片段参数定义中，则丢弃
     if (!createMode.value) {
-      definedArgumentsData.value.forEach((item) => {
+      argumentsData.value.forEach((item) => {
         const arg = elementInfo.value.property.arguments.find((i) => i.name === item.name)
         if (arg) {
           item.value = arg.value
@@ -186,11 +186,11 @@ const querySnippet = (snippetNo) => {
     }
     // 将请求参数合并至表格中，如果片段参数定义（对称差集）有变更，则给出提示
     if (queryMode.value) {
-      if (definedArgumentsData.value.length !== elementInfo.value.property.arguments.length) {
+      if (argumentsData.value.length !== elementInfo.value.property.arguments.length) {
         showWarning.value = true
       }
-      const leftDiff = _differenceBy(definedArgumentsData.value, elementInfo.value.property.arguments, 'name')
-      const rightDiff = _differenceBy(elementInfo.value.property.arguments, definedArgumentsData.value, 'name')
+      const leftDiff = _differenceBy(argumentsData.value, elementInfo.value.property.arguments, 'name')
+      const rightDiff = _differenceBy(elementInfo.value.property.arguments, argumentsData.value, 'name')
       if (leftDiff.length > 0 || rightDiff.length > 0) {
         showWarning.value = true
       }
@@ -263,7 +263,7 @@ const createSamplerElement = async () => {
 // 设置元素属性
 const setElementProperty = () => {
   if (useDefault.value) return
-  elementInfo.value.property.arguments = definedArgumentsData.value.map((item) => ({
+  elementInfo.value.property.arguments = argumentsData.value.map((item) => ({
     name: item.name,
     value: item.value
   }))
