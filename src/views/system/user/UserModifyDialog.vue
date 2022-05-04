@@ -57,8 +57,7 @@ const formData = ref({
   groupNumberedList: []
 })
 const formRules = reactive({
-  userName: [{ required: true, message: '用户昵称不能为空', trigger: 'blur' }],
-  roleNumberedList: [{ required: true, message: '用户角色不能为空', trigger: 'blur' }]
+  userName: [{ required: true, message: '用户昵称不能为空', trigger: 'blur' }]
 })
 const groupList = ref([])
 const roleList = ref([])

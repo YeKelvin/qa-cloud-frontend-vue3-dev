@@ -64,8 +64,7 @@ const formRules = reactive({
   password: [
     { required: true, message: '密码不能为空', trigger: 'blur' },
     { min: 6, max: 16, message: '长度在 6 到 16 个字符', trigger: 'blur' }
-  ],
-  roleNumberedList: [{ required: true, message: '用户角色不能为空', trigger: 'blur' }]
+  ]
 })
 const groupList = ref([])
 const roleList = ref([])

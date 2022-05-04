@@ -14,7 +14,7 @@ export const queryUserList = (params) => request.get('/usercenter/user/list', { 
 
 export const queryUserAll = () => request.get('/usercenter/user/all')
 
-export const modifyUser = (data) => request.put('/usercenter/user/info', data)
+export const modifyUser = (data) => request.put('/usercenter/user', data)
 
 export const modifyUserState = (data) => request.patch('/usercenter/user/state', data)
 
