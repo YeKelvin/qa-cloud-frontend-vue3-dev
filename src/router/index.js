@@ -156,6 +156,12 @@ export const asyncRoutes = [
         meta: { title: '空间管理', activeMenu: '/system/workspace' }
       },
       {
+        path: 'notification/robot',
+        name: 'NotificationRobot',
+        component: () => import('@/views/system/notification/NotificationRobot.vue'),
+        meta: { title: '通知管理', icon: 'sidebar-notification' }
+      },
+      {
         path: 'operation/log',
         name: 'OperationLog',
         component: () => import('@/views/system/operation-log/OperationLog.vue'),

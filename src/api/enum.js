@@ -93,3 +93,13 @@ export const RestrictionState = {
   ENABLE: '启用',
   DISABLE: '禁用'
 }
+
+export const RobotState = {
+  ENABLE: '启用',
+  DISABLE: '禁用'
+}
+
+export const RobotType = {
+  WECOM: '企业微信',
+  DINGTALK: '钉钉'
+}
