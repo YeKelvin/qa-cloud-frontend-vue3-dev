@@ -234,7 +234,7 @@ const openNewSnippetSamplerTab = (node) => {
     editorComponent: 'SnippetSampler',
     editorMode: 'CREATE',
     metadata: {
-      workspaceNo: workspaceNo,
+      workspaceNo: workspaceNo.value,
       rootNo: props.node.data.rootNo,
       parentNo: props.node.data.elementNo
     }
@@ -438,7 +438,7 @@ const copyElementToWorkspace = async ({ elementNo }) => {
     message: (
       <WorkspaceTree
         key={elementNo}
-        data={this.workspaceList}
+        data={workspaceList.value}
         onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
       />
     ),
@@ -465,7 +465,7 @@ const moveElementToWorkspace = async ({ elementNo }) => {
     message: (
       <WorkspaceTree
         key={elementNo}
-        data={this.workspaceList}
+        data={workspaceList.value}
         onNodeClick={(data) => (workspaceNo = data.workspaceNo)}
       />
     ),
