@@ -25,7 +25,7 @@
         <!-- 空数据提示 -->
         <template #empty><el-empty /></template>
         <!-- 列定义 -->
-        <el-table-column prop="planNo" label="计划编号" min-width="150" />
+        <el-table-column prop="planNo" label="计划编号" min-width="180" width="180" />
         <el-table-column prop="planName" label="计划名称" min-width="150" />
         <el-table-column prop="productRequirementsVersion" label="版本号" min-width="150" />
         <el-table-column prop="collectionTotal" label="脚本数" min-width="150" />
@@ -202,7 +202,7 @@ const queryList = () => {
  * 执行测试计划
  */
 const executeTestplan = async ({ planNo, planName }) => {
-  let datasetNumberList = []
+  let datasetNumberedList = []
   let useCurrentValue = false
   // 弹出选择变量集的对话框
   const error = await ElMessageBox.confirm(null, {
@@ -212,7 +212,7 @@ const executeTestplan = async ({ planNo, planName }) => {
         key={new Date().getTime()}
         workspaceNo={workspaceNo.value}
         planName={planName}
-        onChangeDatasetNumberList={(val) => (datasetNumberList = val)}
+        onChangeDatasetNumberList={(val) => (datasetNumberedList = val)}
         onChangeUseCurrentValue={(val) => (useCurrentValue = val)}
       />
     ),
@@ -225,7 +225,7 @@ const executeTestplan = async ({ planNo, planName }) => {
   // 异步执行测试计划
   const response = await ExecutionService.executeTestPlan({
     planNo: planNo,
-    datasetNumberList: datasetNumberList,
+    datasetNumberedList: datasetNumberedList,
     useCurrentValue: useCurrentValue
   })
   // 成功提示

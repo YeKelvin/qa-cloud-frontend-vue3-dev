@@ -1,0 +1,91 @@
+<template>
+  <el-dialog title="编辑通知机器人" width="50%" center @close="$emit('update:model-value', false)">
+    <el-form
+      ref="elformRef"
+      label-width="120px"
+      style="width: 100%; padding-right: 30px"
+      inline-message
+      :model="formData"
+      :rules="formRules"
+    >
+      <el-form-item label="机器人名称：" prop="robotName">
+        <el-input v-model="formData.robotName" clearable />
+      </el-form-item>
+      <el-form-item label="机器人描述：" prop="robotDesc">
+        <el-input v-model="formData.robotDesc" clearable />
+      </el-form-item>
+      <el-form-item label="key：" prop="robotConfig.key">
+        <el-input v-model="formData.robotConfig.key" clearable />
+      </el-form-item>
+      <el-form-item>
+        <el-button type="danger" @click="submitForm()">保 存</el-button>
+        <el-button @click="$emit('update:model-value', false)">取 消</el-button>
+      </el-form-item>
+    </el-form>
+  </el-dialog>
+</template>
+
+<script setup>
+import { ElMessage, ElMessageBox } from 'element-plus'
+import * as NotificationService from '@/api/public/notification'
+
+const emit = defineEmits(['update:model-value', 're-query'])
+const props = defineProps({
+  row: { type: Object, default: () => {} }
+})
+const elformRef = ref()
+const formData = ref({
+  robotNo: '',
+  robotName: '',
+  robotDesc: '',
+  robotType: 'WECOM',
+  robotConfig: {
+    key: ''
+  }
+})
+const formRules = reactive({
+  robotName: [{ required: true, message: '机器人名称不能为空', trigger: 'blur' }],
+  'robotConfig.key': [{ required: true, message: '机器人配置不能为空', trigger: 'blur' }]
+})
+
+onMounted(() => {
+  NotificationService.queryNotificationRobot({ robotNo: props.row.robotNo }).then((response) => {
+    formData.value = response.result
+  })
+})
+
+/**
+ * 提交表单
+ */
+const submitForm = async () => {
+  let error = false
+  // 表单校验
+  error = await elformRef.value
+    .validate()
+    .then(() => false)
+    .catch(() => true)
+  if (error) {
+    ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 二次确认
+  error = await ElMessageBox.confirm('确定修改吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 修改机器人
+  await NotificationService.modifyNotificationRobot(formData.value)
+  // 成功提示
+  ElMessage({ message: '编辑成功', type: 'info', duration: 2 * 1000 })
+  // 关闭dialog
+  emit('update:model-value', false)
+  // 重新查询列表
+  emit('re-query')
+}
+</script>
+
+<style lang="scss" scoped></style>

@@ -43,7 +43,7 @@
             <template v-else>
               <el-button type="text" @click="modifyPermissionState(row, 'ENABLE')">启用</el-button>
             </template>
-            <el-button type="text" @click="disablePermission(row)">删除</el-button>
+            <el-button type="text" @click="removePermission(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -137,7 +137,7 @@ const modifyPermissionState = async (row, state) => {
 /**
  * 删除权限
  */
-const disablePermission = async (row) => {
+const removePermission = async (row) => {
   // 二次确认
   const error = await ElMessageBox.confirm('确定删除吗？', '警告', {
     confirmButtonText: '确定',
@@ -148,7 +148,7 @@ const disablePermission = async (row) => {
     .catch(() => true)
   if (error) return
   // 删除权限
-  await PermissionService.deletePermission({ permissionNo: row.permissionNo })
+  await PermissionService.removePermission({ permissionNo: row.permissionNo })
   // 成功提示
   ElMessage({ message: '删除权限成功', type: 'info', duration: 2 * 1000 })
   // 重新查询列表

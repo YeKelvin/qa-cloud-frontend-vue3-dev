@@ -109,51 +109,51 @@ export const asyncRoutes = [
     alwaysShow: true,
     component: Layout,
     redirect: 'noRedirect',
-    meta: { title: '系统管理', icon: 'sidebar-setting', roles: ['ADMIN'] },
+    meta: { title: '系统管理', icon: 'sidebar-setting' },
     children: [
       {
         path: 'user',
         // name: 'User',
         component: () => import('@/views/system/user/User.vue'),
-        meta: { title: '用户管理', icon: 'sidebar-user' }
+        meta: { title: '用户管理', icon: 'sidebar-user', roles: ['ADMIN'] }
       },
       {
         path: 'group',
         name: 'Group',
         component: () => import('@/views/system/group/Group.vue'),
-        meta: { title: '分组管理', icon: 'sidebar-group' }
+        meta: { title: '分组管理', icon: 'sidebar-group', roles: ['ADMIN'] }
       },
       {
         path: 'role',
         name: 'Role',
         component: () => import('@/views/system/role/Role.vue'),
-        meta: { title: '角色管理', icon: 'sidebar-role' }
+        meta: { title: '角色管理', icon: 'sidebar-role', roles: ['ADMIN'] }
       },
       {
         path: 'permission',
         name: 'Permission',
         component: () => import('@/views/system/permission/Permission.vue'),
-        meta: { title: '权限管理', icon: 'sidebar-permission' }
+        meta: { title: '权限管理', icon: 'sidebar-permission', roles: ['ADMIN'] }
       },
       {
         path: 'role/permissions',
         name: 'RolePermissions',
         hidden: true,
         component: () => import('@/views/system/role/RolePermissions.vue'),
-        meta: { title: '角色权限', activeMenu: '/system/role' }
+        meta: { title: '角色权限', activeMenu: '/system/role', roles: ['ADMIN'] }
       },
       {
         path: 'workspace',
         name: 'Workspace',
         component: () => import('@/views/system/workspace/Workspace.vue'),
-        meta: { title: '空间管理', icon: 'sidebar-workspace' }
+        meta: { title: '空间管理', icon: 'sidebar-workspace', roles: ['ADMIN'] }
       },
       {
         path: 'workspace/restrictions',
         name: 'WorkspaceRestrictions',
         hidden: true,
         component: () => import('@/views/system/workspace/WorkspaceRestrictions.vue'),
-        meta: { title: '空间管理', activeMenu: '/system/workspace' }
+        meta: { title: '空间管理', activeMenu: '/system/workspace', roles: ['ADMIN'] }
       },
       {
         path: 'notification/robot',
@@ -165,7 +165,7 @@ export const asyncRoutes = [
         path: 'operation/log',
         name: 'OperationLog',
         component: () => import('@/views/system/operation-log/OperationLog.vue'),
-        meta: { title: '操作日志', icon: 'sidebar-log' }
+        meta: { title: '操作日志', icon: 'sidebar-log', roles: ['ADMIN'] }
       }
     ]
   },

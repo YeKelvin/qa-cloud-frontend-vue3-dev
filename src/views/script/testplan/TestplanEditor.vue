@@ -65,6 +65,30 @@
             <el-switch v-model="formData.saveOnError" active-color="#13ce66" disabled />
           </el-form-item>
 
+          <!-- 通知机器人 -->
+          <el-form-item label="结果通知：" prop="property.engineNo">
+            <el-select
+              v-model="formData.notificationRobotNumberedList"
+              filterable
+              multiple
+              style="width: 100%"
+              tag-type="danger"
+              :disabled="queryMode"
+            >
+              <el-option
+                v-for="item in notificationRobotList"
+                :key="item.robotNo"
+                :label="item.robotName"
+                :value="item.robotNo"
+              >
+                <span class="robot-type-option">
+                  <span>{{ item.robotName }}</span>
+                  <el-tag type="danger" size="small">{{ RobotType[item.robotType] }}</el-tag>
+                </span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+
           <!-- 操作按钮 -->
           <el-form-item v-if="queryMode">
             <el-button :icon="Edit" type="primary" @click="editorMode = 'MODIFY'">编 辑</el-button>
@@ -88,6 +112,8 @@
 import { assign as _assign } from 'lodash-es'
 import { ElMessage } from 'element-plus'
 import { Check, Close, Edit } from '@element-plus/icons-vue'
+import { RobotType } from '@/api/enum'
+import * as NotificationService from '@/api/public/notification'
 import * as TestplanService from '@/api/script/testplan'
 import useWorkspaceState from '@/composables/useWorkspaceState'
 import TestplanCollectionTree from './TestplanCollectionTree.vue'
@@ -114,6 +140,7 @@ const elformRef = ref()
 const collectionTreeRef = ref()
 const planNo = ref(route.query.planNo)
 const editorMode = ref(route.params.editorMode)
+const notificationRobotList = ref([])
 const formData = reactive({
   planName: '',
   planDesc: '',
@@ -123,11 +150,13 @@ const formData = reactive({
   delay: '0',
   save: true,
   saveOnError: false,
-  stopTestOnErrorCount: '3'
+  stopTestOnErrorCount: '3',
+  notificationRobotNumberedList: []
 })
 const formRules = reactive({
   planName: [{ required: true, message: '计划名称不能为空', trigger: 'blur' }],
-  iterations: [{ validator: checkIterations, trigger: 'blur' }]
+  concurrency: [{ required: true, message: '并发数不能为空', trigger: 'blur' }],
+  iterations: [{ required: true, message: '迭代数不能为空', validator: checkIterations, trigger: 'blur' }]
 })
 
 const queryMode = computed(() => editorMode.value === 'QUERY')
@@ -154,6 +183,7 @@ watch(
 )
 
 onMounted(() => {
+  queryNotificationRobotAll()
   if (createMode.value) return
   if (!planNo.value) {
     editorMode.value = 'CREATE'
@@ -170,6 +200,15 @@ const queryTestplan = () => {
   TestplanService.queryTestplan({ planNo: planNo.value }).then((response) => {
     _assign(formData, response.result)
     collectionTreeRef.value.setCheckedKeys(response.result.collectionNumberList)
+  })
+}
+
+/**
+ * 查询所有通知机器人
+ */
+const queryNotificationRobotAll = () => {
+  NotificationService.queryNotificationRobotAll({ workspaceNo: workspaceNo.value }).then((response) => {
+    notificationRobotList.value = response.result
   })
 }
 
@@ -276,6 +315,12 @@ const goBack = () => {
 
 .settings-container {
   padding: 20px;
+}
+
+.robot-type-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .el-form-item--small.el-form-item {

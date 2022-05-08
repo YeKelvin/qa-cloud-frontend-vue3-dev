@@ -4,8 +4,8 @@
       <template #header><span>查询条件</span></template>
       <div class="conditions-container">
         <ConditionInput v-model="queryConditions.robotNo" label="机器人编号" />
-        <ConditionInput v-model="queryConditions.robotName" label="通知名称" />
-        <ConditionInput v-model="queryConditions.robotDesc" label="通知机器人描述" />
+        <ConditionInput v-model="queryConditions.robotName" label="机器人名称" />
+        <ConditionInput v-model="queryConditions.robotDesc" label="机器人描述" />
         <ConditionSelect v-model="queryConditions.state" :options="RobotType" label="机器人类型" />
         <ConditionSelect v-model="queryConditions.state" :options="RobotState" label="状态" />
       </div>
@@ -28,7 +28,7 @@
         <el-table-column prop="robotNo" label="机器人编号" min-width="180" width="180" />
         <el-table-column prop="robotName" label="机器人名称" min-width="150" />
         <el-table-column prop="robotDesc" label="机器人描述" min-width="150" />
-        <el-table-column prop="robotType" label="机器人类型" min-width="80" width="80">
+        <el-table-column prop="robotType" label="机器人类型" min-width="100" width="100">
           <template #default="{ row }">{{ RobotType[row.robotType] }}</template>
         </el-table-column>
         <el-table-column prop="state" label="状态" min-width="60" width="60">
@@ -38,12 +38,12 @@
           <template #default="{ row }">
             <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
             <template v-if="row.state === 'ENABLE'">
-              <el-button type="text" @click="modifyNotificationState(row, 'DISABLE')">禁用</el-button>
+              <el-button type="text" @click="modifyRobotState(row, 'DISABLE')">禁用</el-button>
             </template>
             <template v-else>
-              <el-button type="text" @click="modifyNotificationState(row, 'ENABLE')">启用</el-button>
+              <el-button type="text" @click="modifyRobotState(row, 'ENABLE')">启用</el-button>
             </template>
-            <el-button type="text" @click="disableNotification(row)">删除</el-button>
+            <el-button type="text" @click="removeRobot(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -61,10 +61,10 @@
       />
     </div>
 
-    <!-- 创建权限表单 -->
-    <CreateDialog v-if="showCreateDialog" v-model="showCreateDialog" @re-query="query" />
-    <!-- 编辑权限表单 -->
-    <ModifyDialog v-if="showModifyDialog" v-model="showModifyDialog" :row="currentRow" @re-query="query" />
+    <!-- 创建机器人表单 -->
+    <WeComRobotCreateDialog v-if="showCreateDialog" v-model="showCreateDialog" @re-query="query" />
+    <!-- 编辑机器人表单 -->
+    <WeComRobotModifyDialog v-if="showModifyDialog" v-model="showModifyDialog" :row="currentRow" @re-query="query" />
   </div>
 </template>
 
@@ -76,11 +76,13 @@ import * as NotificationService from '@/api/public/notification'
 import ConditionInput from '@/components/query-condition/ConditionInput.vue'
 import ConditionSelect from '@/components/query-condition/ConditionSelect.vue'
 import useQueryConditions from '@/composables/useQueryConditions'
+import useWorkspaceState from '@/composables/useWorkspaceState'
 import WeComRobotCreateDialog from './WeComRobotCreateDialog.vue'
 import WeComRobotModifyDialog from './WeComRobotModifyDialog.vue'
 
-// 查询条件
+const { workspaceNo } = useWorkspaceState()
 const { queryConditions, resetQueryConditions } = useQueryConditions({
+  workspaceNo: workspaceNo.value,
   robotNo: '',
   robotName: '',
   robotDesc: '',
@@ -95,6 +97,10 @@ const currentRow = ref({})
 const showCreateDialog = ref(false)
 const showModifyDialog = ref(false)
 
+watch(workspaceNo, (val) => {
+  if (val) query()
+})
+
 onMounted(() => {
   query()
 })
@@ -103,18 +109,20 @@ onMounted(() => {
  * 查询
  */
 const query = () => {
-  NotificationService.queryNotificationList({ ...queryConditions, page: page.value, pageSize: pageSize.value }).then(
-    (response) => {
-      tableData.value = response.result['data']
-      total.value = response.result['total']
-    }
-  )
+  NotificationService.queryNotificationRobotList({
+    ...queryConditions,
+    page: page.value,
+    pageSize: pageSize.value
+  }).then((response) => {
+    tableData.value = response.result['data']
+    total.value = response.result['total']
+  })
 }
 
 /**
- * 修改权限状态
+ * 修改机器人状态
  */
-const modifyNotificationState = async (row, state) => {
+const modifyRobotState = async (row, state) => {
   const stateMsg = state === 'DISABLE' ? '禁用' : '启用'
   // 二次确认
   const error = await ElMessageBox.confirm(`确定${stateMsg}吗？`, '警告', {
@@ -125,18 +133,18 @@ const modifyNotificationState = async (row, state) => {
     .then(() => false)
     .catch(() => true)
   if (error) return
-  // 修改权限状态
-  await NotificationService.modifyNotificationState({ robotNo: row.robotNo, state: state })
+  // 修改机器人状态
+  await NotificationService.modifyNotificationRobotState({ robotNo: row.robotNo, state: state })
   // 成功提示
-  ElMessage({ message: `${stateMsg}权限成功`, type: 'info', duration: 2 * 1000 })
+  ElMessage({ message: `${stateMsg}机器人成功`, type: 'info', duration: 2 * 1000 })
   // 重新查询列表
   query()
 }
 
 /**
- * 删除权限
+ * 删除机器人
  */
-const disableNotification = async (row) => {
+const removeRobot = async (row) => {
   // 二次确认
   const error = await ElMessageBox.confirm('确定删除吗？', '警告', {
     confirmButtonText: '确定',
@@ -146,10 +154,10 @@ const disableNotification = async (row) => {
     .then(() => false)
     .catch(() => true)
   if (error) return
-  // 删除权限
-  await NotificationService.deleteNotification({ robotNo: row.robotNo })
+  // 删除机器人
+  await NotificationService.removeNotificationRobot({ robotNo: row.robotNo })
   // 成功提示
-  ElMessage({ message: '删除权限成功', type: 'info', duration: 2 * 1000 })
+  ElMessage({ message: '删除机器人成功', type: 'info', duration: 2 * 1000 })
   // 重新查询列表
   query()
 }

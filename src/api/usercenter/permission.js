@@ -10,4 +10,4 @@ export const modifyPermission = (data) => request.put('/usercenter/permission', 
 
 export const modifyPermissionState = (data) => request.patch('/usercenter/permission/state', data)
 
-export const deletePermission = (data) => request.delete('/usercenter/permission', { data: data })
+export const removePermission = (data) => request.delete('/usercenter/permission', { data: data })

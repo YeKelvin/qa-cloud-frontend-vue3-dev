@@ -53,7 +53,7 @@ export default {
   name: 'Navbar',
   data() {
     return {
-      displayWorkspaceRoute: ['/script/editor', '/script/testplan', '/system/workspace']
+      displayWorkspaceRoute: ['/script/editor', '/script/testplan', '/system/workspace', '/system/notification/robot']
     }
   },
   computed: {
