@@ -62,9 +62,9 @@
     </div>
 
     <!-- 创建机器人表单 -->
-    <WeComRobotCreateDialog v-if="showCreateDialog" v-model="showCreateDialog" @re-query="query" />
+    <RobotCreateDialog v-if="showCreateDialog" v-model="showCreateDialog" @re-query="query" />
     <!-- 编辑机器人表单 -->
-    <WeComRobotModifyDialog v-if="showModifyDialog" v-model="showModifyDialog" :row="currentRow" @re-query="query" />
+    <RobotModifyDialog v-if="showModifyDialog" v-model="showModifyDialog" :row="currentRow" @re-query="query" />
   </div>
 </template>
 
@@ -77,8 +77,8 @@ import ConditionInput from '@/components/query-condition/ConditionInput.vue'
 import ConditionSelect from '@/components/query-condition/ConditionSelect.vue'
 import useQueryConditions from '@/composables/useQueryConditions'
 import useWorkspaceState from '@/composables/useWorkspaceState'
-import WeComRobotCreateDialog from './WeComRobotCreateDialog.vue'
-import WeComRobotModifyDialog from './WeComRobotModifyDialog.vue'
+import RobotCreateDialog from './RobotCreateDialog.vue'
+import RobotModifyDialog from './RobotModifyDialog.vue'
 
 const { workspaceNo } = useWorkspaceState()
 const { queryConditions, resetQueryConditions } = useQueryConditions({
