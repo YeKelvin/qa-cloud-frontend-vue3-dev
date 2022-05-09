@@ -8,6 +8,12 @@
       :model="formData"
       :rules="formRules"
     >
+      <el-form-item label="机器人类型：" prop="robotType">
+        <el-radio-group v-model="formData.robotType">
+          <el-radio label="WECOM">企业微信</el-radio>
+          <el-radio label="DINGTALK" disabled>钉钉</el-radio>
+        </el-radio-group>
+      </el-form-item>
       <el-form-item label="机器人名称：" prop="robotName">
         <el-input v-model="formData.robotName" clearable />
       </el-form-item>
@@ -44,6 +50,7 @@ const formData = ref({
 })
 const formRules = reactive({
   robotName: [{ required: true, message: '机器人名称不能为空', trigger: 'blur' }],
+  robotType: [{ required: true, message: '机器人类型不能为空', trigger: 'blur' }],
   'robotConfig.key': [{ required: true, message: '机器人配置不能为空', trigger: 'blur' }]
 })
 
