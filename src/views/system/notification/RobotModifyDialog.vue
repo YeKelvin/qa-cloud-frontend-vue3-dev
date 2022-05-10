@@ -2,7 +2,7 @@
   <el-dialog title="编辑通知机器人" width="50%" center @close="$emit('update:model-value', false)">
     <el-form
       ref="elformRef"
-      label-width="120px"
+      label-width="140px"
       style="width: 100%; padding-right: 30px"
       inline-message
       :model="formData"
@@ -21,7 +21,7 @@
         <el-input v-model="formData.robotDesc" clearable />
       </el-form-item>
       <el-form-item label="Webhook Key：" prop="robotConfig.key">
-        <el-input v-model="formData.robotConfig.key" clearable />
+        <el-input v-model="formData.robotConfig.key" type="password" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="danger" @click="submitForm()">保 存</el-button>

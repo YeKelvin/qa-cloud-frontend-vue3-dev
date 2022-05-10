@@ -21,7 +21,7 @@
         <el-input v-model="formData.robotDesc" clearable />
       </el-form-item>
       <el-form-item label="Webhook Key：" prop="robotConfig.key">
-        <el-input v-model="formData.robotConfig.key" clearable />
+        <el-input v-model="formData.robotConfig.key" type="password" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm()">提 交</el-button>
