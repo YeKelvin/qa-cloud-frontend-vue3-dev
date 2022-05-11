@@ -150,7 +150,8 @@ const {
   setReadonly,
   updateTabName,
   closeTab,
-  refreshCollections
+  refreshCollections,
+  addSelectedCollectionNumberedList
 } = useEditor(props)
 const { workspaceNo } = useWorkspaceState()
 const { selectedDatasetNumberList, useCurrentValue } = usePyMeterState()
@@ -256,7 +257,7 @@ const createCollectionElement = async () => {
   // 重新查询集合列表
   refreshCollections()
   // 新增成功后立即在列表中展示
-  store.commit('pymeter/addSelectedCollectionNumberedList', response.result.elementNo)
+  addSelectedCollectionNumberedList(response.result.elementNo)
 }
 
 /**

@@ -94,8 +94,17 @@ import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
 const props = defineProps(editorProps)
 const store = useStore()
-const { queryMode, modifyMode, createMode, editNow, setReadonly, updateTabName, closeTab, refreshCollections } =
-  useEditor(props)
+const {
+  queryMode,
+  modifyMode,
+  createMode,
+  editNow,
+  setReadonly,
+  updateTabName,
+  closeTab,
+  refreshCollections,
+  addSelectedCollectionNumberedList
+} = useEditor(props)
 const { workspaceNo } = useWorkspaceState()
 const { selectedDatasetNumberList, useCurrentValue } = usePyMeterState()
 const elformRef = ref()
@@ -176,7 +185,7 @@ const createCollectionElement = async () => {
   // 重新查询集合列表
   refreshCollections()
   // 新增成功后立即在列表中展示
-  store.commit('pymeter/addSelectedCollectionNumberedList', response.result.elementNo)
+  addSelectedCollectionNumberedList(response.result.elementNo)
 }
 
 /**

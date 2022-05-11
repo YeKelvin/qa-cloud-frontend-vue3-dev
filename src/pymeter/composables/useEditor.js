@@ -46,6 +46,13 @@ export default function useEditor(props) {
   }
 
   /**
+   * 添加集合编号至列表中
+   */
+  const addSelectedCollectionNumberedList = (collectionNo) => {
+    store.commit('pymeter/addSelectedCollectionNumberedList', collectionNo)
+  }
+
+  /**
    * 重新查询脚本列表
    */
   const refreshElementTree = () => {
@@ -77,6 +84,7 @@ export default function useEditor(props) {
     updateTabName,
     closeTab,
     refreshCollections,
+    addSelectedCollectionNumberedList,
     refreshElementTree,
     queryDatasetAll,
     queryHttpHeaderTemplateAll,

@@ -75,7 +75,8 @@ watch(
   (val) => {
     if (!val) return
     queryElementsTree()
-  }
+  },
+  { deep: true }
 )
 
 onMounted(() => {

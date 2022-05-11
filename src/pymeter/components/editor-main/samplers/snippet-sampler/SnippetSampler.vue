@@ -20,11 +20,11 @@
       </el-form-item>
 
       <!-- 片段列表 -->
-      <el-form-item label="片段引用：" prop="property.snippetNo">
+      <el-form-item label="片段引用：" prop="property.snippetNo" class="snippets-item">
         <el-select
           v-model="elementInfo.property.snippetNo"
           placeholder="脚本片段"
-          style="width: 100%"
+          style="width: 100%; margin-right: 10px"
           :disabled="queryMode"
         >
           <el-option
@@ -34,6 +34,15 @@
             :value="snippet.elementNo"
           />
         </el-select>
+        <el-button
+          :disabled="isBlank(elementInfo.property.snippetNo)"
+          :icon="View"
+          type="primary"
+          plain
+          @click="openSnippetCollection()"
+        >
+          查 看
+        </el-button>
       </el-form-item>
 
       <!-- 是否使用默认值 -->
@@ -81,7 +90,7 @@
 
 <script setup>
 import { ElMessage } from 'element-plus'
-import { Check, Close, Edit } from '@element-plus/icons-vue'
+import { Check, Close, Edit, View } from '@element-plus/icons-vue'
 import { differenceBy as _differenceBy } from 'lodash-es'
 import { isBlank } from '@/utils/string-util'
 import editorProps from '@/pymeter/composables/editor.props'
@@ -99,6 +108,7 @@ const {
   setReadonly,
   updateTabName,
   closeTab,
+  addSelectedCollectionNumberedList,
   refreshElementTree
 } = useEditor(props)
 const elformRef = ref()
@@ -281,6 +291,16 @@ const checkParameter = () => {
   if (!pass) ElMessage({ message: '参数值不能为空', type: 'error' })
   return pass
 }
+
+const openSnippetCollection = () => {
+  addSelectedCollectionNumberedList(elementInfo.value.property.snippetNo)
+}
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.snippets-item {
+  :deep(.el-form-item__content) {
+    flex-wrap: nowrap;
+  }
+}
+</style>

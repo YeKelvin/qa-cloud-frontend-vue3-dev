@@ -21,7 +21,7 @@
         <el-input v-model="formData.robotDesc" clearable />
       </el-form-item>
       <el-form-item label="Webhook Key：" prop="robotConfig.key">
-        <el-input v-model="formData.robotConfig.key" type="password" clearable />
+        <el-input v-model="formData.robotConfig.key" class="no-autofill-pwd" clearable />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm()">提 交</el-button>
@@ -78,4 +78,10 @@ const submitForm = async () => {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.no-autofill-pwd {
+  :deep(.el-input__inner) {
+    -webkit-text-security: disc !important;
+  }
+}
+</style>
