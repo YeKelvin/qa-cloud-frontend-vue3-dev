@@ -93,7 +93,6 @@ import useRunnableElement from '@/pymeter/composables/useRunnableElement'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
 const props = defineProps(editorProps)
-const store = useStore()
 const {
   queryMode,
   modifyMode,
@@ -103,7 +102,8 @@ const {
   updateTabName,
   closeTab,
   refreshCollections,
-  addSelectedCollectionNumberedList
+  addSelectedCollectionNumberedList,
+  scrollToElementTreeBottom
 } = useEditor(props)
 const { workspaceNo } = useWorkspaceState()
 const { selectedDatasetNumberList, useCurrentValue } = usePyMeterState()
@@ -186,6 +186,8 @@ const createCollectionElement = async () => {
   refreshCollections()
   // 新增成功后立即在列表中展示
   addSelectedCollectionNumberedList(response.result.elementNo)
+  // 滚动至底部
+  scrollToElementTreeBottom()
 }
 
 /**

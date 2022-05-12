@@ -51,11 +51,14 @@ const state = {
   // 当前 tab 的编号（elementNo）
   activeTabNo: '',
 
-  // 是否刷新集合列表
+  // 刷新集合列表
   refreshCollections: 0,
 
-  // 是否刷新脚本内容
+  // 刷新脚本元素
   refreshElementTree: 0,
+
+  // 滚动至脚本列表底部
+  scrollToElementTreeBottom: 0,
 
   // 全局变量集列表
   globalDatasetList: [],
@@ -177,6 +180,13 @@ const mutations = {
    */
   refreshElementTreeNow: (state) => {
     state.refreshElementTree += 1
+  },
+
+  /**
+   * 滚动至脚本列表底部
+   */
+  scrollToElementTreeBottom: (state) => {
+    state.scrollToElementTreeBottom += 1
   },
 
   setSelectedDatasetNumberedList: (state, data) => {

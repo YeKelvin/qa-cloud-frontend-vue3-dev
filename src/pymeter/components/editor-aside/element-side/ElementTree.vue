@@ -4,6 +4,7 @@
     node-key="elementNo"
     highlight-current
     draggable
+    style="padding-bottom: 100px"
     :indent="36"
     :expand-on-click-node="false"
     :data="elementList"

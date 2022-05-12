@@ -109,7 +109,8 @@ const {
   updateTabName,
   closeTab,
   addSelectedCollectionNumberedList,
-  refreshElementTree
+  refreshElementTree,
+  scrollToElementTreeBottom
 } = useEditor(props)
 const elformRef = ref()
 const elementNo = ref(props.editorNo)
@@ -293,7 +294,10 @@ const checkParameter = () => {
 }
 
 const openSnippetCollection = () => {
+  // 脚本列表打开片段脚本
   addSelectedCollectionNumberedList(elementInfo.value.property.snippetNo)
+  // 滚动至底部
+  scrollToElementTreeBottom()
 }
 </script>
 

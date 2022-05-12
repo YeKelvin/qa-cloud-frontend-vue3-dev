@@ -60,6 +60,13 @@ export default function useEditor(props) {
   }
 
   /**
+   * 滚动至脚本列表底部
+   */
+  const scrollToElementTreeBottom = () => {
+    store.commit('pymeter/scrollToElementTreeBottom')
+  }
+
+  /**
    * 重新加载列表
    */
   const queryDatasetAll = () => {
@@ -86,6 +93,7 @@ export default function useEditor(props) {
     refreshCollections,
     addSelectedCollectionNumberedList,
     refreshElementTree,
+    scrollToElementTreeBottom,
     queryDatasetAll,
     queryHttpHeaderTemplateAll,
     queryDatabaseEngineAll

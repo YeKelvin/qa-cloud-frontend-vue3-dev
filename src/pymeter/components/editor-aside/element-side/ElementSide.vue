@@ -86,7 +86,12 @@
       <!-- 分割线 -->
       <el-divider />
       <!-- 脚本内容 -->
-      <el-scrollbar style="width: 100%; height: 100%" wrap-style="overflow-x:auto;" view-style="padding:10px;">
+      <el-scrollbar
+        ref="elScrollbarRef"
+        style="width: 100%; height: 100%"
+        wrap-style="overflow-x:auto;"
+        view-style="padding:10px;"
+      >
         <ElementTree ref="elementTreeRef" :collection-number-list="selectedCollectionNumberedList" />
       </el-scrollbar>
     </template>
@@ -105,7 +110,7 @@ import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 import ElementTree from './ElementTree.vue'
 
 const { workspaceNo } = useWorkspaceState()
-const { refreshCollections } = usePyMeterState()
+const { refreshCollections, scrollToElementTreeBottom } = usePyMeterState()
 const store = useStore()
 const loading = ref(false)
 const collections = ref([])
@@ -119,6 +124,7 @@ const selectedCollectionNumberedList = computed({
     if (!loading.value) store.commit('pymeter/setSelectedCollectionNumberedList', val)
   }
 })
+const elScrollbarRef = ref()
 
 watch(workspaceNo, (val) => {
   if (!val) return
@@ -128,11 +134,19 @@ watch(workspaceNo, (val) => {
   selectedCollectionNumberedList.value = []
 })
 watch(refreshCollections, () => queryCollections())
+watch(scrollToElementTreeBottom, () => scrollToBottom())
 
 onMounted(() => {
   if (!workspaceNo.value) return
   queryCollections()
 })
+
+/**
+ * 滚动至底部
+ */
+const scrollToBottom = () => {
+  elScrollbarRef.value && elScrollbarRef.value.setScrollTop(elScrollbarRef.value.wrap$.clientHeight)
+}
 
 /**
  * 根据工作空间编号查询测试集合和脚本片段

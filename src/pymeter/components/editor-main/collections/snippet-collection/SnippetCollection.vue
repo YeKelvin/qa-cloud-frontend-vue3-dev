@@ -140,7 +140,6 @@ import ArgumentTable from './SnippetCollectionArgumentTable.vue' // 实参
 import ParameterTable from './SnippetCollectionParameterTable.vue' // 形参
 
 const props = defineProps(editorProps)
-const store = useStore()
 const {
   editMode,
   queryMode,
@@ -151,7 +150,8 @@ const {
   updateTabName,
   closeTab,
   refreshCollections,
-  addSelectedCollectionNumberedList
+  addSelectedCollectionNumberedList,
+  scrollToElementTreeBottom
 } = useEditor(props)
 const { workspaceNo } = useWorkspaceState()
 const { selectedDatasetNumberList, useCurrentValue } = usePyMeterState()
@@ -258,6 +258,8 @@ const createCollectionElement = async () => {
   refreshCollections()
   // 新增成功后立即在列表中展示
   addSelectedCollectionNumberedList(response.result.elementNo)
+  // 滚动至底部
+  scrollToElementTreeBottom()
 }
 
 /**

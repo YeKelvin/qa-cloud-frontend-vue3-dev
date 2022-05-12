@@ -6,6 +6,7 @@ export default function usePyMeterState() {
 
   const refreshCollections = computed(() => store.state.pymeter.refreshCollections)
   const refreshElementTree = computed(() => store.state.pymeter.refreshElementTree)
+  const scrollToElementTreeBottom = computed(() => store.state.pymeter.scrollToElementTreeBottom)
 
   const globalDatasetList = computed(() => store.state.pymeter.globalDatasetList)
   const environmentDatasetList = computed(() => store.state.pymeter.environmentDatasetList)
@@ -43,6 +44,7 @@ export default function usePyMeterState() {
   return {
     refreshCollections,
     refreshElementTree,
+    scrollToElementTreeBottom,
     globalDatasetList,
     environmentDatasetList,
     customDatasetList,
