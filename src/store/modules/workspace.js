@@ -54,9 +54,7 @@ const actions = {
    * 查询所有工作空间
    */
   setWorkspaceList({ commit, state }) {
-    const userNo = store.getters?.userNo
-    if (!userNo) return
-    WorkspaceService.queryWorkspaceAll({ userNo: userNo }).then((response) => {
+    WorkspaceService.queryWorkspaceAll({ userNo: store.getters.userNo }).then((response) => {
       commit('setWorkspaceList', response.result)
       // 当前工作空间不为空且不在工作空间列表中时（表示该工作空间已无效），清空localStorage
       if (state.workspaceNo !== '') {

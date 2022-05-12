@@ -49,8 +49,8 @@ router.beforeEach(async (to, from, next) => {
           // hack method to ensure that addRoutes is complete
           next({ ...to, replace: true }) // replace: true 的作用是不留下历史记录
         } catch (error) {
-          // 移除 token并重定向到登录页
-          ElMessage.error(error.toString() || 'Has Error')
+          // 移除 token 并重定向到登录页
+          ElMessage.error(error.toString() || 'Error')
           await store.dispatch('user/resetToken')
           next({ path: '/login', query: { redirect: to.path, ...to.query } })
           NProgress.done()

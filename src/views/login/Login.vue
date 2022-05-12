@@ -59,7 +59,7 @@
 
 <script>
 import { isEmpty } from 'lodash-es'
-export default {
+export default defineComponent({
   name: 'Login',
   data() {
     const validateLoginName = (_, value, callback) => {
@@ -109,27 +109,29 @@ export default {
         this.$refs.password.focus()
       })
     },
-    handleLogin() {
-      this.$refs.loginForm.validate((valid) => {
-        if (valid) {
-          this.loading = true
-          this.$store
-            .dispatch('user/login', this.loginForm)
-            .then(() => {
-              this.$router.push({ path: this.redirect || '/' }, () => {})
-              this.loading = false
-            })
-            .catch(() => {
-              this.loading = false
-            })
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
+    async handleLogin() {
+      // 表单校验
+      const error = await this.$refs.loginForm
+        .validate()
+        .then(() => false)
+        .catch(() => true)
+      if (error) {
+        this.$message({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
+        return
+      }
+      // 登录
+      try {
+        this.loading = true
+        await this.$store.dispatch('user/login', this.loginForm)
+        this.$router.push({ path: this.redirect || '/' }, () => {})
+        this.loading = false
+      } catch (error) {
+        this.loading = false
+        console.error(error.toString())
+      }
     }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

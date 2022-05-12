@@ -89,4 +89,9 @@ const save = () => {
 :deep(.el-transfer__buttons) {
   display: flex;
 }
+
+:deep(.el-transfer-panel__body) {
+  display: flex;
+  flex-direction: column;
+}
 </style>

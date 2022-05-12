@@ -38,28 +38,17 @@ const mutations = {
 }
 
 const actions = {
-  login({ commit }, userInfo) {
+  async login({ commit }, userInfo) {
     const { loginName, password } = userInfo
-    return new Promise((resolve, reject) => {
-      // 获取加密公钥
-      AuthService.encryptionFactor({ loginName: loginName.trim() })
-        .then((response) => {
-          const { result } = response
-          const rsaPublicKey = result['publicKey']
-          const jse = new JSEncrypt()
-          jse.setPublicKey(rsaPublicKey)
-          return UserService.login({ loginName: loginName.trim(), password: jse.encrypt(password) })
-        })
-        .then((response) => {
-          const { result } = response
-          commit('SET_TOKEN', result.accessToken)
-          setToken(result.accessToken)
-          resolve()
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
+    // 获取加密公钥
+    const encryptionRes = await AuthService.encryptionFactor({ loginName: loginName.trim() })
+    const publicKey = encryptionRes.result['publicKey']
+    const jse = new JSEncrypt()
+    jse.setPublicKey(publicKey)
+    // 登录
+    const loginRes = await UserService.login({ loginName: loginName.trim(), password: jse.encrypt(password) })
+    commit('SET_TOKEN', loginRes.result.accessToken)
+    setToken(loginRes.result.accessToken)
   },
 
   queryInfo({ commit }) {
@@ -67,16 +56,19 @@ const actions = {
       UserService.queryInfo()
         .then((response) => {
           if (!response) {
-            reject('身份认证失败或过期，请重新登录')
+            reject('身份认证失败或失效，请重新登录')
+            return
+          }
+          if (response && (!response.success || !response.result)) {
+            reject('身份认证失败或失效，请重新登录')
             return
           }
 
-          const { result } = response
-          commit('SET_NUMBER', result.userNo)
-          commit('SET_NAME', result.userName)
+          commit('SET_NUMBER', response.result.userNo)
+          commit('SET_NAME', response.result.userName)
+          commit('SET_ROLES', response.result.roles)
           commit('SET_AVATAR', userDefaultAvatar)
-          commit('SET_ROLES', result.roles)
-          resolve(result)
+          resolve(response.result)
         })
         .catch((error) => {
           reject(error)
