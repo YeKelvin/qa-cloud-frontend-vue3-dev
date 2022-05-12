@@ -550,7 +550,7 @@ const querySelectedHeaderTemplateList = () => {
 
 .raw-type {
   margin-left: 40px;
-  width: 80px;
+  width: 90px;
 
   &.el-select {
     --el-select-border-color-hover: none;
@@ -559,9 +559,14 @@ const querySelectedHeaderTemplateList = () => {
   }
 
   :deep(.el-input__inner) {
+    background-color: #ffffff;
     box-shadow: none;
     color: #409eff;
+  }
+
+  :deep(.el-input__wrapper) {
     background-color: #ffffff;
+    box-shadow: none;
   }
 
   :deep(.el-select__caret) {
