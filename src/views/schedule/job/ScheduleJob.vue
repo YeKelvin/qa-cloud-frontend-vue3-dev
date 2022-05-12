@@ -3,11 +3,11 @@
     <el-card shadow="hover" style="margin-bottom: 10px">
       <template #header><span>查询条件</span></template>
       <div class="conditions-container">
-        <ConditionInput v-model="queryConditions.robotNo" label="机器人编号" />
-        <ConditionInput v-model="queryConditions.robotName" label="机器人名称" />
-        <ConditionInput v-model="queryConditions.robotDesc" label="机器人描述" />
-        <ConditionSelect v-model="queryConditions.robotType" :options="RobotType" label="机器人类型" />
-        <ConditionSelect v-model="queryConditions.state" :options="RobotState" label="状态" />
+        <ConditionInput v-model="queryConditions.jobNo" label="作业编号" />
+        <ConditionInput v-model="queryConditions.jobName" label="作业名称" />
+        <ConditionInput v-model="queryConditions.jobDesc" label="作业描述" />
+        <ConditionSelect v-model="queryConditions.jobType" :options="JobType" label="作业类型" />
+        <ConditionSelect v-model="queryConditions.state" :options="JobState" label="状态" />
       </div>
       <div style="display: flex; justify-content: space-between">
         <div />
@@ -25,25 +25,25 @@
         <!-- 空数据提示 -->
         <template #empty><el-empty /></template>
         <!-- 列定义 -->
-        <el-table-column prop="robotNo" label="机器人编号" min-width="180" width="180" />
-        <el-table-column prop="robotName" label="机器人名称" min-width="150" />
-        <el-table-column prop="robotDesc" label="机器人描述" min-width="150" />
-        <el-table-column prop="robotType" label="机器人类型" min-width="100" width="100">
-          <template #default="{ row }">{{ RobotType[row.robotType] }}</template>
+        <el-table-column prop="jobNo" label="作业编号" min-width="180" width="180" />
+        <el-table-column prop="jobName" label="作业名称" min-width="150" />
+        <el-table-column prop="jobDesc" label="作业描述" min-width="150" />
+        <el-table-column prop="jobType" label="作业类型" min-width="100" width="100">
+          <template #default="{ row }">{{ JobType[row.jobType] }}</template>
         </el-table-column>
         <el-table-column prop="state" label="状态" min-width="60" width="60">
-          <template #default="{ row }">{{ RobotState[row.state] }}</template>
+          <template #default="{ row }">{{ JobState[row.state] }}</template>
         </el-table-column>
         <el-table-column fixed="right" label="操作" min-width="160" width="160">
           <template #default="{ row }">
             <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
             <template v-if="row.state === 'ENABLE'">
-              <el-button type="text" @click="modifyRobotState(row, 'DISABLE')">禁用</el-button>
+              <el-button type="text" @click="pauseJob(row)">暂停</el-button>
             </template>
             <template v-else>
-              <el-button type="text" @click="modifyRobotState(row, 'ENABLE')">启用</el-button>
+              <el-button type="text" @click="resumeJob(row)">恢复</el-button>
             </template>
-            <el-button type="text" @click="removeRobot(row)">删除</el-button>
+            <el-button type="text" @click="shutdownJob(row)">关闭</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -61,32 +61,32 @@
       />
     </div>
 
-    <!-- 创建机器人表单 -->
-    <RobotCreateDialog v-if="showCreateDialog" v-model="showCreateDialog" @re-query="query" />
-    <!-- 编辑机器人表单 -->
-    <RobotModifyDialog v-if="showModifyDialog" v-model="showModifyDialog" :row="currentRow" @re-query="query" />
+    <!-- 创建作业表单 -->
+    <CreateDialog v-if="showCreateDialog" v-model="showCreateDialog" @re-query="query" />
+    <!-- 编辑作业表单 -->
+    <ModifyDialog v-if="showModifyDialog" v-model="showModifyDialog" :row="currentRow" @re-query="query" />
   </div>
 </template>
 
 <script setup>
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus } from '@element-plus/icons-vue'
-import { RobotState, RobotType } from '@/api/enum'
-import * as NotificationService from '@/api/public/notification'
+import { JobState, JobType } from '@/api/enum'
+import * as ScheduleService from '@/api/public/schedule'
 import ConditionInput from '@/components/query-condition/ConditionInput.vue'
 import ConditionSelect from '@/components/query-condition/ConditionSelect.vue'
 import useQueryConditions from '@/composables/useQueryConditions'
 import useWorkspaceState from '@/composables/useWorkspaceState'
-import RobotCreateDialog from './RobotCreateDialog.vue'
-import RobotModifyDialog from './RobotModifyDialog.vue'
+import CreateDialog from './ScheduleJobCreateDialog.vue'
+import ModifyDialog from './ScheduleJobModifyDialog.vue'
 
 const { workspaceNo } = useWorkspaceState()
 const { queryConditions, resetQueryConditions } = useQueryConditions({
   workspaceNo: workspaceNo.value,
-  robotNo: '',
-  robotName: '',
-  robotDesc: '',
-  robotType: '',
+  jobNo: '',
+  jobName: '',
+  jobDesc: '',
+  jobType: '',
   state: ''
 })
 const tableData = ref([])
@@ -109,7 +109,7 @@ onMounted(() => {
  * 查询
  */
 const query = () => {
-  NotificationService.queryNotificationRobotList({
+  ScheduleService.queryScheduleJobList({
     ...queryConditions,
     page: page.value,
     pageSize: pageSize.value
@@ -120,12 +120,11 @@ const query = () => {
 }
 
 /**
- * 修改机器人状态
+ * 暂停作业
  */
-const modifyRobotState = async (row, state) => {
-  const stateMsg = state === 'DISABLE' ? '禁用' : '启用'
+const pauseJob = async (row) => {
   // 二次确认
-  const error = await ElMessageBox.confirm(`确定${stateMsg}吗？`, '警告', {
+  const error = await ElMessageBox.confirm('确定暂停吗？', '警告', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
@@ -133,18 +132,39 @@ const modifyRobotState = async (row, state) => {
     .then(() => false)
     .catch(() => true)
   if (error) return
-  // 修改机器人状态
-  await NotificationService.modifyNotificationRobotState({ robotNo: row.robotNo, state: state })
+  // 暂停作业
+  await ScheduleService.pauseScheduleJob({ jobNo: row.jobNo })
   // 成功提示
-  ElMessage({ message: `${stateMsg}机器人成功`, type: 'info', duration: 2 * 1000 })
+  ElMessage({ message: `暂停作业成功`, type: 'info', duration: 2 * 1000 })
   // 重新查询列表
   query()
 }
 
 /**
- * 删除机器人
+ * 恢复作业
  */
-const removeRobot = async (row) => {
+const resumeJob = async (row) => {
+  // 二次确认
+  const error = await ElMessageBox.confirm('确定恢复吗？', '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(() => false)
+    .catch(() => true)
+  if (error) return
+  // 恢复作业
+  await ScheduleService.resumeScheduleJob({ jobNo: row.jobNo })
+  // 成功提示
+  ElMessage({ message: `恢复作业成功`, type: 'info', duration: 2 * 1000 })
+  // 重新查询列表
+  query()
+}
+
+/**
+ * 关闭作业
+ */
+const shutdownJob = async (row) => {
   // 二次确认
   const error = await ElMessageBox.confirm('确定删除吗？', '警告', {
     confirmButtonText: '确定',
@@ -154,10 +174,10 @@ const removeRobot = async (row) => {
     .then(() => false)
     .catch(() => true)
   if (error) return
-  // 删除机器人
-  await NotificationService.removeNotificationRobot({ robotNo: row.robotNo })
+  // 关闭作业
+  await ScheduleService.shutdownScheduleJob({ jobNo: row.jobNo })
   // 成功提示
-  ElMessage({ message: '删除机器人成功', type: 'info', duration: 2 * 1000 })
+  ElMessage({ message: '关闭作业成功', type: 'info', duration: 2 * 1000 })
   // 重新查询列表
   query()
 }
