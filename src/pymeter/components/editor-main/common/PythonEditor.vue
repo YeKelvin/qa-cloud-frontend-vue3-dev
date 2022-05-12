@@ -13,14 +13,14 @@
         <ul class="snippet-code-list">
           <li @click="getVarSnippet()">获取局部变量</li>
           <li @click="getPropSnippet()">获取全局变量</li>
-          <template v-if="type == 'HTTP' && phase == 'POST' && phase == 'ASSERT'">
+          <template v-if="type == 'HTTP' && (phase == 'POST' || phase == 'ASSERTION')">
             <li @click="getResponseJsonSnippet()">获取Json响应</li>
           </template>
           <li @click="getTableData()">获取表数据</li>
           <li @click="setVarSnippet()">设置局部变量</li>
           <li @click="setPropSnippet()">设置全局变量</li>
           <li @click="outputLogInfo()">输出日志</li>
-          <template v-if="phase == 'ASSERT'">
+          <template v-if="phase == 'ASSERTION'">
             <li @click="assertion()">断言</li>
           </template>
           <li @click="toJson()">Json序列化</li>
@@ -38,7 +38,7 @@
 <script>
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
-export default {
+export default defineComponent({
   components: { MonacoEditor },
   props: {
     readOnly: Boolean,
@@ -149,7 +149,7 @@ export default {
       this.$refs.pythonEditor.focus()
     }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>
