@@ -103,7 +103,7 @@
     </el-form>
 
     <el-dialog v-model="showJsonScriptDialog" center title="Json脚本" width="80%">
-      <MonacoEditor ref="jsonEditorRef" language="json" style="height: 300px" :read-only="true" />
+      <MonacoEditor ref="jsonEditorRef" language="json" style="height: 400px" :read-only="true" />
     </el-dialog>
   </div>
 </template>
@@ -113,8 +113,10 @@ import { isEmpty as _isEmpty, assign as _assign } from 'lodash-es'
 import { ElMessage } from 'element-plus'
 import { Check, Close, Edit } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
+import * as ExecutionService from '@/api/script/execution'
 import editorProps from '@/pymeter/composables/editor.props'
 import useEditor from '@/pymeter/composables/useEditor'
+import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 import useRunnableElement from '@/pymeter/composables/useRunnableElement'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 import SvgIcon from '@/components/svg-icon/SvgIcon.vue'
@@ -138,6 +140,7 @@ const checkLoops = (_, value, callback) => {
 const props = defineProps(editorProps)
 const { queryMode, modifyMode, createMode, editNow, setReadonly, updateTabName, closeTab, refreshElementTree } =
   useEditor(props)
+const { selectedDatasetNumberList, useCurrentValue } = usePyMeterState()
 const elformRef = ref()
 const elementNo = ref(props.editorNo)
 const elementInfo = ref({
@@ -187,6 +190,7 @@ const builtIn = ref([])
 const showHttpSettings = computed(() => activeTabName.value === 'HTTP')
 const hiddenConfigDot = computed(() => useHTTPSession.value === false)
 const showJsonScriptDialog = ref(false)
+const jsonEditorRef = ref()
 
 onMounted(() => {
   // 查询或更新模式时，先拉取元素信息
@@ -296,6 +300,25 @@ const modifyBuiltIns = async () => {
       manager && (await ElementService.disableElement({ elementNo: manager.elementNo }))
     }
   }
+}
+
+/**
+ * 查看 Json 脚本
+ */
+const queryGroupJson = () => {
+  ExecutionService.queryGroupJson({
+    groupNo: elementNo.value,
+    datasetNumberedList: selectedDatasetNumberList.value,
+    useCurrentValue: useCurrentValue.value
+  }).then((response) => {
+    showJsonScriptDialog.value = true
+    nextTick(() => {
+      jsonEditorRef.value.setValue(JSON.stringify(response.result))
+      setTimeout(() => {
+        jsonEditorRef.value.formatDocument()
+      }, 200)
+    })
+  })
 }
 
 const { executeTestGroup } = useRunnableElement(elementNo.value)

@@ -1,4 +1,3 @@
-import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { isEmpty } from 'lodash-es'
 import { ElMessageBox } from 'element-plus'
@@ -30,12 +29,10 @@ export default function useRunnableElement(elementNo) {
       const sid = await socketio.getId()
       // 后端异步执行脚本
       await ExecutionService.executeCollection({
-        collectionNo: elementNo,
         socketId: sid,
-        variableDataSet: {
-          useCurrentValue: useCurrentValue.value,
-          numberList: selectedDatasetNumberList.value
-        }
+        collectionNo: elementNo,
+        datasetNumberedList: selectedDatasetNumberList.value,
+        useCurrentValue: useCurrentValue.value
       })
       // 打开结果面板
       store.commit('pymeter/openResultDrawer')
@@ -46,7 +43,7 @@ export default function useRunnableElement(elementNo) {
   }
 
   /**
-   * 根据 collectionNo 执行脚本
+   * 根据 collectionNo 执行片段
    */
   const executeSnippetCollection = async (additionalVariables) => {
     try {
@@ -64,12 +61,10 @@ export default function useRunnableElement(elementNo) {
       const sid = await socketio.getId()
       // 后端异步执行脚本
       await ExecutionService.executeSnippets({
-        collectionNo: elementNo,
         socketId: sid,
-        variableDataSet: {
-          useCurrentValue: useCurrentValue.value,
-          numberList: selectedDatasetNumberList.value
-        },
+        collectionNo: elementNo,
+        datasetNumberedList: selectedDatasetNumberList.value,
+        useCurrentValue: useCurrentValue.value,
         variables: additionalVariables
       })
       // 打开结果面板
@@ -83,7 +78,7 @@ export default function useRunnableElement(elementNo) {
   /**
    * 根据 groupNo 执行脚本
    */
-  const executeTestGroup = async (selfOnly = false) => {
+  const executeTestGroup = async (selfonly = false) => {
     try {
       // 没有选择变量集时给出提示
       if (isEmpty(selectedDatasetNumberList.value)) {
@@ -99,13 +94,11 @@ export default function useRunnableElement(elementNo) {
       const sid = await socketio.getId()
       // 后端异步执行脚本
       await ExecutionService.executeGroup({
-        groupNo: elementNo,
         socketId: sid,
-        variableDataSet: {
-          useCurrentValue: useCurrentValue.value,
-          numberList: selectedDatasetNumberList.value
-        },
-        selfOnly: selfOnly
+        groupNo: elementNo,
+        datasetNumberedList: selectedDatasetNumberList.value,
+        useCurrentValue: useCurrentValue.value,
+        selfonly: selfonly
       })
       // 打开结果面板
       store.commit('pymeter/openResultDrawer')

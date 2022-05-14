@@ -75,7 +75,7 @@
     </el-form>
 
     <el-dialog v-model="showJsonScriptDialog" center title="Json脚本" width="80%">
-      <MonacoEditor ref="jsonEditor" language="json" style="height: 300px" :read-only="true" />
+      <MonacoEditor ref="jsonEditor" language="json" style="height: 400px" :read-only="true" />
     </el-dialog>
   </div>
 </template>
@@ -84,14 +84,17 @@
 import { ElMessage } from 'element-plus'
 import { Check, Close, Edit } from '@element-plus/icons-vue'
 import * as ElementService from '@/api/script/element'
+import * as ExecutionService from '@/api/script/execution'
 import editorProps from '@/pymeter/composables/editor.props'
 import useEditor from '@/pymeter/composables/useEditor'
+import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 import useRunnableElement from '@/pymeter/composables/useRunnableElement'
 import MonacoEditor from '@/components/monaco-editor/MonacoEditor.vue'
 
 const props = defineProps(editorProps)
 const { queryMode, modifyMode, createMode, editNow, setReadonly, updateTabName, closeTab, refreshElementTree } =
   useEditor(props)
+const { selectedDatasetNumberList, useCurrentValue } = usePyMeterState()
 const elformRef = ref()
 const elementNo = ref(props.editorNo)
 const elementInfo = ref({
@@ -121,6 +124,7 @@ const elementFormRules = reactive({
   ]
 })
 const showJsonScriptDialog = ref(false)
+const jsonEditorRef = ref()
 
 onMounted(() => {
   // 查询或更新模式时，先拉取元素信息
@@ -180,6 +184,25 @@ const createGroupElement = async () => {
   closeTab()
   // 重新查询脚本列表
   refreshElementTree()
+}
+
+/**
+ * 查看 Json 脚本
+ */
+const queryGroupJson = () => {
+  ExecutionService.queryGroupJson({
+    groupNo: elementNo.value,
+    datasetNumberedList: selectedDatasetNumberList.value,
+    useCurrentValue: useCurrentValue.value
+  }).then((response) => {
+    showJsonScriptDialog.value = true
+    nextTick(() => {
+      jsonEditorRef.value.setValue(JSON.stringify(response.result))
+      setTimeout(() => {
+        jsonEditorRef.value.formatDocument()
+      }, 200)
+    })
+  })
 }
 
 const { executeTestGroup } = useRunnableElement(elementNo.value)

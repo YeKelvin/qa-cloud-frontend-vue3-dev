@@ -196,7 +196,7 @@ const createCollectionElement = async () => {
 const queryCollectionJson = () => {
   ExecutionService.queryCollectionJson({
     collectionNo: elementNo.value,
-    dataSetNumberList: selectedDatasetNumberList.value,
+    datasetNumberedList: selectedDatasetNumberList.value,
     useCurrentValue: useCurrentValue.value
   }).then((response) => {
     showJsonScriptDialog.value = true

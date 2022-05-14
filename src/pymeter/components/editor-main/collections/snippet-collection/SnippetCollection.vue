@@ -301,7 +301,7 @@ const querySnippetsJson = () => {
   showArgumentsDialog.value = false
   ExecutionService.querySnippetsJson({
     collectionNo: elementNo.value,
-    dataSetNumberList: selectedDatasetNumberList.value,
+    datasetNumberedList: selectedDatasetNumberList.value,
     useCurrentValue: useCurrentValue.value,
     variables: additionalVariables.value
   }).then((response) => {
