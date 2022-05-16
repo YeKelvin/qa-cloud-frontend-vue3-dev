@@ -3,7 +3,7 @@ import qs from 'qs'
 
 export const queryElementList = (params) => request.get('/script/element/list', { params: params })
 
-export const queryElementAll = (params) => request.get('/script/element/all', { params: params })
+export const queryCollectionAll = (params) => request.get('/script/collection/all', { params: params })
 
 export const queryElementInfo = (params) => request.get('/script/element/info', { params: params })
 

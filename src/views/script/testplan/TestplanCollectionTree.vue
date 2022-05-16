@@ -78,9 +78,8 @@ onMounted(() => {
  * 根据工作空间编号查询测试集合
  */
 const queryCollections = () => {
-  ElementService.queryElementAll({
+  ElementService.queryCollectionAll({
     workspaceNo: workspaceNo.value,
-    elementType: 'COLLECTION',
     elementClass: 'TestCollection'
   }).then((response) => {
     collections.value = response.result

@@ -156,19 +156,11 @@ const queryCollections = async () => {
   loading.value = true
   // 查询 TestCollection
   collections.value = (
-    await ElementService.queryElementAll({
-      workspaceNo: workspaceNo.value,
-      elementType: 'COLLECTION',
-      elementClass: 'TestCollection'
-    })
+    await ElementService.queryCollectionAll({ workspaceNo: workspaceNo.value, elementClass: 'TestCollection' })
   ).result
   // 查询 SnippetCollection
   snippets.value = (
-    await ElementService.queryElementAll({
-      workspaceNo: workspaceNo.value,
-      elementType: 'COLLECTION',
-      elementClass: 'SnippetCollection'
-    })
+    await ElementService.queryCollectionAll({ workspaceNo: workspaceNo.value, elementClass: 'SnippetCollection' })
   ).result
   // 加载完成
   loading.value = false

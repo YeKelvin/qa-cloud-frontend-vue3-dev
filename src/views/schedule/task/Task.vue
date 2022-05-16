@@ -7,6 +7,7 @@
         <ConditionInput v-model="queryConditions.jobName" label="作业名称" />
         <ConditionInput v-model="queryConditions.jobDesc" label="作业描述" />
         <ConditionSelect v-model="queryConditions.jobType" :options="JobType" label="作业类型" />
+        <ConditionSelect v-model="queryConditions.triggerType" :options="JobType" label="触发类型" />
         <ConditionSelect v-model="queryConditions.state" :options="JobState" label="状态" />
       </div>
       <div style="display: flex; justify-content: space-between">
@@ -36,6 +37,7 @@
         </el-table-column>
         <el-table-column fixed="right" label="操作" min-width="160" width="160">
           <template #default="{ row }">
+            <el-button type="text" @click="openDetailDialog(row)">详情</el-button>
             <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
             <template v-if="row.state === 'ENABLE'">
               <el-button type="text" @click="pauseJob(row)">暂停</el-button>
@@ -43,7 +45,7 @@
             <template v-else>
               <el-button type="text" @click="resumeJob(row)">恢复</el-button>
             </template>
-            <el-button type="text" @click="shutdownJob(row)">关闭</el-button>
+            <el-button type="text" @click="removeTask(row)">关闭</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -61,10 +63,12 @@
       />
     </div>
 
-    <!-- 创建作业表单 -->
-    <CreateDialog v-if="showCreateDialog" v-model="showCreateDialog" @re-query="query" />
-    <!-- 编辑作业表单 -->
-    <ModifyDialog v-if="showModifyDialog" v-model="showModifyDialog" :row="currentRow" @re-query="query" />
+    <!-- 任务详情 -->
+    <TaskDetailDialog v-if="showDetailDialog" v-model="showDetailDialog" />
+    <!-- 创建任务表单 -->
+    <TaskCreateDialog v-if="showCreateDialog" v-model="showCreateDialog" @re-query="query" />
+    <!-- 编辑任务表单 -->
+    <TaskModifyDialog v-if="showModifyDialog" v-model="showModifyDialog" :row="currentRow" @re-query="query" />
   </div>
 </template>
 
@@ -72,13 +76,14 @@
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus } from '@element-plus/icons-vue'
 import { JobState, JobType } from '@/api/enum'
-import * as ScheduleService from '@/api/public/schedule'
+import * as ScheduleService from '@/api/schedule/task'
 import ConditionInput from '@/components/query-condition/ConditionInput.vue'
 import ConditionSelect from '@/components/query-condition/ConditionSelect.vue'
 import useQueryConditions from '@/composables/useQueryConditions'
 import useWorkspaceState from '@/composables/useWorkspaceState'
-import CreateDialog from './ScheduleJobCreateDialog.vue'
-import ModifyDialog from './ScheduleJobModifyDialog.vue'
+import TaskDetailDialog from './TaskDetailDialog.vue'
+import TaskCreateDialog from './TaskCreateDialog.vue'
+import TaskModifyDialog from './TaskModifyDialog.vue'
 
 const { workspaceNo } = useWorkspaceState()
 const { queryConditions, resetQueryConditions } = useQueryConditions({
@@ -87,6 +92,7 @@ const { queryConditions, resetQueryConditions } = useQueryConditions({
   jobName: '',
   jobDesc: '',
   jobType: '',
+  triggerType: '',
   state: ''
 })
 const tableData = ref([])
@@ -94,6 +100,7 @@ const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 const currentRow = ref({})
+const showDetailDialog = ref(false)
 const showCreateDialog = ref(false)
 const showModifyDialog = ref(false)
 
@@ -109,11 +116,7 @@ onMounted(() => {
  * 查询
  */
 const query = () => {
-  ScheduleService.queryScheduleJobList({
-    ...queryConditions,
-    page: page.value,
-    pageSize: pageSize.value
-  }).then((response) => {
+  ScheduleService.queryTaskList({ ...queryConditions, page: page.value, pageSize: pageSize.value }).then((response) => {
     tableData.value = response.result['data']
     total.value = response.result['total']
   })
@@ -133,7 +136,7 @@ const pauseJob = async (row) => {
     .catch(() => true)
   if (error) return
   // 暂停作业
-  await ScheduleService.pauseScheduleJob({ jobNo: row.jobNo })
+  await ScheduleService.pauseJob({ jobNo: row.jobNo })
   // 成功提示
   ElMessage({ message: `暂停作业成功`, type: 'info', duration: 2 * 1000 })
   // 重新查询列表
@@ -154,7 +157,7 @@ const resumeJob = async (row) => {
     .catch(() => true)
   if (error) return
   // 恢复作业
-  await ScheduleService.resumeScheduleJob({ jobNo: row.jobNo })
+  await ScheduleService.resumeJob({ jobNo: row.jobNo })
   // 成功提示
   ElMessage({ message: `恢复作业成功`, type: 'info', duration: 2 * 1000 })
   // 重新查询列表
@@ -164,7 +167,7 @@ const resumeJob = async (row) => {
 /**
  * 关闭作业
  */
-const shutdownJob = async (row) => {
+const removeTask = async (row) => {
   // 二次确认
   const error = await ElMessageBox.confirm('确定删除吗？', '警告', {
     confirmButtonText: '确定',
@@ -175,11 +178,19 @@ const shutdownJob = async (row) => {
     .catch(() => true)
   if (error) return
   // 关闭作业
-  await ScheduleService.shutdownScheduleJob({ jobNo: row.jobNo })
+  await ScheduleService.removeTask({ jobNo: row.jobNo })
   // 成功提示
   ElMessage({ message: '关闭作业成功', type: 'info', duration: 2 * 1000 })
   // 重新查询列表
   query()
+}
+
+/**
+ * 打开详情对话框
+ */
+const openDetailDialog = (row) => {
+  showDetailDialog.value = true
+  currentRow.value = row
 }
 
 /**

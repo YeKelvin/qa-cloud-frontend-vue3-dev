@@ -93,6 +93,23 @@ export const constantRoutes = [
         meta: { title: '测试报告', activeMenu: '/script/testplan' }
       }
     ]
+  },
+
+  {
+    path: '/schedule',
+    name: 'Schedule',
+    alwaysShow: true,
+    component: Layout,
+    redirect: 'noRedirect',
+    meta: { title: '定时任务', icon: 'sidebar-schedule' },
+    children: [
+      {
+        path: 'task',
+        name: 'Task',
+        component: () => import('@/views/schedule/task/Task.vue'),
+        meta: { title: '任务管理', icon: 'sidebar-schedule-task' }
+      }
+    ]
   }
 
   // 注意!!!不要把 404 放在这里，因为 asyncRoutes 中的路由是接在这后面的

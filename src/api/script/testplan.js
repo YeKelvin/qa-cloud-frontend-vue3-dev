@@ -2,6 +2,8 @@ import request from '@/utils/request'
 
 export const queryTestplanList = (params) => request.get('/script/testplan/list', { params: params })
 
+export const queryTestplanAll = (params) => request.get('/script/testplan/all', { params: params })
+
 export const queryTestplan = (params) => request.get('/script/testplan', { params: params })
 
 export const createTestplan = (data) => request.post('/script/testplan', data)

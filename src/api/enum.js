@@ -103,3 +103,21 @@ export const RobotType = {
   WECOM: '企业微信',
   DINGTALK: '钉钉'
 }
+
+export const JobState = {
+  NORMAL: '正常',
+  PAUSED: '已暂停',
+  CLOSED: '已关闭'
+}
+
+export const JobType = {
+  TESTPLAN: '测试计划',
+  COLLECTION: '元素集合',
+  GROUP: '元素分组'
+}
+
+export const TriggerType = {
+  DATE: '固定时间',
+  INTERVAL: '固定间隔',
+  CRON: 'cron'
+}
