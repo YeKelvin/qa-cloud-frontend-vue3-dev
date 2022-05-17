@@ -92,7 +92,7 @@ const queryElementsTree = () => {
     elementList.value = []
     return
   }
-  ElementService.queryElementsChildren({ elementNumberList: props.collectionNumberList }).then((response) => {
+  ElementService.queryElementsChildren({ elementNumberedList: props.collectionNumberList }).then((response) => {
     elementList.value = response.result
     // 自动展开顶级节点
     elementList.value.forEach((item) => {

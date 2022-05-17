@@ -1,8 +1,13 @@
 import request from '@/utils/request'
+import qs from 'qs'
 
 export const queryTestplanList = (params) => request.get('/script/testplan/list', { params: params })
 
-export const queryTestplanAll = (params) => request.get('/script/testplan/all', { params: params })
+export const queryTestplanAll = (params) =>
+  request.get('/script/testplan/all', {
+    params: params,
+    paramsSerializer: (params) => qs.stringify(params, { indices: false })
+  })
 
 export const queryTestplan = (params) => request.get('/script/testplan', { params: params })
 

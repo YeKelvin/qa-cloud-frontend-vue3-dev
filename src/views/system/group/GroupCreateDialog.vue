@@ -58,7 +58,7 @@ const submitForm = async () => {
   const error = await elformRef.value
     .validate()
     .then(() => false)
-    .catch(() => false)
+    .catch(() => true)
   if (error) {
     ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
     return
