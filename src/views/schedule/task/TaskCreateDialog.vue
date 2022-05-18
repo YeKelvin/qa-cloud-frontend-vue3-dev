@@ -32,8 +32,8 @@
           :rules="taskFormRules"
         >
           <template v-if="jobForm.jobType == 'TESTPLAN'">
-            <el-form-item label="测试计划：" prop="testplanNo" style="margin-bottom: 10px">
-              <el-select v-model="taskForm.testplanNo" tag-type="danger" style="width: 100%" filterable>
+            <el-form-item label="测试计划：" prop="planNo" style="margin-bottom: 10px">
+              <el-select v-model="taskForm.planNo" tag-type="danger" style="width: 100%" filterable>
                 <el-option
                   v-for="testplan in testplanList"
                   :key="testplan.planNo"
@@ -70,8 +70,8 @@
       <el-form-item label="触发类型：" prop="triggerType" style="padding: 0 10px">
         <el-radio-group v-model="jobForm.triggerType">
           <el-radio label="DATE">固定时间</el-radio>
-          <el-radio label="INTERVAL">固定间隔</el-radio>
-          <el-radio label="CRON">CRON</el-radio>
+          <el-radio label="INTERVAL" disabled>固定间隔</el-radio>
+          <el-radio label="CRON">CRON间隔</el-radio>
         </el-radio-group>
       </el-form-item>
 
@@ -91,9 +91,9 @@
                 type="datetime"
                 value-format="YYYY-MM-DD HH:mm:ss"
                 :disabled-date="(time) => time.getTime() < Date.now() - 1 * 24 * 3600 * 1000"
-                :disabled-hours="() => makeRange(0, 0)"
-                :disabled-minutes="(hour) => makeRange(0, 0)"
-                :disabled-seconds="(hour, minute) => makeRange(0, 0)"
+                :disabled-hours="disabledHours"
+                :disabled-minutes="disabledMinutes"
+                :disabled-seconds="disabledSeconds"
               />
             </el-form-item>
           </template>
@@ -118,32 +118,8 @@
             </el-form-item>
           </template>
           <template v-else>
-            <el-form-item label="开始-结束：" prop="cron.datetimerange">
-              <el-date-picker
-                v-model="triggerForm.cron.datetimerange"
-                type="datetimerange"
-                range-separator="-"
-                start-placeholder="开始时间"
-                end-placeholder="结束时间"
-              />
-            </el-form-item>
-            <el-form-item label="年：" prop="cron.year">
-              <el-input v-model="triggerForm.interval.year" clearable />
-            </el-form-item>
-            <el-form-item label="月：" prop="cron.month">
-              <el-input v-model="triggerForm.interval.month" clearable />
-            </el-form-item>
-            <el-form-item label="日：" prop="cron.day">
-              <el-input v-model="triggerForm.interval.day" clearable />
-            </el-form-item>
-            <el-form-item label="周：" prop="cron.week">
-              <el-input v-model="triggerForm.interval.week" clearable />
-            </el-form-item>
-            <el-form-item label="星期：" prop="cron.day_of_week">
-              <el-input v-model="triggerForm.interval.day_of_week" clearable />
-            </el-form-item>
-            <el-form-item label="小时：" prop="cron.hour" style="margin-bottom: 0">
-              <el-input v-model="triggerForm.interval.hour" clearable />
+            <el-form-item label="crontab：" prop="cron.crontab">
+              <el-input v-model="triggerForm.cron.crontab" clearable />
             </el-form-item>
           </template>
         </el-form>
@@ -159,11 +135,13 @@
 
 <script setup>
 import { ElMessage } from 'element-plus'
+import { isValidCron } from 'cron-validator'
 import * as ScheduleService from '@/api/schedule/task'
 import * as TestplanService from '@/api/script/testplan'
 import * as ElementService from '@/api/script/element'
 import useWorkspaceState from '@/composables/useWorkspaceState'
 import TaskDatasetSelect from './TaskDatasetSelect.vue'
+import dayjs from 'dayjs'
 
 const emit = defineEmits(['update:model-value', 're-query'])
 const { workspaceNo } = useWorkspaceState()
@@ -191,12 +169,12 @@ const collectionList = ref([])
 const groupList = ref([])
 const taskformRef = ref()
 const taskForm = ref({
-  testplanNo: '',
+  planNo: '',
   collectionNo: '',
   groupNo: ''
 })
 const taskFormRules = reactive({
-  testplanNo: [{ required: true, message: '测试计划不能为空', trigger: 'blur' }],
+  planNo: [{ required: true, message: '测试计划不能为空', trigger: 'blur' }],
   collectionNo: [{ required: true, message: '集合元素不能为空', trigger: 'blur' }],
   groupNo: [{ required: true, message: '分组元素不能为空', trigger: 'blur' }]
 })
@@ -216,25 +194,16 @@ const triggerForm = ref({
     end_date: ''
   },
   cron: {
-    datetimerange: [],
-    year: '',
-    month: '',
-    day: '',
-    week: '',
-    day_of_week: '',
-    hour: '',
-    minute: '',
-    second: '',
-    start_date: '',
-    end_date: ''
+    crontab: ''
   }
 })
 const triggerFormRules = reactive({
-  'date.datetime': [{ required: true, message: '时间不能为空', trigger: 'blur' }]
+  'date.datetime': [{ required: true, message: '时间不能为空', trigger: 'blur' }],
+  'cron.crontab': [{ required: true, message: 'crontab不能为空', trigger: 'blur' }]
 })
 const requestData = computed(() => {
   if (jobForm.value.jobType === 'TESTPLAN') {
-    jobForm.value.jobArgs.testplanNo = taskForm.value.testplanNo
+    jobForm.value.jobArgs.testplanNo = taskForm.value.planNo
   } else if (jobForm.value.jobType === 'COLLECTION') {
     jobForm.value.jobArgs.collectionNo = taskForm.value.collectionNo
   } else {
@@ -349,6 +318,34 @@ const makeRange = (start, end) => {
     result.push(i)
   }
   return result
+}
+
+const isSameDate = (current) => {
+  const selectedDatetime = triggerForm.value.date.datetime
+  const sameYear = current.isSame(selectedDatetime, 'year')
+  const sameMonth = current.isSame(selectedDatetime, 'month')
+  const sameDate = current.isSame(selectedDatetime, 'date')
+  return sameYear && sameMonth && sameDate
+}
+
+const disabledHours = () => {
+  const current = dayjs()
+  if (isSameDate(current)) {
+    return makeRange(0, current.hour() - 1)
+  }
+  return []
+}
+
+const disabledMinutes = (hour) => {
+  const current = dayjs()
+  if (isSameDate(current)) {
+    return makeRange(0, current.minute() - 1)
+  }
+  return []
+}
+
+const disabledSeconds = () => {
+  return makeRange(0, 60)
 }
 </script>
 

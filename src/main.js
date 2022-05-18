@@ -23,6 +23,7 @@ import PermissionDirective from '@/directive/permission'
 
 // 工具库
 import DayJs from 'dayjs'
+import CustomParseFormat from 'dayjs/plugin/CustomParseFormat'
 
 // socket-io
 import SocketIO from '@/plugins/socketio'
@@ -30,6 +31,7 @@ import SocketIO from '@/plugins/socketio'
 // 全局样式
 import '@/styles/index.scss'
 
+DayJs.extend(CustomParseFormat)
 // 创建 vue 实例
 const app = createApp(App)
 // 全局注册插件
