@@ -6,7 +6,7 @@
         <ConditionInput v-model="queryConditions.jobNo" label="作业编号" />
         <ConditionInput v-model="queryConditions.jobName" label="作业名称" />
         <ConditionSelect v-model="queryConditions.jobType" :options="JobType" label="作业类型" />
-        <ConditionSelect v-model="queryConditions.triggerType" :options="JobType" label="触发类型" />
+        <ConditionSelect v-model="queryConditions.triggerType" :options="TriggerType" label="触发类型" />
         <ConditionSelect v-model="queryConditions.state" :options="JobState" label="状态" />
       </div>
       <div style="display: flex; justify-content: space-between">
@@ -29,6 +29,9 @@
         <el-table-column prop="jobName" label="作业名称" min-width="150" />
         <el-table-column prop="jobType" label="作业类型" min-width="100" width="100">
           <template #default="{ row }">{{ JobType[row.jobType] }}</template>
+        </el-table-column>
+        <el-table-column prop="triggerType" label="触发类型" min-width="100" width="100">
+          <template #default="{ row }">{{ TriggerType[row.triggerType] }}</template>
         </el-table-column>
         <el-table-column prop="state" label="状态" min-width="80" width="80">
           <template #default="{ row }">{{ JobState[row.state] }}</template>
@@ -75,7 +78,7 @@
 <script setup>
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Plus } from '@element-plus/icons-vue'
-import { JobState, JobType } from '@/api/enum'
+import { JobState, JobType, TriggerType } from '@/api/enum'
 import * as ScheduleService from '@/api/schedule/task'
 import ConditionInput from '@/components/query-condition/ConditionInput.vue'
 import ConditionSelect from '@/components/query-condition/ConditionSelect.vue'
