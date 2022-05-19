@@ -118,7 +118,16 @@
             </el-form-item>
           </template>
           <template v-else>
-            <el-form-item label="crontab：" prop="cron.crontab">
+            <el-form-item prop="cron.crontab">
+              <template #label>
+                <span>crontab：</span>
+                <el-tooltip trigger="click" effect="light" placement="right-end">
+                  <template #content>
+                    <CrontabIntroduce />
+                  </template>
+                  <SvgIcon icon-name="common-question" />
+                </el-tooltip>
+              </template>
               <el-input v-model="triggerForm.cron.crontab" clearable />
             </el-form-item>
           </template>
@@ -139,9 +148,10 @@ import { isValidCron } from 'cron-validator'
 import * as ScheduleService from '@/api/schedule/task'
 import * as TestplanService from '@/api/script/testplan'
 import * as ElementService from '@/api/script/element'
+import dayjs from 'dayjs'
 import useWorkspaceState from '@/composables/useWorkspaceState'
 import TaskDatasetSelect from './TaskDatasetSelect.vue'
-import dayjs from 'dayjs'
+import CrontabIntroduce from './TaskCrontabIntroduce.vue'
 
 const emit = defineEmits(['update:model-value', 're-query'])
 const { workspaceNo } = useWorkspaceState()
@@ -312,6 +322,9 @@ const resetFields = () => {
   triggerformRef.value.resetFields()
 }
 
+/**
+ * 生成区间数组
+ */
 const makeRange = (start, end) => {
   const result = []
   for (let i = start; i <= end; i++) {
@@ -320,30 +333,41 @@ const makeRange = (start, end) => {
   return result
 }
 
-const isSameDate = (current) => {
-  const selectedDatetime = triggerForm.value.date.datetime
-  const sameYear = current.isSame(selectedDatetime, 'year')
-  const sameMonth = current.isSame(selectedDatetime, 'month')
-  const sameDate = current.isSame(selectedDatetime, 'date')
+/**
+ * 判断是否同一天
+ */
+const isSameDate = (current, strftime) => {
+  const sameYear = current.isSame(strftime, 'year')
+  const sameMonth = current.isSame(strftime, 'month')
+  const sameDate = current.isSame(strftime, 'date')
   return sameYear && sameMonth && sameDate
 }
 
+/**
+ * el-date-picker handler
+ */
 const disabledHours = () => {
   const current = dayjs()
-  if (isSameDate(current)) {
+  if (isSameDate(current, triggerForm.value.date.datetime)) {
     return makeRange(0, current.hour() - 1)
   }
   return []
 }
 
+/**
+ * el-date-picker handler
+ */
 const disabledMinutes = (hour) => {
   const current = dayjs()
-  if (isSameDate(current)) {
+  if (isSameDate(current, triggerForm.value.date.datetime)) {
     return makeRange(0, current.minute() - 1)
   }
   return []
 }
 
+/**
+ * el-date-picker handler
+ */
 const disabledSeconds = () => {
   return makeRange(0, 60)
 }
