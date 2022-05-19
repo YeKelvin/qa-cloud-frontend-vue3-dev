@@ -113,7 +113,7 @@
             <el-form-item label="日：" prop="interval.days">
               <el-input v-model="triggerForm.interval.days" clearable />
             </el-form-item>
-            <el-form-item label="时：" prop="interval.hours" style="margin-bottom: 0">
+            <el-form-item label="时：" prop="interval.hours">
               <el-input v-model="triggerForm.interval.hours" clearable />
             </el-form-item>
           </template>
@@ -213,7 +213,7 @@ const triggerFormRules = reactive({
 })
 const requestData = computed(() => {
   if (jobForm.value.jobType === 'TESTPLAN') {
-    jobForm.value.jobArgs.testplanNo = taskForm.value.planNo
+    jobForm.value.jobArgs.planNo = taskForm.value.planNo
   } else if (jobForm.value.jobType === 'COLLECTION') {
     jobForm.value.jobArgs.collectionNo = taskForm.value.collectionNo
   } else {
@@ -302,9 +302,12 @@ const submitForm = async () => {
     ElMessage({ message: '数据校验失败', type: 'error', duration: 2 * 1000 })
     return
   }
+  // cron格式校验
+  if (jobForm.value.triggerType === 'CRON' && isValidCron(triggerForm.value.cron.crontab)) {
+    ElMessage({ message: 'cron表达式不正确', type: 'error', duration: 2 * 1000 })
+  }
   // 创建任务
-  // await ScheduleService.createTask(requestData.value)
-  console.log('requestData.value: ', requestData.value)
+  await ScheduleService.createTask(requestData.value)
   // 成功提示
   ElMessage({ message: '新增成功', type: 'info', duration: 2 * 1000 })
   // 关闭dialog
@@ -359,7 +362,7 @@ const disabledHours = () => {
  */
 const disabledMinutes = (hour) => {
   const current = dayjs()
-  if (isSameDate(current, triggerForm.value.date.datetime)) {
+  if (hour === current.hour()) {
     return makeRange(0, current.minute() - 1)
   }
   return []

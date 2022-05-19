@@ -5,7 +5,6 @@
       <div class="conditions-container">
         <ConditionInput v-model="queryConditions.jobNo" label="作业编号" />
         <ConditionInput v-model="queryConditions.jobName" label="作业名称" />
-        <ConditionInput v-model="queryConditions.jobDesc" label="作业描述" />
         <ConditionSelect v-model="queryConditions.jobType" :options="JobType" label="作业类型" />
         <ConditionSelect v-model="queryConditions.triggerType" :options="JobType" label="触发类型" />
         <ConditionSelect v-model="queryConditions.state" :options="JobState" label="状态" />
@@ -28,24 +27,25 @@
         <!-- 列定义 -->
         <el-table-column prop="jobNo" label="作业编号" min-width="180" width="180" />
         <el-table-column prop="jobName" label="作业名称" min-width="150" />
-        <el-table-column prop="jobDesc" label="作业描述" min-width="150" />
         <el-table-column prop="jobType" label="作业类型" min-width="100" width="100">
           <template #default="{ row }">{{ JobType[row.jobType] }}</template>
         </el-table-column>
-        <el-table-column prop="state" label="状态" min-width="60" width="60">
+        <el-table-column prop="state" label="状态" min-width="80" width="80">
           <template #default="{ row }">{{ JobState[row.state] }}</template>
         </el-table-column>
-        <el-table-column fixed="right" label="操作" min-width="160" width="160">
+        <el-table-column fixed="right" label="操作" min-width="200" width="200">
           <template #default="{ row }">
             <el-button type="text" @click="openDetailDialog(row)">详情</el-button>
             <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
-            <template v-if="row.state === 'ENABLE'">
+            <template v-if="row.state == 'NORMAL'">
               <el-button type="text" @click="pauseJob(row)">暂停</el-button>
             </template>
-            <template v-else>
+            <template v-if="row.state == 'PAUSED'">
               <el-button type="text" @click="resumeJob(row)">恢复</el-button>
             </template>
-            <el-button type="text" @click="removeTask(row)">关闭</el-button>
+            <template v-if="row.state != 'CLOSED'">
+              <el-button type="text" @click="removeTask(row)">关闭</el-button>
+            </template>
           </template>
         </el-table-column>
       </el-table>
