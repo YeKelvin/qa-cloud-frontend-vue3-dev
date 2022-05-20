@@ -41,10 +41,10 @@
             <el-button type="text" @click="openDetailDialog(row)">详情</el-button>
             <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
             <template v-if="row.state == 'NORMAL'">
-              <el-button type="text" @click="pauseJob(row)">暂停</el-button>
+              <el-button type="text" @click="pauseTask(row)">暂停</el-button>
             </template>
             <template v-if="row.state == 'PAUSED'">
-              <el-button type="text" @click="resumeJob(row)">恢复</el-button>
+              <el-button type="text" @click="resumeTask(row)">恢复</el-button>
             </template>
             <template v-if="row.state != 'CLOSED'">
               <el-button type="text" @click="removeTask(row)">关闭</el-button>
@@ -128,7 +128,7 @@ const query = () => {
 /**
  * 暂停作业
  */
-const pauseJob = async (row) => {
+const pauseTask = async (row) => {
   // 二次确认
   const error = await ElMessageBox.confirm('确定暂停吗？', '警告', {
     confirmButtonText: '确定',
@@ -139,7 +139,7 @@ const pauseJob = async (row) => {
     .catch(() => true)
   if (error) return
   // 暂停作业
-  await ScheduleService.pauseJob({ jobNo: row.jobNo })
+  await ScheduleService.pauseTask({ jobNo: row.jobNo })
   // 成功提示
   ElMessage({ message: `暂停作业成功`, type: 'info', duration: 2 * 1000 })
   // 重新查询列表
@@ -149,7 +149,7 @@ const pauseJob = async (row) => {
 /**
  * 恢复作业
  */
-const resumeJob = async (row) => {
+const resumeTask = async (row) => {
   // 二次确认
   const error = await ElMessageBox.confirm('确定恢复吗？', '警告', {
     confirmButtonText: '确定',
@@ -160,7 +160,7 @@ const resumeJob = async (row) => {
     .catch(() => true)
   if (error) return
   // 恢复作业
-  await ScheduleService.resumeJob({ jobNo: row.jobNo })
+  await ScheduleService.resumeTask({ jobNo: row.jobNo })
   // 成功提示
   ElMessage({ message: `恢复作业成功`, type: 'info', duration: 2 * 1000 })
   // 重新查询列表
@@ -172,7 +172,7 @@ const resumeJob = async (row) => {
  */
 const removeTask = async (row) => {
   // 二次确认
-  const error = await ElMessageBox.confirm('确定删除吗？', '警告', {
+  const error = await ElMessageBox.confirm('确定关闭吗？', '警告', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'

@@ -143,8 +143,9 @@
 </template>
 
 <script setup>
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { isValidCron } from 'cron-validator'
+import { isEmpty as _isEmpty } from 'lodash-es'
 import * as ScheduleService from '@/api/schedule/task'
 import * as TestplanService from '@/api/script/testplan'
 import * as ElementService from '@/api/script/element'
@@ -171,8 +172,7 @@ const jobForm = ref({
 const jobFormRules = reactive({
   jobName: [{ required: true, message: '任务名称不能为空', trigger: 'blur' }],
   jobType: [{ required: true, message: '任务类型不能为空', trigger: 'blur' }],
-  triggerType: [{ required: true, message: '触发类型不能为空', trigger: 'blur' }],
-  'jobArgs.datasetNumberedList': [{ required: true, message: '测试环境不能为空', trigger: 'blur' }]
+  triggerType: [{ required: true, message: '触发类型不能为空', trigger: 'blur' }]
 })
 const testplanList = ref([])
 const collectionList = ref([])
@@ -303,8 +303,20 @@ const submitForm = async () => {
     return
   }
   // cron格式校验
-  if (jobForm.value.triggerType === 'CRON' && isValidCron(triggerForm.value.cron.crontab)) {
+  if (
+    jobForm.value.triggerType === 'CRON' &&
+    !isValidCron(triggerForm.value.cron.crontab, { alias: true, allowBlankDay: true })
+  ) {
     ElMessage({ message: 'cron表达式不正确', type: 'error', duration: 2 * 1000 })
+    return
+  }
+  // 没有选择变量集时给出提示
+  if (_isEmpty(jobForm.value.jobArgs.datasetNumberedList)) {
+    await ElMessageBox.confirm('当前没有选择[环境/变量]，确定执行吗？', '警告', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
   }
   // 创建任务
   await ScheduleService.createTask(requestData.value)

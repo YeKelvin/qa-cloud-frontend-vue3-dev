@@ -6,7 +6,7 @@
         <el-table-column prop="field" label="字段" min-width="100" width="100" />
         <el-table-column prop="required" label="必填" min-width="50" width="50" />
         <el-table-column prop="allowedValues" label="允许值" />
-        <el-table-column prop="specialCharacters" label="特殊字符" min-width="80" width="80" />
+        <el-table-column prop="specialCharacters" label="特殊字符" min-width="100" width="100" />
         <el-table-column prop="remark" label="备注" />
       </el-table>
       <h1>字符说明：</h1>
@@ -25,13 +25,13 @@
 
 <script setup>
 const fieldTableData = ref([
-  {
-    field: 'Seconds',
-    required: '是',
-    allowedValues: '0–59',
-    specialCharacters: '* , - /',
-    remark: 'Cron表达式从左往右，从秒开始；而Crontab则是从分钟开始的。'
-  },
+  // {
+  //   field: 'Seconds',
+  //   required: '是',
+  //   allowedValues: '0–59',
+  //   specialCharacters: '* , - /',
+  //   remark: 'Cron表达式从左往右，从秒开始；而Crontab则是从分钟开始的。'
+  // },
   { field: 'Minutes', required: '是', allowedValues: '0–59', specialCharacters: '* , - /', remark: '' },
   { field: 'Hours', required: '是', allowedValues: '0–23', specialCharacters: '* , - /', remark: '' },
   { field: 'Day of month', required: '是', allowedValues: '1–31', specialCharacters: '* , - ? / L W C', remark: '' },
@@ -61,15 +61,14 @@ const characterTableData = ref([
   { field: '#', explanation: '该月第几个周，如 6#3 表示六月第3个周五' }
 ])
 const exampleTableData = ref([
-  { description: '每隔5秒执行一次', example: '*/5 * * * * ?' },
-  { description: '每隔1分钟执行一次', example: '0 */1 * * * ?' },
-  { description: '每天23点执行一次', example: '0 0 23 * * ?' },
-  { description: '每天凌晨1点执行一次', example: '0 0 1 * * ?' },
-  { description: '每月1号凌晨1点执行一次', example: '0 0 1 1 * ?' },
-  { description: '每月最后一天23点执行一次', example: '0 0 23 L * ?' },
-  { description: '每周星期天凌晨1点实行一次', example: '0 0 1 ? * L' },
-  { description: '在26分、29分、33分执行一次', example: '0 26,29,33 * * * ?' },
-  { description: '每天的0点、13点、18点、21点都执行一次', example: '0 0 0,13,18,21 * * ?' }
+  { description: '每隔1分钟执行一次', example: '*/1 * * * ?' },
+  { description: '每天23点执行一次', example: '0 23 * * ?' },
+  { description: '每天凌晨1点执行一次', example: '0 1 * * ?' },
+  { description: '每月1号凌晨1点执行一次', example: '0 1 1 * ?' },
+  { description: '每月最后一天23点执行一次', example: '0 23 L * ?' },
+  { description: '每周星期天凌晨1点实行一次', example: '0 1 ? * L' },
+  { description: '在26分、29分、33分执行一次', example: '26,29,33 * * * ?' },
+  { description: '每天的0点、13点、18点、21点都执行一次', example: '0 0,13,18,21 * * ?' }
 ])
 </script>
 

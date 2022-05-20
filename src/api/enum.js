@@ -119,5 +119,5 @@ export const JobType = {
 export const TriggerType = {
   DATE: '固定时间',
   INTERVAL: '固定间隔',
-  CRON: 'cron'
+  CRON: 'CRON间隔'
 }
