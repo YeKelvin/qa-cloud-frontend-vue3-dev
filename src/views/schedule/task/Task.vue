@@ -15,7 +15,7 @@
           <el-button type="primary" :icon="Search" @click="query()">查 询</el-button>
           <el-button :icon="Refresh" @click="resetQueryConditions()">重 置</el-button>
         </div>
-        <el-button type="primary" :icon="Plus" @click="showCreateDialog = true">新 增</el-button>
+        <el-button type="primary" :icon="Plus" @click="openCreateDialog()">新 增</el-button>
       </div>
     </el-card>
 
@@ -66,12 +66,14 @@
       />
     </div>
 
-    <!-- 任务详情 -->
-    <TaskDetailDialog v-if="showDetailDialog" v-model="showDetailDialog" />
-    <!-- 创建任务表单 -->
-    <TaskCreateDialog v-if="showCreateDialog" v-model="showCreateDialog" @re-query="query" />
-    <!-- 编辑任务表单 -->
-    <TaskModifyDialog v-if="showModifyDialog" v-model="showModifyDialog" :row="currentRow" @re-query="query" />
+    <!-- 任务表单 -->
+    <TaskInfoDialog
+      v-if="showDialog"
+      v-model="showDialog"
+      :edit-mode="dialogEditMode"
+      :row="currentRow"
+      @re-query="query"
+    />
   </div>
 </template>
 
@@ -84,9 +86,7 @@ import ConditionInput from '@/components/query-condition/ConditionInput.vue'
 import ConditionSelect from '@/components/query-condition/ConditionSelect.vue'
 import useQueryConditions from '@/composables/useQueryConditions'
 import useWorkspaceState from '@/composables/useWorkspaceState'
-import TaskDetailDialog from './TaskDetailDialog.vue'
-import TaskCreateDialog from './TaskCreateDialog.vue'
-import TaskModifyDialog from './TaskModifyDialog.vue'
+import TaskInfoDialog from './TaskInfoDialog.vue'
 
 const { workspaceNo } = useWorkspaceState()
 const { queryConditions, resetQueryConditions } = useQueryConditions({
@@ -102,10 +102,9 @@ const tableData = ref([])
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
-const currentRow = ref({})
-const showDetailDialog = ref(false)
-const showCreateDialog = ref(false)
-const showModifyDialog = ref(false)
+const currentRow = ref(null)
+const showDialog = ref(false)
+const dialogEditMode = ref(null)
 
 watch(workspaceNo, (val) => {
   if (val) query()
@@ -191,17 +190,28 @@ const removeTask = async (row) => {
 /**
  * 打开详情对话框
  */
+const openCreateDialog = (row) => {
+  dialogEditMode.value = 'CREATE'
+  currentRow.value = null
+  showDialog.value = true
+}
+
+/**
+ * 打开详情对话框
+ */
 const openDetailDialog = (row) => {
-  showDetailDialog.value = true
+  dialogEditMode.value = 'QUERY'
   currentRow.value = row
+  showDialog.value = true
 }
 
 /**
  * 打开编辑对话框
  */
 const openModifyDialog = (row) => {
-  showModifyDialog.value = true
+  dialogEditMode.value = 'MODIFY'
   currentRow.value = row
+  showDialog.value = true
 }
 
 /**

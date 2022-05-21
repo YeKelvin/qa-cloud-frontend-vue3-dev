@@ -9,16 +9,16 @@
       :rules="jobFormRules"
     >
       <el-form-item label="任务名称：" prop="jobName" style="padding: 0 10px">
-        <el-input v-model="jobForm.jobName" clearable />
+        <el-input v-model="jobForm.jobName" clearable :readonly="queryMode" />
       </el-form-item>
       <el-form-item label="任务描述：" prop="jobDesc" style="padding: 0 10px">
-        <el-input v-model="jobForm.jobDesc" clearable />
+        <el-input v-model="jobForm.jobDesc" clearable :readonly="queryMode" />
       </el-form-item>
       <el-form-item label="任务类型：" prop="jobType" style="padding: 0 10px">
-        <el-radio-group v-model="jobForm.jobType">
+        <el-radio-group v-model="jobForm.jobType" :disabled="queryMode">
           <el-radio label="TESTPLAN">测试计划</el-radio>
           <el-radio label="COLLECTION">集合元素</el-radio>
-          <el-radio label="GROUP" disabled>分组元素</el-radio>
+          <el-radio label="GROUP">分组元素</el-radio>
         </el-radio-group>
       </el-form-item>
 
@@ -33,7 +33,13 @@
         >
           <template v-if="jobForm.jobType == 'TESTPLAN'">
             <el-form-item label="测试计划：" prop="planNo" style="margin-bottom: 10px">
-              <el-select v-model="taskForm.planNo" tag-type="danger" style="width: 100%" filterable>
+              <el-select
+                v-model="taskForm.planNo"
+                tag-type="danger"
+                style="width: 100%"
+                filterable
+                :disabled="queryMode"
+              >
                 <el-option
                   v-for="testplan in testplanList"
                   :key="testplan.planNo"
@@ -45,7 +51,13 @@
           </template>
           <template v-else-if="jobForm.jobType == 'COLLECTION'">
             <el-form-item label="测试集合：" prop="collectionNo" style="margin-bottom: 10px">
-              <el-select v-model="taskForm.collectionNo" tag-type="danger" style="width: 100%" filterable>
+              <el-select
+                v-model="taskForm.collectionNo"
+                tag-type="danger"
+                style="width: 100%"
+                filterable
+                :disabled="queryMode"
+              >
                 <el-option
                   v-for="collection in collectionList"
                   :key="collection.elementNo"
@@ -56,21 +68,37 @@
             </el-form-item>
           </template>
           <template v-else>
-            <div></div>
+            <el-form-item label="测试分组：" prop="groupNo" style="margin-bottom: 10px">
+              <el-cascader
+                v-model="taskForm.groupNo"
+                tag-type="danger"
+                style="width: 100%"
+                clearable
+                filterable
+                :filter-method="cascaderFilter"
+                :options="groupList"
+                :props="{ value: 'elementNo', label: 'elementName', children: 'children' }"
+                :disabled="queryMode"
+              />
+            </el-form-item>
           </template>
         </el-form>
         <el-form-item label="环境/变量：" prop="jobArgs.datasetNumberedList" style="margin-bottom: 10px">
-          <TaskDatasetSelect v-model="jobForm.jobArgs.datasetNumberedList" :workspace-no="workspaceNo" />
+          <DatasetSelect
+            v-model="jobForm.jobArgs.datasetNumberedList"
+            :workspace-no="workspaceNo"
+            :disabled="queryMode"
+          />
         </el-form-item>
         <el-form-item label="使用当前值：" prop="jobArgs.useCurrentValue" style="margin-bottom: 0">
-          <el-switch v-model="jobForm.jobArgs.useCurrentValue" active-color="#13ce66" />
+          <el-switch v-model="jobForm.jobArgs.useCurrentValue" active-color="#13ce66" :disabled="queryMode" />
         </el-form-item>
       </el-card>
 
       <el-form-item label="触发类型：" prop="triggerType" style="padding: 0 10px">
-        <el-radio-group v-model="jobForm.triggerType">
+        <el-radio-group v-model="jobForm.triggerType" :disabled="queryMode">
           <el-radio label="DATE">固定时间</el-radio>
-          <el-radio label="INTERVAL" disabled>固定间隔</el-radio>
+          <el-radio label="INTERVAL">固定间隔</el-radio>
           <el-radio label="CRON">CRON间隔</el-radio>
         </el-radio-group>
       </el-form-item>
@@ -94,27 +122,36 @@
                 :disabled-hours="disabledHours"
                 :disabled-minutes="disabledMinutes"
                 :disabled-seconds="disabledSeconds"
+                :disabled="queryMode"
               />
             </el-form-item>
           </template>
           <template v-else-if="jobForm.triggerType == 'INTERVAL'">
-            <el-form-item label="开始-结束：" prop="interval.datetimerange">
+            <el-form-item label="开始-结束：">
               <el-date-picker
-                v-model="triggerForm.interval.datetimerange"
+                v-model="intervalDatetimeRange"
                 type="datetimerange"
                 range-separator="-"
                 start-placeholder="开始时间"
                 end-placeholder="结束时间"
+                :disabled-date="(time) => time.getTime() < Date.now() - 1 * 24 * 3600 * 1000"
+                :disabled-hours="disabledHours"
+                :disabled-minutes="disabledMinutes"
+                :disabled-seconds="disabledSeconds"
+                :disabled="queryMode"
               />
             </el-form-item>
             <el-form-item label="周：" prop="interval.weeks">
-              <el-input v-model="triggerForm.interval.weeks" clearable />
+              <el-input v-model="triggerForm.interval.weeks" clearable :readonly="queryMode" />
             </el-form-item>
             <el-form-item label="日：" prop="interval.days">
-              <el-input v-model="triggerForm.interval.days" clearable />
+              <el-input v-model="triggerForm.interval.days" clearable :readonly="queryMode" />
             </el-form-item>
             <el-form-item label="时：" prop="interval.hours">
-              <el-input v-model="triggerForm.interval.hours" clearable />
+              <el-input v-model="triggerForm.interval.hours" clearable :readonly="queryMode" />
+            </el-form-item>
+            <el-form-item label="分：" prop="interval.minutes">
+              <el-input v-model="triggerForm.interval.minutes" clearable :readonly="queryMode" />
             </el-form-item>
           </template>
           <template v-else>
@@ -128,7 +165,7 @@
                   <SvgIcon icon-name="common-question" />
                 </el-tooltip>
               </template>
-              <el-input v-model="triggerForm.cron.crontab" clearable />
+              <el-input v-model="triggerForm.cron.crontab" clearable :readonly="queryMode" />
             </el-form-item>
           </template>
         </el-form>
@@ -151,11 +188,18 @@ import * as TestplanService from '@/api/script/testplan'
 import * as ElementService from '@/api/script/element'
 import dayjs from 'dayjs'
 import useWorkspaceState from '@/composables/useWorkspaceState'
-import TaskDatasetSelect from './TaskDatasetSelect.vue'
+import DatasetSelect from './TaskDatasetSelect.vue'
 import CrontabIntroduce from './TaskCrontabIntroduce.vue'
 
 const emit = defineEmits(['update:model-value', 're-query'])
+const props = defineProps({
+  editMode: { type: String, required: true },
+  row: { type: Object, default: () => {} }
+})
 const { workspaceNo } = useWorkspaceState()
+const queryMode = computed(() => props.editMode === 'QUERY')
+const modifyMode = computed(() => props.editMode === 'MODIFY')
+const createMode = computed(() => props.editMode === 'CREATE')
 const jobformRef = ref()
 const jobForm = ref({
   workspaceNo: workspaceNo.value,
@@ -194,12 +238,10 @@ const triggerForm = ref({
     datetime: ''
   },
   interval: {
-    datetimerange: [],
     weeks: '',
     days: '',
     hours: '',
     minutes: '',
-    seconds: '',
     start_date: '',
     end_date: ''
   },
@@ -211,6 +253,7 @@ const triggerFormRules = reactive({
   'date.datetime': [{ required: true, message: '时间不能为空', trigger: 'blur' }],
   'cron.crontab': [{ required: true, message: 'crontab不能为空', trigger: 'blur' }]
 })
+const intervalDatetimeRange = ref([])
 const requestData = computed(() => {
   if (jobForm.value.jobType === 'TESTPLAN') {
     jobForm.value.jobArgs.planNo = taskForm.value.planNo
@@ -264,8 +307,9 @@ const queryTestplanAll = () => {
 }
 
 const queryCollectionAll = () => {
-  ElementService.queryCollectionAll({
+  ElementService.queryElementAll({
     workspaceNo: workspaceNo.value,
+    elementType: 'COLLECTION',
     elementClass: 'TestCollection',
     enabled: true
   }).then((response) => {
@@ -274,7 +318,14 @@ const queryCollectionAll = () => {
 }
 
 const queryGroupAll = () => {
-  ElementService.queryGroupAll({ workspaceNo: workspaceNo.value }).then((response) => {
+  ElementService.queryElementAllWithChildren({
+    workspaceNo: workspaceNo.value,
+    elementType: 'COLLECTION',
+    elementClass: 'TestCollection',
+    childType: 'GROUP',
+    childClass: 'TestGroup',
+    enabled: true
+  }).then((response) => {
     groupList.value = response.result
   })
 }
@@ -385,6 +436,13 @@ const disabledMinutes = (hour) => {
  */
 const disabledSeconds = () => {
   return makeRange(0, 60)
+}
+
+/**
+ * el-cascader handler
+ */
+const cascaderFilter = (node, keyword) => {
+  return node.data.elementName.includes(keyword)
 }
 </script>
 

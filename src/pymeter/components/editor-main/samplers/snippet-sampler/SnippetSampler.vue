@@ -163,8 +163,9 @@ onMounted(() => {
  * 根据工作空间编号查询所有片段
  */
 const querySnippets = () => {
-  ElementService.queryCollectionAll({
+  ElementService.queryElementAll({
     workspaceNo: props.metadata.workspaceNo,
+    elementType: 'COLLECTION',
     elementClass: 'SnippetCollection'
   }).then((response) => {
     snippets.value = response.result
