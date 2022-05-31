@@ -36,6 +36,11 @@
         <el-table-column prop="state" label="状态" min-width="80" width="80">
           <template #default="{ row }">{{ JobState[row.state] }}</template>
         </el-table-column>
+        <el-table-column prop="createTime" label="创建时间" min-width="150">
+          <template #default="{ row }">
+            {{ row.createTime ? $dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') : '' }}
+          </template>
+        </el-table-column>
         <el-table-column fixed="right" label="操作" min-width="200" width="200">
           <template #default="{ row }">
             <el-button type="text" @click="openDetailDialog(row)">详情</el-button>
@@ -70,8 +75,8 @@
     <TaskInfoDialog
       v-if="showDialog"
       v-model="showDialog"
-      :edit-mode="dialogEditMode"
-      :row="currentRow"
+      :edit-mode="dialogArgs.editMode"
+      :data="dialogArgs.data"
       @re-query="query"
     />
   </div>
@@ -102,9 +107,11 @@ const tableData = ref([])
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
-const currentRow = ref(null)
 const showDialog = ref(false)
-const dialogEditMode = ref(null)
+const dialogArgs = reactive({
+  editMode: null,
+  data: {}
+})
 
 watch(workspaceNo, (val) => {
   if (val) query()
@@ -191,8 +198,8 @@ const removeTask = async (row) => {
  * 打开详情对话框
  */
 const openCreateDialog = (row) => {
-  dialogEditMode.value = 'CREATE'
-  currentRow.value = null
+  dialogArgs.editMode = 'CREATE'
+  dialogArgs.data = null
   showDialog.value = true
 }
 
@@ -200,8 +207,8 @@ const openCreateDialog = (row) => {
  * 打开详情对话框
  */
 const openDetailDialog = (row) => {
-  dialogEditMode.value = 'QUERY'
-  currentRow.value = row
+  dialogArgs.editMode = 'QUERY'
+  dialogArgs.data = row
   showDialog.value = true
 }
 
@@ -209,8 +216,8 @@ const openDetailDialog = (row) => {
  * 打开编辑对话框
  */
 const openModifyDialog = (row) => {
-  dialogEditMode.value = 'MODIFY'
-  currentRow.value = row
+  dialogArgs.editMode = 'MODIFY'
+  dialogArgs.data = row
   showDialog.value = true
 }
 

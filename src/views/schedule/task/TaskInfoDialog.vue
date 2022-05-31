@@ -139,19 +139,20 @@
                 :disabled-minutes="disabledMinutes"
                 :disabled-seconds="disabledSeconds"
                 :disabled="queryMode"
+                @change="datetimeRangeChange"
               />
             </el-form-item>
-            <el-form-item label="周：" prop="interval.weeks">
-              <el-input v-model="triggerForm.interval.weeks" clearable :readonly="queryMode" />
-            </el-form-item>
-            <el-form-item label="日：" prop="interval.days">
-              <el-input v-model="triggerForm.interval.days" clearable :readonly="queryMode" />
-            </el-form-item>
-            <el-form-item label="时：" prop="interval.hours">
-              <el-input v-model="triggerForm.interval.hours" clearable :readonly="queryMode" />
-            </el-form-item>
-            <el-form-item label="分：" prop="interval.minutes">
-              <el-input v-model="triggerForm.interval.minutes" clearable :readonly="queryMode" />
+            <el-form-item label="固定间隔：" prop="interval.value">
+              <el-input v-model="triggerForm.interval.value">
+                <template #prepend>
+                  <el-select v-model="triggerForm.interval.type" style="width: 115px">
+                    <el-option label="周" value="weeks" />
+                    <el-option label="天" value="days" />
+                    <el-option label="时" value="hours" />
+                    <el-option label="分" value="minutes" />
+                  </el-select>
+                </template>
+              </el-input>
             </el-form-item>
           </template>
           <template v-else>
@@ -171,9 +172,12 @@
         </el-form>
       </el-card>
 
-      <el-form-item>
+      <el-form-item v-if="createMode || modifyMode">
         <el-button type="primary" @click="submitForm()">提 交</el-button>
         <el-button @click="resetFields">重 置</el-button>
+      </el-form-item>
+      <el-form-item v-else>
+        <el-button @click="$emit('update:model-value', false)">关 闭</el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
@@ -182,7 +186,7 @@
 <script setup>
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { isValidCron } from 'cron-validator'
-import { isEmpty as _isEmpty } from 'lodash-es'
+import { isEmpty as _isEmpty, omit as _omit } from 'lodash-es'
 import * as ScheduleService from '@/api/schedule/task'
 import * as TestplanService from '@/api/script/testplan'
 import * as ElementService from '@/api/script/element'
@@ -194,7 +198,7 @@ import CrontabIntroduce from './TaskCrontabIntroduce.vue'
 const emit = defineEmits(['update:model-value', 're-query'])
 const props = defineProps({
   editMode: { type: String, required: true },
-  row: { type: Object, default: () => {} }
+  data: { type: Object, default: () => {} }
 })
 const { workspaceNo } = useWorkspaceState()
 const queryMode = computed(() => props.editMode === 'QUERY')
@@ -232,18 +236,31 @@ const taskFormRules = reactive({
   collectionNo: [{ required: true, message: '集合元素不能为空', trigger: 'blur' }],
   groupNo: [{ required: true, message: '分组元素不能为空', trigger: 'blur' }]
 })
+const checkIntervalValue = (_, value, callback) => {
+  if (!value) {
+    return callback(new Error('间隔时长不能为空'))
+  }
+  const val = parseInt(value)
+  if (!Number.isInteger(val)) {
+    return callback(new Error('间隔时长必须为整数'))
+  } else {
+    if (val <= 0) {
+      return callback(new Error('间隔时长必须大于0'))
+    } else {
+      return callback()
+    }
+  }
+}
 const triggerformRef = ref()
 const triggerForm = ref({
   date: {
     datetime: ''
   },
   interval: {
-    weeks: '',
-    days: '',
-    hours: '',
-    minutes: '',
     start_date: '',
-    end_date: ''
+    end_date: '',
+    type: 'hours',
+    value: ''
   },
   cron: {
     crontab: ''
@@ -251,24 +268,28 @@ const triggerForm = ref({
 })
 const triggerFormRules = reactive({
   'date.datetime': [{ required: true, message: '时间不能为空', trigger: 'blur' }],
+  'interval.value': [{ validator: checkIntervalValue, trigger: 'blur' }],
   'cron.crontab': [{ required: true, message: 'crontab不能为空', trigger: 'blur' }]
 })
 const intervalDatetimeRange = ref([])
 const requestData = computed(() => {
-  if (jobForm.value.jobType === 'TESTPLAN') {
-    jobForm.value.jobArgs.planNo = taskForm.value.planNo
-  } else if (jobForm.value.jobType === 'COLLECTION') {
-    jobForm.value.jobArgs.collectionNo = taskForm.value.collectionNo
+  const jobType = jobForm.value.jobType
+  const triggerType = jobForm.value.triggerType
+  const query = { ...jobForm.value }
+  if (jobType === 'TESTPLAN') {
+    query.jobArgs.planNo = taskForm.value.planNo
+  } else if (jobType === 'COLLECTION') {
+    query.jobArgs.collectionNo = taskForm.value.collectionNo
   } else {
-    jobForm.value.jobArgs.groupNo = taskForm.value.groupNo
+    query.jobArgs.groupNo = taskForm.value.groupNo
   }
 
-  if (jobForm.value.triggerType === 'DATE') {
-    jobForm.value.triggerArgs = triggerForm.value.date
-  } else if (jobForm.value.triggerType === 'INTERVAL') {
-    jobForm.value.triggerArgs = triggerForm.value.interval
+  if (triggerType === 'DATE') {
+    query.triggerArgs = triggerForm.value.date
+  } else if (triggerType === 'INTERVAL') {
+    query.triggerArgs = triggerForm.value.interval
   } else {
-    jobForm.value.triggerArgs = triggerForm.value.cron
+    query.triggerArgs = triggerForm.value.cron
   }
 
   return jobForm.value
@@ -288,6 +309,7 @@ watch(
 )
 
 onMounted(() => {
+  // 查询测试计划、测试集合或测试分组的列表数据
   if (jobForm.value.jobType === 'TESTPLAN') {
     queryTestplanAll()
   } else if (jobForm.value.jobType === 'COLLECTION') {
@@ -295,6 +317,35 @@ onMounted(() => {
   } else {
     queryGroupAll()
   }
+  // 新增模式时无需查询定时任务信息
+  if (createMode.value) return
+  // 查询定时任务信息
+  ElementService.queryTaskInfo({ jobNo: props.data.jobNo }).then((response) => {
+    // 除 jobArgs, triggerArgs 属性外，其余赋值给 jobForm
+    jobForm.value = _omit(response.result, ['jobArgs', 'triggerArgs'])
+    jobForm.value.datasetNumberedList = response.result.jobArgs.datasetNumberedList
+    jobForm.value.useCurrentValue = response.result.jobArgs.useCurrentValue
+
+    // 赋值任务参数
+    const jobType = jobForm.value.jobType
+    if (jobType === 'TESTPLAN') {
+      taskForm.value.planNo = response.result.jobArgs.planNo
+    } else if (jobType === 'COLLECTION') {
+      taskForm.value.collectionNo = response.result.jobArgs.collectionNo
+    } else {
+      taskForm.value.groupNo = response.result.jobArgs.groupNo
+    }
+
+    // 赋值触发器参数
+    const triggerType = jobForm.value.triggerType
+    if (triggerType === 'DATE') {
+      triggerForm.value.date = response.result.triggerArgs
+    } else if (triggerType === 'INTERVAL') {
+      triggerForm.value.interval = response.result.triggerArgs
+    } else {
+      triggerForm.value.cron = response.result.triggerArgs
+    }
+  })
 })
 
 const queryTestplanAll = () => {
@@ -369,8 +420,12 @@ const submitForm = async () => {
       type: 'warning'
     })
   }
-  // 创建任务
-  await ScheduleService.createTask(requestData.value)
+  // 创建或修改任务
+  if (createMode.value) {
+    await ScheduleService.createTask(requestData.value)
+  } else {
+    await ScheduleService.modifyTask(requestData.value)
+  }
   // 成功提示
   ElMessage({ message: '新增成功', type: 'info', duration: 2 * 1000 })
   // 关闭dialog
@@ -443,6 +498,11 @@ const disabledSeconds = () => {
  */
 const cascaderFilter = (node, keyword) => {
   return node.data.elementName.includes(keyword)
+}
+
+const datetimeRangeChange = () => {
+  triggerForm.value.interval.start_date = intervalDatetimeRange.value[0]
+  triggerForm.value.interval.end_date = intervalDatetimeRange.value[1]
 }
 </script>
 
