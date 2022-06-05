@@ -1,6 +1,6 @@
 <template>
   <el-drawer direction="btt" size="50%" custom-class="pymeter-footer-log-drawer" :show-close="false">
-    <template #title>
+    <template #header>
       <span class="drawer-title">
         <span class="title-name">执行日志</span>
         <el-button type="danger" :icon="Delete" circle plain @click="clean()" />

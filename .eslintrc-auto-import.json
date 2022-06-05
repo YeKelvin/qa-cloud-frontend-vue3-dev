@@ -1,5 +1,6 @@
 {
   "globals": {
+    "EffectScope": true,
     "computed": true,
     "createApp": true,
     "createLogger": true,
@@ -9,11 +10,12 @@
     "defineAsyncComponent": true,
     "defineComponent": true,
     "effectScope": true,
-    "EffectScope": true,
     "getCurrentInstance": true,
     "getCurrentScope": true,
     "h": true,
     "inject": true,
+    "isProxy": true,
+    "isReactive": true,
     "isReadonly": true,
     "isRef": true,
     "mapActions": true,
@@ -56,6 +58,8 @@
     "useSlots": true,
     "useStore": true,
     "watch": true,
-    "watchEffect": true
+    "watchEffect": true,
+    "watchPostEffect": true,
+    "watchSyncEffect": true
   }
 }

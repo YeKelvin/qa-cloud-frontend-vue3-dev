@@ -1,6 +1,6 @@
 <template>
   <el-drawer custom-class="pymeter-footer-result-drawer" direction="btt" size="50%" :show-close="false">
-    <template #title>
+    <template #header>
       <template v-if="_isEmpty(tabs)">
         <span class="drawer-title__empty">
           <span class="title-name">执行结果</span>
