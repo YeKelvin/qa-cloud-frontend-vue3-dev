@@ -17,12 +17,12 @@
         <!-- 下拉框顶部的新增脚本按钮 -->
         <el-option-group key="new-operation" label="新增">
           <el-option value="NEW_COLLECTION">
-            <el-button type="text" :icon="Plus" style="width: 100%" @click.stop="openNewCollectionTab()">
+            <el-button type="primary" link :icon="Plus" style="width: 100%" @click.stop="openNewCollectionTab()">
               新增集合
             </el-button>
           </el-option>
           <el-option value="NEW_SNIPPET">
-            <el-button type="text" :icon="Plus" style="width: 100%" @click.stop="openNewSnippetTab()">
+            <el-button type="primary" link :icon="Plus" style="width: 100%" @click.stop="openNewSnippetTab()">
               新增片段
             </el-button>
           </el-option>
@@ -66,19 +66,19 @@
       <!-- 元素操作按钮 -->
       <div class="operation-container" style="margin-top: 5px">
         <!-- 展开节点按钮 -->
-        <el-button type="text" @click="expandAll(true)">
+        <el-button type="primary" link @click="expandAll(true)">
           <SvgIcon icon-name="pymeter-expand-all" />
           展开
         </el-button>
         <el-divider direction="vertical" />
         <!-- 收起节点按钮 -->
-        <el-button type="text" @click="expandAll(false)">
+        <el-button type="primary" link @click="expandAll(false)">
           <SvgIcon icon-name="pymeter-collapse-all" />
           收起
         </el-button>
         <el-divider direction="vertical" />
         <!-- 刷新脚本按钮 -->
-        <el-button type="text" @click="queryElementsTree()">
+        <el-button type="primary" link @click="queryElementsTree()">
           <SvgIcon icon-name="pymeter-refresh" />
           刷新
         </el-button>

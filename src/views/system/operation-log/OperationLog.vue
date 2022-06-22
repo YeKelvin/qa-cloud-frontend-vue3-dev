@@ -29,7 +29,7 @@
         <el-table-column prop="operationTime" label="操作时间" min-width="180" width="180" />
         <el-table-column fixed="right" label="操作" min-width="80" width="80" align="center">
           <template #default="{ row }">
-            <el-button type="text">详情</el-button>
+            <el-button type="primary" link>详情</el-button>
           </template>
         </el-table-column>
       </el-table>

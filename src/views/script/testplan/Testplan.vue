@@ -104,16 +104,16 @@
         <el-table-column fixed="right" label="操作" min-width="150">
           <template #default="{ row }">
             <template v-if="row.state != 'COMPLETED'">
-              <el-button type="text" style="margin-left: 12px" @click="gotoTestplanEditor(row.planNo, 'QUERY')">
+              <el-button type="primary" link style="margin-left: 12px" @click="gotoTestplanEditor(row.planNo, 'QUERY')">
                 计划详情
               </el-button>
-              <el-button type="text" @click="openExecutionRecordDialog(row)">执行记录</el-button>
-              <el-button type="text" style="color: #f56c6c; font-weight: bold" @click="executeTestplan(row)">
+              <el-button type="primary" link @click="openExecutionRecordDialog(row)">执行记录</el-button>
+              <el-button type="primary" link style="color: #f56c6c; font-weight: bold" @click="executeTestplan(row)">
                 立即执行
               </el-button>
             </template>
             <template v-else>
-              <el-button type="text" style="margin-left: 12px" @click="openExecutionRecordDialog(row)">
+              <el-button type="primary" link style="margin-left: 12px" @click="openExecutionRecordDialog(row)">
                 执行记录
               </el-button>
             </template>

@@ -7,7 +7,7 @@
         <template #prepend>
           <el-dropdown trigger="click" placement="bottom-start">
             <!-- 菜单弹出按钮 -->
-            <el-button type="text" :icon="Plus" style="padding: 6px 20px" />
+            <el-button type="primary" link :icon="Plus" style="padding: 6px 20px" />
             <!-- 菜单 -->
             <template #dropdown>
               <el-dropdown-menu>

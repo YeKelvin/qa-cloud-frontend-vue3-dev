@@ -5,7 +5,7 @@
       <el-input v-model="filterText" placeholder="请输入搜索内容" size="large" clearable>
         <!-- 新增菜单 -->
         <template #prepend>
-          <el-button type="text" :icon="Plus" style="padding: 6px 20px" @click="createDatabaseEngine()" />
+          <el-button type="primary" link :icon="Plus" style="padding: 6px 20px" @click="createDatabaseEngine()" />
         </template>
       </el-input>
     </span>

@@ -3,8 +3,8 @@
     <div v-show="collections.length > 0" style="width: 100%; height: 100%">
       <!-- 按钮 -->
       <div style="display: flex; justify-content: flex-end">
-        <el-button type="text" :disabled="readonly" @click="setAllChecked">全选</el-button>
-        <el-button type="text" :disabled="readonly" @click="resetChecked">清空</el-button>
+        <el-button type="primary" link :disabled="readonly" @click="setAllChecked">全选</el-button>
+        <el-button type="primary" link :disabled="readonly" @click="resetChecked">清空</el-button>
       </div>
 
       <!-- 搜索 -->

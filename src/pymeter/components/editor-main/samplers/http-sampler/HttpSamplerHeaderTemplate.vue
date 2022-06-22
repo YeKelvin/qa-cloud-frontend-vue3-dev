@@ -26,7 +26,14 @@
     </el-select>
 
     <!-- 查看详情按钮 -->
-    <el-button v-if="!showDetails" type="text" :icon="ArrowDown" :disabled="_isEmpty(localModel)" @click="showHeaders">
+    <el-button
+      v-if="!showDetails"
+      type="primary"
+      link
+      :icon="ArrowDown"
+      :disabled="_isEmpty(localModel)"
+      @click="showHeaders"
+    >
       查看详情
     </el-button>
 

@@ -12,7 +12,15 @@
               :name="item.datasetNo"
             />
           </el-tabs>
-          <el-button type="text" :icon="Edit" @click="openVariableDatasetEditor()">批量编辑</el-button>
+          <el-button
+            type="primary"
+            link
+            style="border-bottom: var(--el-border); border-radius: 0"
+            :icon="Edit"
+            @click="openVariableDatasetEditor()"
+          >
+            批量编辑
+          </el-button>
         </div>
       </template>
 
@@ -21,14 +29,14 @@
       <!-- 滚动条 -->
       <el-scrollbar
         id="variables-view__scrollbar"
-        style="width: 100%; height: 600px"
+        style="width: 100%; max-height: 600px"
         wrap-style="overflow-x:auto;"
         view-style="padding: 0 10px 10px 10px;"
       >
         <!-- 变量表格 -->
         <el-table :data="filteredTableData" fit stripe highlight-current-row>
           <!-- 空表格 -->
-          <template #empty><el-empty /></template>
+          <template #empty><el-empty description=" " /></template>
 
           <!-- 变量名称 -->
           <el-table-column label="变量名称" width="auto">
@@ -56,13 +64,13 @@
               <span v-if="row.editing" class="current-value-item__editing">
                 <el-input v-model="row.currentValue" autosize type="textarea" size="small" :rows="1" />
                 <span id="current-value-button" style="display: flex; justify-content: flex-end">
-                  <el-button type="text" :icon="Close" @click="row.editing = false" />
-                  <el-button type="text" :icon="Check" @click="updateCurrentValue(row)" />
+                  <el-button type="primary" link :icon="Close" @click="row.editing = false" />
+                  <el-button type="primary" link :icon="Check" @click="updateCurrentValue(row)" />
                 </span>
               </span>
               <span v-else class="current-value-item">
                 <span>{{ row.currentValue || '-' }}</span>
-                <el-button type="text" :icon="Edit" @click="row.editing = true" />
+                <el-button type="primary" link :icon="Edit" @click="row.editing = true" />
               </span>
             </template>
           </el-table-column>

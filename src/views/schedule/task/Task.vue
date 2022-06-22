@@ -43,16 +43,16 @@
         </el-table-column>
         <el-table-column fixed="right" label="操作" min-width="200" width="200">
           <template #default="{ row }">
-            <el-button type="text" @click="openDetailDialog(row)">详情</el-button>
-            <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
+            <el-button type="primary" link @click="openDetailDialog(row)">详情</el-button>
+            <el-button type="primary" link @click="openModifyDialog(row)">编辑</el-button>
             <template v-if="row.state == 'NORMAL'">
-              <el-button type="text" @click="pauseTask(row)">暂停</el-button>
+              <el-button type="primary" link @click="pauseTask(row)">暂停</el-button>
             </template>
             <template v-if="row.state == 'PAUSED'">
-              <el-button type="text" @click="resumeTask(row)">恢复</el-button>
+              <el-button type="primary" link @click="resumeTask(row)">恢复</el-button>
             </template>
             <template v-if="row.state != 'CLOSED'">
-              <el-button type="text" @click="removeTask(row)">关闭</el-button>
+              <el-button type="primary" link @click="removeTask(row)">关闭</el-button>
             </template>
           </template>
         </el-table-column>

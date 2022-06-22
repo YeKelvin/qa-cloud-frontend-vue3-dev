@@ -36,14 +36,14 @@
         </el-table-column>
         <el-table-column fixed="right" label="操作" min-width="160" width="160">
           <template #default="{ row }">
-            <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
+            <el-button type="primary" link @click="openModifyDialog(row)">编辑</el-button>
             <template v-if="row.state === 'ENABLE'">
-              <el-button type="text" @click="modifyRobotState(row, 'DISABLE')">禁用</el-button>
+              <el-button type="primary" link @click="modifyRobotState(row, 'DISABLE')">禁用</el-button>
             </template>
             <template v-else>
-              <el-button type="text" @click="modifyRobotState(row, 'ENABLE')">启用</el-button>
+              <el-button type="primary" link @click="modifyRobotState(row, 'ENABLE')">启用</el-button>
             </template>
-            <el-button type="text" @click="removeRobot(row)">删除</el-button>
+            <el-button type="primary" link @click="removeRobot(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

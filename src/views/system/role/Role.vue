@@ -38,15 +38,15 @@
         </el-table-column>
         <el-table-column fixed="right" label="操作" min-width="180" width="180">
           <template #default="{ row }">
-            <el-button type="text" @click="gotoPermissionManager(row)">权限管理</el-button>
-            <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
+            <el-button type="primary" link @click="gotoPermissionManager(row)">权限管理</el-button>
+            <el-button type="primary" link @click="openModifyDialog(row)">编辑</el-button>
             <template v-if="row.state === 'ENABLE'">
-              <el-button type="text" @click="modifyRoleState(row, 'DISABLE')">禁用</el-button>
+              <el-button type="primary" link @click="modifyRoleState(row, 'DISABLE')">禁用</el-button>
             </template>
             <template v-else>
-              <el-button type="text" @click="modifyRoleState(row, 'ENABLE')">启用</el-button>
+              <el-button type="primary" link @click="modifyRoleState(row, 'ENABLE')">启用</el-button>
             </template>
-            <el-button v-if="row.roleType == 'CUSTOM'" type="text" @click="deleteRole(row)">删除</el-button>
+            <el-button v-if="row.roleType == 'CUSTOM'" type="primary" link @click="deleteRole(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

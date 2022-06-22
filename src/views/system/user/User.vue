@@ -46,15 +46,15 @@
         </el-table-column>
         <el-table-column fixed="right" label="操作" min-width="160" width="160">
           <template #default="{ row }">
-            <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
-            <el-button type="text" @click="resetPassword(row)">重置密码</el-button>
+            <el-button type="primary" link @click="openModifyDialog(row)">编辑</el-button>
+            <el-button type="primary" link @click="resetPassword(row)">重置密码</el-button>
             <template v-if="row.state === 'ENABLE'">
-              <el-button type="text" @click="modifyUserState(row, 'DISABLE')">禁用</el-button>
+              <el-button type="primary" link @click="modifyUserState(row, 'DISABLE')">禁用</el-button>
             </template>
             <template v-else>
-              <el-button type="text" @click="modifyUserState(row, 'ENABLE')">启用</el-button>
+              <el-button type="primary" link @click="modifyUserState(row, 'ENABLE')">启用</el-button>
             </template>
-            <el-button type="text" @click="deleteUser(row)">删除</el-button>
+            <el-button type="primary" link @click="deleteUser(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

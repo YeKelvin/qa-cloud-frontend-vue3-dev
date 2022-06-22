@@ -10,15 +10,15 @@
       <!-- 操作按钮 -->
       <span style="display: inline-flex">
         <template v-if="queryMode">
-          <el-button type="text" :icon="Edit" @click="batchEditNow()">批量编辑</el-button>
-          <el-button type="text" :icon="Close" @click="closeTab()">关 闭</el-button>
+          <el-button type="primary" link :icon="Edit" @click="batchEditNow()">批量编辑</el-button>
+          <el-button type="primary" link :icon="Close" @click="closeTab()">关 闭</el-button>
         </template>
         <template v-else-if="!createMode">
-          <el-button type="text" :icon="Check" @click="saveVariables()">保 存</el-button>
-          <el-button type="text" :icon="Close" @click="cancelEdit()">取 消</el-button>
+          <el-button type="primary" link :icon="Check" @click="saveVariables()">保 存</el-button>
+          <el-button type="primary" link :icon="Close" @click="cancelEdit()">取 消</el-button>
         </template>
         <template v-else>
-          <el-button type="text" :icon="Check" @click="createVariables()">提 交</el-button>
+          <el-button type="primary" link :icon="Check" @click="createVariables()">提 交</el-button>
         </template>
       </span>
     </div>
@@ -64,33 +64,35 @@
         <!-- 操作列表格头，新增变量按钮 -->
 
         <template #header>
-          <el-button type="text" :icon="Plus" :disabled="!queryMode" @click="newAndEditVariable()">添加</el-button>
+          <el-button type="primary" link :icon="Plus" :disabled="!queryMode" @click="newAndEditVariable()">
+            添加
+          </el-button>
         </template>
         <!-- 操作按钮 -->
         <template #default="{ row, $index }">
           <!-- 编辑或新增模式下可用的按钮 -->
           <!-- 删除变量按钮 -->
-          <el-button v-if="!queryMode" type="text" :icon="Close" @click="cancelVariable(row, $index)" />
+          <el-button v-if="!queryMode" type="primary" link :icon="Close" @click="cancelVariable(row, $index)" />
           <!-- 查询模式下可用的按钮 -->
           <template v-if="queryMode">
             <template v-if="row.editing">
               <!-- 取消单行编辑按钮 -->
-              <el-button type="text" :icon="Close" @click="queryVariables()" />
+              <el-button type="primary" link :icon="Close" @click="queryVariables()" />
               <!-- 提交单行编辑按钮 -->
-              <el-button type="text" :icon="Check" @click="submitSingleVariable(row)" />
+              <el-button type="primary" link :icon="Check" @click="submitSingleVariable(row)" />
             </template>
             <template v-else>
               <!-- 编辑单行变量按钮 -->
-              <el-button type="text" :icon="Edit" @click="row.editing = true" />
+              <el-button type="primary" link :icon="Edit" @click="row.editing = true" />
               <!-- 删除变量按钮 -->
-              <el-button type="text" :icon="Delete" @click="removeVariable(row)" />
+              <el-button type="primary" link :icon="Delete" @click="removeVariable(row)" />
             </template>
           </template>
         </template>
       </el-table-column>
     </el-table>
     <!-- 底部添加按钮 -->
-    <el-button v-show="queryMode" type="text" :icon="Plus" @click="newAndEditVariable()">添加</el-button>
+    <el-button v-show="queryMode" type="primary" link :icon="Plus" @click="newAndEditVariable()">添加</el-button>
   </div>
 </template>
 

@@ -10,15 +10,15 @@
       <!-- 操作按钮 -->
       <span style="display: inline-flex">
         <template v-if="queryMode">
-          <el-button type="text" :icon="Edit" @click="batchEditNow()">批量编辑</el-button>
-          <el-button type="text" :icon="Close" @click="closeTab()">关闭</el-button>
+          <el-button type="primary" link :icon="Edit" @click="batchEditNow()">批量编辑</el-button>
+          <el-button type="primary" link :icon="Close" @click="closeTab()">关闭</el-button>
         </template>
         <template v-else-if="!createMode">
-          <el-button type="text" :icon="Check" @click="saveHeaders()">保存</el-button>
-          <el-button type="text" :icon="Close" @click="cancelEdit()">取消</el-button>
+          <el-button type="primary" link :icon="Check" @click="saveHeaders()">保存</el-button>
+          <el-button type="primary" link :icon="Close" @click="cancelEdit()">取消</el-button>
         </template>
         <template v-else>
-          <el-button type="text" :icon="Check" @click="createHeaders()">提交</el-button>
+          <el-button type="primary" link :icon="Check" @click="createHeaders()">提交</el-button>
         </template>
       </span>
     </div>
@@ -55,33 +55,35 @@
       <el-table-column fixed="right" align="center" width="80" min-width="80">
         <!-- 操作列表格头，新增请求头按钮 -->
         <template #header>
-          <el-button type="text" :icon="Plus" :disabled="!queryMode" @click="newAndEditHeader()">添加</el-button>
+          <el-button type="primary" link :icon="Plus" :disabled="!queryMode" @click="newAndEditHeader()">
+            添加
+          </el-button>
         </template>
         <!-- 操作按钮 -->
         <template #default="{ row, $index }">
           <!-- 编辑或新增模式下可用的按钮 -->
           <!-- 删除请求头按钮 -->
-          <el-button v-if="!queryMode" type="text" :icon="Close" @click="cancelHeader(row, $index)" />
+          <el-button v-if="!queryMode" type="primary" link :icon="Close" @click="cancelHeader(row, $index)" />
           <!-- 查询模式下可用的按钮 -->
           <template v-if="queryMode">
             <template v-if="row.editing">
               <!-- 取消单行编辑按钮 -->
-              <el-button type="text" :icon="Close" @click="queryHeaders()" />
+              <el-button type="primary" link :icon="Close" @click="queryHeaders()" />
               <!-- 提交单行编辑按钮 -->
-              <el-button type="text" :icon="Check" @click="submitSingleHeader(row)" />
+              <el-button type="primary" link :icon="Check" @click="submitSingleHeader(row)" />
             </template>
             <template v-else>
               <!-- 编辑单行请求头按钮 -->
-              <el-button type="text" :icon="Edit" @click="row.editing = true" />
+              <el-button type="primary" link :icon="Edit" @click="row.editing = true" />
               <!-- 删除请求头按钮 -->
-              <el-button type="text" :icon="Delete" @click="removeHeader(row)" />
+              <el-button type="primary" link :icon="Delete" @click="removeHeader(row)" />
             </template>
           </template>
         </template>
       </el-table-column>
     </el-table>
     <!-- 底部添加按钮 -->
-    <el-button v-show="queryMode" type="text" :icon="Plus" @click="newAndEditHeader()">添加</el-button>
+    <el-button v-show="queryMode" type="primary" link :icon="Plus" @click="newAndEditHeader()">添加</el-button>
   </div>
 </template>
 

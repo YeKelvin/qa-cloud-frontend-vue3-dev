@@ -4,7 +4,7 @@
     <template #empty>
       <el-empty :image-size="80">
         <template #description>
-          <el-button type="text" :icon="Plus" :disabled="queryMode" @click="newItem()">添加</el-button>
+          <el-button type="primary" link :icon="Plus" :disabled="queryMode" @click="newItem()">添加</el-button>
         </template>
       </el-empty>
     </template>
@@ -43,10 +43,10 @@
     <!-- 操作列 -->
     <el-table-column fixed="right" align="center" width="50" min-width="10">
       <template #header>
-        <el-button type="text" :icon="Plus" :disabled="queryMode" @click="newItem()" />
+        <el-button type="primary" link :icon="Plus" :disabled="queryMode" @click="newItem()" />
       </template>
       <template #default="{ $index }">
-        <el-button type="text" :icon="Delete" :disabled="queryMode" @click="delItem($index)" />
+        <el-button type="primary" link :icon="Delete" :disabled="queryMode" @click="delItem($index)" />
       </template>
     </el-table-column>
   </el-table>

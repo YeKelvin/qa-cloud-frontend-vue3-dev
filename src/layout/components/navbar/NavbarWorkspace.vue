@@ -2,7 +2,7 @@
   <el-popover ref="elpopoverRef" placement="bottom" width="400px" trigger="click">
     <!-- 切换工作空间的按钮 -->
     <template #reference>
-      <el-button type="text" style="color: #606266; font: 14px; font-family: inherit">
+      <el-button link style="color: #606266; font: 14px; font-family: inherit">
         <SvgIcon icon-name="navbar-workspace" style="height: 1.5em; width: 1.5em" />
         <span style="margin: 5px">{{ workspaceName }}</span>
         <el-icon><caret-bottom /></el-icon>

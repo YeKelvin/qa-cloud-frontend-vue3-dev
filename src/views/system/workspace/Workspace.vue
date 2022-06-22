@@ -33,12 +33,12 @@
         <el-table-column fixed="right" label="操作" min-width="250" width="250">
           <template #default="{ row }">
             <template v-if="row.workspaceScope == 'PROTECTED'">
-              <el-button type="text" @click="openMemberDialog(row)">成员管理</el-button>
+              <el-button type="primary" link @click="openMemberDialog(row)">成员管理</el-button>
             </template>
             <template v-if="row.workspaceScope != 'PRIVATE'">
-              <el-button type="text" @click="gotoRestrictionManager(row)">权限管理</el-button>
-              <el-button type="text" @click="openModifyDialog(row)">编辑</el-button>
-              <el-button type="text" @click="deleteWorkspace(row)">删除</el-button>
+              <el-button type="primary" link @click="gotoRestrictionManager(row)">权限管理</el-button>
+              <el-button type="primary" link @click="openModifyDialog(row)">编辑</el-button>
+              <el-button type="primary" link @click="deleteWorkspace(row)">删除</el-button>
             </template>
           </template>
         </el-table-column>

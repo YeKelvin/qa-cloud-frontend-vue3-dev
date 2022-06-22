@@ -5,7 +5,7 @@
       <el-input v-model="filterText" placeholder="请输入搜索内容" size="large" clearable>
         <!-- 新增请求头模板 -->
         <template #prepend>
-          <el-button type="text" :icon="Plus" style="padding: 6px 20px" @click="createTemplate()" />
+          <el-button type="primary" link :icon="Plus" style="padding: 6px 20px" @click="createTemplate()" />
         </template>
       </el-input>
     </span>

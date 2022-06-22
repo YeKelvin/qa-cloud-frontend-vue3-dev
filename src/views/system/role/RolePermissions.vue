@@ -50,7 +50,7 @@
         <el-table-column prop="method" label="请求方法" />
         <el-table-column v-if="queryMode" key="operation" fixed="right" label="操作" min-width="40" width="80">
           <template #default="{ row }">
-            <el-button type="text" @click="deletePermission(row)">删除</el-button>
+            <el-button type="primary" link @click="deletePermission(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>

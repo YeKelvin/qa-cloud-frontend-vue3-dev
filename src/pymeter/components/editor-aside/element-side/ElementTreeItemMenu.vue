@@ -1,7 +1,7 @@
 <template>
   <el-dropdown trigger="click" placement="bottom" :show-timeout="50" :hide-timeout="50">
     <!-- 菜单弹出按钮 -->
-    <el-button type="text" :icon="More" />
+    <el-button type="primary" link :icon="More" />
     <!-- 菜单 -->
     <template #dropdown>
       <el-dropdown-menu>

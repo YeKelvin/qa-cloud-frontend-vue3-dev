@@ -30,10 +30,10 @@
     <!-- 操作列 -->
     <el-table-column v-if="!queryMode" fixed="right" align="center" width="50" min-width="10">
       <template #header>
-        <el-button type="text" :icon="Plus" :disabled="queryMode" @click="newParameter" />
+        <el-button type="primary" link :icon="Plus" :disabled="queryMode" @click="newParameter" />
       </template>
       <template #default="scope">
-        <el-button type="text" :icon="Delete" :disabled="queryMode" @click="removeParameter(scope.$index)" />
+        <el-button type="primary" link :icon="Delete" :disabled="queryMode" @click="removeParameter(scope.$index)" />
       </template>
     </el-table-column>
   </el-table>

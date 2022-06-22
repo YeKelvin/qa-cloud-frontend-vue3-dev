@@ -26,11 +26,14 @@
       </el-table-column>
       <el-table-column fixed="right" label="操作" min-width="100" width="100">
         <template #default="{ row }">
-          <el-button type="text" style="margin-left: 12px" @click="openDetails(row.executionNo)">查看详情</el-button>
-          <el-button v-if="row.reportNo" type="text" @click="openReport(row.reportNo)">查看报告</el-button>
+          <el-button type="primary" link style="margin-left: 12px" @click="openDetails(row.executionNo)">
+            查看详情
+          </el-button>
+          <el-button v-if="row.reportNo" type="primary" link @click="openReport(row.reportNo)">查看报告</el-button>
           <el-button
             v-if="isShowInterruptBtn(row)"
-            type="text"
+            type="primary"
+            link
             style="color: #f56c6c"
             @click="interrupt(row.executionNo)"
           >

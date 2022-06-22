@@ -3,9 +3,9 @@
     <!-- 报告标题 -->
     <div class="report-header">
       <el-card shadow="hover">
-        <el-button type="text" :icon="ArrowLeft" @click="goBack()">返 回</el-button>
+        <el-button type="primary" link :icon="ArrowLeft" @click="goBack()">返 回</el-button>
         <span style="font-size: 16px">接口测试报告</span>
-        <el-button type="text" :icon="DataAnalysis" @click="openOverview()">统 计</el-button>
+        <el-button type="primary" link :icon="DataAnalysis" @click="openOverview()">统 计</el-button>
       </el-card>
     </div>
 
