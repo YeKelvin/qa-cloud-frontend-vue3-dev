@@ -12,7 +12,7 @@
     <el-select
       v-model="localModel"
       v-bind="$attrs"
-      style="width: 100%"
+      style="width: 100%; margin-bottom: 5px"
       multiple
       :disabled="queryMode"
       @change="handleChange"

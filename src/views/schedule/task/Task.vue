@@ -72,7 +72,7 @@
     </div>
 
     <!-- 任务表单 -->
-    <TaskInfoDialog
+    <TaskFormDialog
       v-if="showDialog"
       v-model="showDialog"
       :edit-mode="dialogArgs.editMode"
@@ -91,7 +91,7 @@ import ConditionInput from '@/components/query-condition/ConditionInput.vue'
 import ConditionSelect from '@/components/query-condition/ConditionSelect.vue'
 import useQueryConditions from '@/composables/useQueryConditions'
 import useWorkspaceState from '@/composables/useWorkspaceState'
-import TaskInfoDialog from './TaskInfoDialog.vue'
+import TaskFormDialog from './TaskFormDialog.vue'
 
 const { workspaceNo } = useWorkspaceState()
 const { queryConditions, resetQueryConditions } = useQueryConditions({

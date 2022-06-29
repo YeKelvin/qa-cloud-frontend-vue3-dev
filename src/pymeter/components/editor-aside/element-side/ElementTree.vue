@@ -27,7 +27,7 @@
       <!-- 树结点 -->
       <span class="tree-item" @mouseenter="mouseenter(node)" @mouseleave="mouseleave()">
         <!-- 元素名称 -->
-        <ElementTreeItemName :data="data" @dblclick="handleNodeDoubleClick(node)" />
+        <ElementTreeItemName :data="data" @dblclick="handleNodeDBClick(node)" />
         <!-- 元素操作菜单 -->
         <span v-show="hoveredNode === node" @click.stop>
           <ElementTreeItemMenu :node="node" @visible-change="visibleChange" />
@@ -46,6 +46,7 @@ import usePyMeterState from '@/pymeter/composables/usePyMeterState'
 import ElementTreeItemName from './ElementTreeItemName.vue'
 import ElementTreeItemMenu from './ElementTreeItemMenu.vue'
 
+let clickTimer = null
 const props = defineProps({
   collectionNumberList: { type: Array, default: () => [] }
 })
@@ -105,17 +106,28 @@ const queryElementsTree = () => {
  * el-tree handler
  */
 const handleNodeClick = (data) => {
-  store.commit({
-    type: 'pymeter/addTab',
-    editorNo: data.elementNo,
-    editorName: data.elementName,
-    editorComponent: data.elementClass,
-    editorMode: 'QUERY',
-    metadata: {
-      rootNo: data.rootNo,
-      parentNo: data.elementNo
-    }
-  })
+  clearTimeout(clickTimer) //清除计时器
+  clickTimer = setTimeout(() => {
+    store.commit({
+      type: 'pymeter/addTab',
+      editorNo: data.elementNo,
+      editorName: data.elementName,
+      editorComponent: data.elementClass,
+      editorMode: 'QUERY',
+      metadata: {
+        rootNo: data.rootNo,
+        parentNo: data.elementNo
+      }
+    })
+  }, 200)
+}
+
+/**
+ * el-tree handler
+ */
+const handleNodeDBClick = (node) => {
+  clearTimeout(clickTimer) //清除计时器
+  handleNodeDoubleClick(node) // TODO: 名字不好，改命
 }
 
 /**

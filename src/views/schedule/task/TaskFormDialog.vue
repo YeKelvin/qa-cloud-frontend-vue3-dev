@@ -134,6 +134,7 @@
                 range-separator="-"
                 start-placeholder="开始时间"
                 end-placeholder="结束时间"
+                :default-time="[new Date(0, 0, 0, 0, 0, 0), new Date(0, 0, 0, 23, 59, 59)]"
                 :disabled-date="(time) => time.getTime() < Date.now() - 1 * 24 * 3600 * 1000"
                 :disabled-hours="disabledHours"
                 :disabled-minutes="disabledMinutes"
@@ -292,7 +293,7 @@ const requestData = computed(() => {
     query.triggerArgs = triggerForm.value.cron
   }
 
-  return jobForm.value
+  return query
 })
 
 watch(
@@ -506,4 +507,8 @@ const datetimeRangeChange = () => {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+:deep(.el-form-item__label) {
+  align-items: center;
+}
+</style>
