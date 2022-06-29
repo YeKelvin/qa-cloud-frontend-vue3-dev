@@ -34,6 +34,7 @@ export default ({ mode }) =>
       visualizer()
     ],
     server: {
+      // host: '0.0.0.0', // 设置外网访问
       port: 9529, // 服务器端口
       open: false, // 启动时自动在浏览器中打开应用程序
       cors: true // 跨域
