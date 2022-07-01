@@ -20,7 +20,7 @@ export default function useHTTPBody() {
   const formParameters = computed(() => {
     if (_isEmpty(formItems.value) || bodyMode.value !== 'x-www-form-urlencoded') return null
     const parameters = []
-    parameters.forEach((item) => {
+    formItems.value.forEach((item) => {
       if (isBlank(item.name)) return
       parameters.push({
         class: 'Argument',
