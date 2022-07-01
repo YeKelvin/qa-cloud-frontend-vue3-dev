@@ -94,13 +94,13 @@ export default defineComponent({
     setVarSnippet() {
       let selection = this.$refs.pythonEditor.getSelectionValue()
       selection = selection || 'value'
-      this.$refs.pythonEditor.insertSnippet(`vars.set('\${1:name}', \${2:${selection}})`)
+      this.$refs.pythonEditor.insertSnippet(`vars.put('\${1:name}', \${2:${selection}})`)
       this.$refs.pythonEditor.focus()
     },
     setPropSnippet() {
       let selection = this.$refs.pythonEditor.getSelectionValue()
       selection = selection || 'value'
-      this.$refs.pythonEditor.insertSnippet(`props.set('\${1:name}', \${2:${selection}})`)
+      this.$refs.pythonEditor.insertSnippet(`props.put('\${1:name}', \${2:${selection}})`)
       this.$refs.pythonEditor.focus()
     },
     outputLogInfo() {

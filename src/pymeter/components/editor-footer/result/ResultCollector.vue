@@ -52,42 +52,42 @@
       </el-tabs>
 
       <!-- 请求简要 -->
-      <template v-if="showing && showSamplerSummary">
+      <div v-show="showing && showSamplerSummary" class="tab-pane">
         <el-scrollbar style="width: 100%; height: 100%" wrap-style="overflow-x:auto;" view-style="padding:10px;">
           <el-table :data="samplerSummary" style="width: 100%" :show-header="false">
             <el-table-column prop="name" width="200" />
             <el-table-column prop="value" />
           </el-table>
         </el-scrollbar>
-      </template>
+      </div>
 
       <!-- 请求头部 -->
-      <template v-if="showing && showRequestHeaders">
+      <div v-show="showing && showRequestHeaders" class="tab-pane">
         <el-scrollbar style="width: 100%; height: 100%" wrap-style="overflow-x:auto;" view-style="padding:10px;">
           <el-table :data="requestHeaders" style="width: 100%" :show-header="false">
             <el-table-column prop="name" width="250" min-width="200" />
             <el-table-column prop="value" />
           </el-table>
         </el-scrollbar>
-      </template>
+      </div>
 
       <!-- 请求体 -->
-      <template v-if="showing && showRequestCode">
+      <div v-show="showing && showRequestCode" class="tab-pane">
         <MonacoEditor ref="requestEditorRef" language="json" :read-only="true" />
-      </template>
+      </div>
 
       <!-- 响应头部 -->
-      <template v-if="showing && showResponseHeaders">
+      <div v-show="showing && showResponseHeaders" class="tab-pane">
         <el-scrollbar style="width: 100%; height: 100%" wrap-style="overflow-x:auto;" view-style="padding:10px;">
           <el-table :data="responseHeaders" style="width: 100%" :show-header="false">
             <el-table-column prop="name" width="250" min-width="200" />
             <el-table-column prop="value" />
           </el-table>
         </el-scrollbar>
-      </template>
+      </div>
 
       <!-- 响应体 -->
-      <template v-if="showing && showResponseCode">
+      <div v-show="showing && showResponseCode" class="tab-pane">
         <!-- 按钮组 -->
         <span style="display: flex; align-items: center; padding: 5px">
           <el-radio-group v-model="responseDisplayType" style="margin-right: 20px" size="small">
@@ -110,12 +110,12 @@
           :word-wrap="responseWordWrap"
           :read-only="true"
         />
-      </template>
+      </div>
 
       <!-- 失败断言 -->
-      <template v-if="showing && showAssertionCode">
+      <div v-show="showing && showAssertionCode" class="tab-pane">
         <MonacoEditor ref="assertionEditorRef" language="python" :read-only="true" />
-      </template>
+      </div>
     </el-card>
   </div>
 </template>
@@ -187,6 +187,7 @@ const handleNodeClick = (data, node) => {
   current.sampler = data
 
   if (activeTabName.value === 'REQUEST') {
+    console.log('data.request: ', data.request)
     setRequestCode(data.request)
     return
   }
@@ -201,6 +202,7 @@ const handleNodeClick = (data, node) => {
 }
 const handleTabClick = (tab) => {
   if (tab.paneName === 'REQUEST') {
+    console.log('current.sampler.request: ', current.sampler.request)
     setRequestCode(current.sampler.request)
     return
   }
@@ -215,6 +217,7 @@ const handleTabClick = (tab) => {
 }
 const setRequestCode = (code) => {
   nextTick(() => {
+    console.log('requestEditorRef.value: ', requestEditorRef)
     requestEditorRef.value && requestEditorRef.value.setValue(code)
   })
 }
@@ -297,11 +300,16 @@ const toggleResponseWordWrap = () => {
     flex: 1;
     flex-direction: column;
     align-items: flex-start;
+    justify-content: flex-start;
 
     width: 100%;
     height: 100%;
 
     padding: 0;
+
+    .tab-pane {
+      width: 100%;
+    }
   }
 }
 
