@@ -74,13 +74,13 @@ export default defineComponent({
     getVarSnippet() {
       let selection = this.$refs.pythonEditor.getSelectionValue()
       selection = selection || 'name'
-      this.$refs.pythonEditor.insertSnippet(`vars.get('\${1:${selection}}')`)
+      this.$refs.pythonEditor.insertSnippet(`vars.get(\${1:${selection}})`)
       this.$refs.pythonEditor.focus()
     },
     getPropSnippet() {
       let selection = this.$refs.pythonEditor.getSelectionValue()
       selection = selection || 'name'
-      this.$refs.pythonEditor.insertSnippet(`props.get('\${1:${selection}}')`)
+      this.$refs.pythonEditor.insertSnippet(`props.get(\${1:${selection}})`)
       this.$refs.pythonEditor.focus()
     },
     getResponseJsonSnippet() {
@@ -94,13 +94,13 @@ export default defineComponent({
     setVarSnippet() {
       let selection = this.$refs.pythonEditor.getSelectionValue()
       selection = selection || 'value'
-      this.$refs.pythonEditor.insertSnippet(`vars.set('\${1:name}', '\${2:${selection}}')`)
+      this.$refs.pythonEditor.insertSnippet(`vars.set('\${1:name}', \${2:${selection}})`)
       this.$refs.pythonEditor.focus()
     },
     setPropSnippet() {
       let selection = this.$refs.pythonEditor.getSelectionValue()
       selection = selection || 'value'
-      this.$refs.pythonEditor.insertSnippet(`props.set('\${1:name}', '\${2:${selection}}')`)
+      this.$refs.pythonEditor.insertSnippet(`props.set('\${1:name}', \${2:${selection}})`)
       this.$refs.pythonEditor.focus()
     },
     outputLogInfo() {
@@ -119,13 +119,13 @@ export default defineComponent({
     toJson() {
       let selection = this.$refs.pythonEditor.getSelectionValue()
       selection = selection || 'object'
-      this.$refs.pythonEditor.insertSnippet(`to_json('\${1:${selection}}')`)
+      this.$refs.pythonEditor.insertSnippet(`to_json(\${1:${selection}})`)
       this.$refs.pythonEditor.focus()
     },
     fromJson() {
       let selection = this.$refs.pythonEditor.getSelectionValue()
       selection = selection || 'json_str'
-      this.$refs.pythonEditor.insertSnippet(`from_json('\${1:${selection}}')`)
+      this.$refs.pythonEditor.insertSnippet(`from_json(\${1:${selection}})`)
       this.$refs.pythonEditor.focus()
     },
     foreachList() {

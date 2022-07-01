@@ -7,7 +7,7 @@ export default function useHTTPQuery() {
   const queryParameters = computed(() => {
     if (_isEmpty(queryItems.value)) return null
     const parameters = []
-    queryItems.value.forEach((item) => {
+    queryItems.forEach((item) => {
       if (isBlank(item.name)) return
       parameters.push({
         class: 'Argument',
