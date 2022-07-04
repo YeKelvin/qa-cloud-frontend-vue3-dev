@@ -321,7 +321,7 @@ onMounted(() => {
   // 新增模式时无需查询定时任务信息
   if (createMode.value) return
   // 查询定时任务信息
-  ElementService.queryTaskInfo({ jobNo: props.data.jobNo }).then((response) => {
+  ScheduleService.queryTaskInfo({ jobNo: props.data.jobNo }).then((response) => {
     // 除 jobArgs, triggerArgs 属性外，其余赋值给 jobForm
     jobForm.value = _omit(response.result, ['jobArgs', 'triggerArgs'])
     jobForm.value.datasetNumberedList = response.result.jobArgs.datasetNumberedList
