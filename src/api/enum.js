@@ -121,3 +121,12 @@ export const TriggerType = {
   INTERVAL: '固定间隔',
   CRON: 'CRON间隔'
 }
+
+export const TaskOperationType = {
+  ADD: '添加作业',
+  MODIFY: '修改作业',
+  EXECUTE: '执行作业',
+  PAUSE: '暂停作业',
+  RESUME: '恢复作业',
+  CLOSE: '关闭作业'
+}

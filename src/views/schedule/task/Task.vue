@@ -36,9 +36,9 @@
         <el-table-column prop="state" label="状态" min-width="80" width="80">
           <template #default="{ row }">{{ JobState[row.state] }}</template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" min-width="150">
+        <el-table-column prop="createdTime" label="创建时间" min-width="180" width="180">
           <template #default="{ row }">
-            {{ row.createTime ? $dayjs(row.createTime).format('YYYY-MM-DD HH:mm:ss') : '' }}
+            {{ row.createdTime ? $dayjs(row.createdTime).format('YYYY-MM-DD HH:mm:ss') : '' }}
           </template>
         </el-table-column>
         <el-table-column fixed="right" label="操作" min-width="200" width="200">
@@ -54,6 +54,7 @@
             <template v-if="row.state != 'CLOSED'">
               <el-button type="primary" link @click="removeTask(row)">关闭</el-button>
             </template>
+            <el-button type="primary" link @click="openHistoryDialog(row)">历史</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -73,12 +74,15 @@
 
     <!-- 任务表单 -->
     <TaskFormDialog
-      v-if="showDialog"
-      v-model="showDialog"
+      v-if="showFormDialog"
+      v-model="showFormDialog"
       :edit-mode="dialogArgs.editMode"
       :data="dialogArgs.data"
       @re-query="query"
     />
+
+    <!-- 任务历史 -->
+    <TaskHistoryDialog v-if="showHistoryDialog" v-model="showHistoryDialog" />
   </div>
 </template>
 
@@ -92,6 +96,7 @@ import ConditionSelect from '@/components/query-condition/ConditionSelect.vue'
 import useQueryConditions from '@/composables/useQueryConditions'
 import useWorkspaceState from '@/composables/useWorkspaceState'
 import TaskFormDialog from './TaskFormDialog.vue'
+import TaskHistoryDialog from './TaskHistoryDialog.vue'
 
 const { workspaceNo } = useWorkspaceState()
 const { queryConditions, resetQueryConditions } = useQueryConditions({
@@ -107,11 +112,15 @@ const tableData = ref([])
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
-const showDialog = ref(false)
+const currentRow = ref(null)
+const showFormDialog = ref(false)
+const showHistoryDialog = ref(false)
 const dialogArgs = reactive({
   editMode: null,
   data: {}
 })
+
+provide('currentRow', readonly(currentRow))
 
 watch(workspaceNo, (val) => {
   if (val) query()
@@ -200,7 +209,7 @@ const removeTask = async (row) => {
 const openCreateDialog = (row) => {
   dialogArgs.editMode = 'CREATE'
   dialogArgs.data = null
-  showDialog.value = true
+  showFormDialog.value = true
 }
 
 /**
@@ -209,7 +218,7 @@ const openCreateDialog = (row) => {
 const openDetailDialog = (row) => {
   dialogArgs.editMode = 'QUERY'
   dialogArgs.data = row
-  showDialog.value = true
+  showFormDialog.value = true
 }
 
 /**
@@ -218,7 +227,15 @@ const openDetailDialog = (row) => {
 const openModifyDialog = (row) => {
   dialogArgs.editMode = 'MODIFY'
   dialogArgs.data = row
-  showDialog.value = true
+  showFormDialog.value = true
+}
+
+/**
+ * 打开历史对话框
+ */
+const openHistoryDialog = (row) => {
+  currentRow.value = row
+  showHistoryDialog.value = true
 }
 
 /**

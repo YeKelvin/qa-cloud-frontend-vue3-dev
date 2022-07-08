@@ -13,3 +13,5 @@ export const pauseTask = (data) => request.patch('/schedule/task/pause', data)
 export const resumeTask = (data) => request.patch('/schedule/task/resume', data)
 
 export const removeTask = (data) => request.patch('/schedule/task/remove', data)
+
+export const queryTaskHistoryList = (params) => request.get('/schedule/task/history/list', { params: params })
