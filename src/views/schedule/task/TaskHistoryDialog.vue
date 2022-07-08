@@ -4,12 +4,16 @@
       <!-- 空数据提示 -->
       <template #empty><el-empty /></template>
       <!-- 列定义 -->
-      <el-table-column prop="operationType" label="操作类型" min-width="180" width="180">
+      <el-table-column prop="operationType" label="操作类型" min-width="120" width="120">
         <template #default="{ row }">{{ TaskOperationType[row.operationType] }}</template>
       </el-table-column>
       <el-table-column prop="operationContent" label="操作内容" min-width="150" />
-      <el-table-column prop="operationBy" label="操作人" min-width="150" />
-      <el-table-column prop="operationTime" label="操作时间" min-width="150" />
+      <el-table-column prop="operationBy" label="操作人" min-width="160" width="160" />
+      <el-table-column prop="operationTime" label="操作时间" min-width="180" width="180">
+        <template #default="{ row }">
+          {{ row.operationTime ? $dayjs(row.operationTime).format('YYYY-MM-DD HH:mm:ss') : '' }}
+        </template>
+      </el-table-column>
     </el-table>
 
     <div class="pagination-container">
