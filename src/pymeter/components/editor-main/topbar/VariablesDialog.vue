@@ -2,7 +2,7 @@
   <div id="topbar-variables-dialog">
     <el-dialog width="60%" :show-close="false" center v-bind="$attrs" @close="$emit('update:model-value', false)">
       <!-- 顶栏 -->
-      <template #title>
+      <template #header>
         <div v-show="!_isEmpty(selectedDatasetList)" style="display: flex">
           <el-tabs v-model="activeTabNo" type="card" style="flex-grow: 1">
             <el-tab-pane
@@ -15,7 +15,7 @@
           <el-button
             type="primary"
             link
-            style="border-bottom: var(--el-border); border-radius: 0"
+            style="border-bottom: var(--el-border); border-radius: 0; padding-right: 10px"
             :icon="Edit"
             @click="openVariableDatasetEditor()"
           >

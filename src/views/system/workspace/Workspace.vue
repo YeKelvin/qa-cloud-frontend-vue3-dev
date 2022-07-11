@@ -30,7 +30,7 @@
           <template #default="{ row }">{{ WorkspaceScope[row.workspaceScope] }}</template>
         </el-table-column>
         <el-table-column prop="workspaceDesc" label="空间描述" min-width="200" />
-        <el-table-column fixed="right" label="操作" min-width="250" width="250">
+        <el-table-column fixed="right" label="操作" min-width="280" width="280">
           <template #default="{ row }">
             <template v-if="row.workspaceScope == 'PROTECTED'">
               <el-button type="primary" link @click="openMemberDialog(row)">成员管理</el-button>
