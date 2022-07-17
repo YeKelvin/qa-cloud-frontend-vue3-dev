@@ -87,5 +87,6 @@ const handleCurrentChange = (val) => {
   display: flex;
   justify-content: flex-end;
   padding: 10px 0;
+  padding-right: 10px;
 }
 </style>
