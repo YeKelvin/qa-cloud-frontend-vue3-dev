@@ -54,7 +54,7 @@ const store = useStore()
 const elementList = ref([])
 const pendingPaste = ref(null)
 const isMacOS = computed(() => /macintosh|mac os x/i.test(navigator.userAgent))
-const isWindows = computed(() => /windows|win32/i.test(navigator.userAgent))
+const isWindows = computed(() => /windows|win32|win64/i.test(navigator.userAgent))
 const {
   eltreeRef,
   hoveredNode,
@@ -81,8 +81,25 @@ watch(
   { deep: true }
 )
 
+const cutByHotkey = (e) => {
+  e.preventDefault() // 阻止浏览器默认快捷键
+}
+const copyByHotkey = (e) => {}
+const pasteByHotkey = (e) => {}
+
 onMounted(() => {
   if (!isEmpty(props.collectionNumberList)) queryElementsTree()
+  // 根据操作系统动态绑定快捷键
+  // document.addEventListener('keydown', cutByHotkey, false)
+  // document.addEventListener('keydown', copyByHotkey, false)
+  // document.addEventListener('keydown', pasteByHotkey, false)
+})
+
+onUnmounted(() => {
+  // 移除快捷键监听
+  // document.removeEventListener('keydown', cutByHotkey, false)
+  // document.removeEventListener('keydown', copyByHotkey, false)
+  // document.removeEventListener('keydown', pasteByHotkey, false)
 })
 
 /**

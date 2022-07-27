@@ -112,8 +112,8 @@ export const JobState = {
 
 export const JobType = {
   TESTPLAN: '测试计划',
-  COLLECTION: '元素集合',
-  GROUP: '元素分组'
+  COLLECTION: '测试集合',
+  GROUP: '测试用例'
 }
 
 export const TriggerType = {

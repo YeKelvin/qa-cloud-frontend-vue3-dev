@@ -187,7 +187,6 @@ const handleNodeClick = (data, node) => {
   current.sampler = data
 
   if (activeTabName.value === 'REQUEST') {
-    console.log('data.request: ', data.request)
     setRequestCode(data.request)
     return
   }
@@ -202,7 +201,6 @@ const handleNodeClick = (data, node) => {
 }
 const handleTabClick = (tab) => {
   if (tab.paneName === 'REQUEST') {
-    console.log('current.sampler.request: ', current.sampler.request)
     setRequestCode(current.sampler.request)
     return
   }
@@ -217,7 +215,6 @@ const handleTabClick = (tab) => {
 }
 const setRequestCode = (code) => {
   nextTick(() => {
-    console.log('requestEditorRef.value: ', requestEditorRef)
     requestEditorRef.value && requestEditorRef.value.setValue(code)
   })
 }

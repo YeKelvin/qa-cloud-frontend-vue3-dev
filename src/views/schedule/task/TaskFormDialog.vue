@@ -17,8 +17,8 @@
       <el-form-item label="任务类型：" prop="jobType" style="padding: 0 10px">
         <el-radio-group v-model="jobForm.jobType" :disabled="queryMode">
           <el-radio label="TESTPLAN">测试计划</el-radio>
-          <el-radio label="COLLECTION">集合元素</el-radio>
-          <el-radio label="GROUP">分组元素</el-radio>
+          <el-radio label="COLLECTION">测试集合</el-radio>
+          <el-radio label="GROUP">测试用例</el-radio>
         </el-radio-group>
       </el-form-item>
 
@@ -68,7 +68,7 @@
             </el-form-item>
           </template>
           <template v-else>
-            <el-form-item label="测试分组：" prop="groupNo" style="margin-bottom: 10px">
+            <el-form-item label="测试用例：" prop="groupNo" style="margin-bottom: 10px">
               <el-cascader
                 v-model="taskForm.groupNo"
                 tag-type="danger"
@@ -234,8 +234,8 @@ const taskForm = ref({
 })
 const taskFormRules = reactive({
   planNo: [{ required: true, message: '测试计划不能为空', trigger: 'blur' }],
-  collectionNo: [{ required: true, message: '集合元素不能为空', trigger: 'blur' }],
-  groupNo: [{ required: true, message: '分组元素不能为空', trigger: 'blur' }]
+  collectionNo: [{ required: true, message: '测试集合不能为空', trigger: 'blur' }],
+  groupNo: [{ required: true, message: '测试用例不能为空', trigger: 'blur' }]
 })
 const checkIntervalValue = (_, value, callback) => {
   if (!value) {
@@ -310,7 +310,7 @@ watch(
 )
 
 onMounted(() => {
-  // 查询测试计划、测试集合或测试分组的列表数据
+  // 查询测试计划、测试集合或测试用例的列表数据
   if (jobForm.value.jobType === 'TESTPLAN') {
     queryTestplanAll()
   } else if (jobForm.value.jobType === 'COLLECTION') {

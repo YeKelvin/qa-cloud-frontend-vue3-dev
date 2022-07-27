@@ -7,14 +7,14 @@
       <el-dropdown-menu>
         <!-- Group -->
         <template v-if="data.elementClass == 'TestCollection'">
-          <el-dropdown-item @click="openNewGroupTab(node)">新增测试分组</el-dropdown-item>
-          <el-dropdown-item @click="openNewSetupGroupTab(node)">新增前置分组</el-dropdown-item>
-          <el-dropdown-item @click="openNewTeardownGroupTab(node)">新增后置分组</el-dropdown-item>
+          <el-dropdown-item @click="openNewGroupTab(node)">新增测试用例</el-dropdown-item>
+          <el-dropdown-item @click="openNewSetupGroupTab(node)">新增前置用例</el-dropdown-item>
+          <el-dropdown-item @click="openNewTeardownGroupTab(node)">新增后置用例</el-dropdown-item>
         </template>
 
         <template v-if="data.elementClass == 'SnippetCollection'">
-          <el-dropdown-item @click="openNewSetupGroupDebugerTab(node)">新增前置分组调试器</el-dropdown-item>
-          <el-dropdown-item @click="openNewTeardownGroupDebugerTab(node)">新增后置分组调试器</el-dropdown-item>
+          <el-dropdown-item @click="openNewSetupGroupDebugerTab(node)">新增前置用例调试器</el-dropdown-item>
+          <el-dropdown-item @click="openNewTeardownGroupDebugerTab(node)">新增后置用例调试器</el-dropdown-item>
         </template>
 
         <!-- Sampler -->
