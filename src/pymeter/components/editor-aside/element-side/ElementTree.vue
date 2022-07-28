@@ -6,22 +6,16 @@
     draggable
     style="padding-bottom: 100px"
     :indent="36"
-    :expand-on-click-node="false"
     :data="elementList"
-    :props="{ label: 'elementName', children: 'children' }"
+    :expand-on-click-node="false"
     :default-expanded-keys="expandedList"
+    :props="{ label: 'elementName', children: 'children' }"
     :allow-drag="allowDrag"
     :allow-drop="allowDrop"
     @node-click="handleNodeClick"
     @node-expand="handleNodeExpand"
     @node-collapse="handleNodeCollapse"
     @node-drop="handleNodeDrop"
-    @keyup.ctrl.x="handleCtrlX"
-    @keyup.ctrl.c="handleCtrlC"
-    @keyup.ctrl.v="handleCtrlV"
-    @keyup.meta.x="handleMetaX"
-    @keyup.meta.c="handleMetaC"
-    @keyup.meta.v="handleMetaV"
   >
     <template #default="{ node, data }">
       <!-- 树结点 -->
@@ -81,25 +75,19 @@ watch(
   { deep: true }
 )
 
-const cutByHotkey = (e) => {
-  e.preventDefault() // 阻止浏览器默认快捷键
-}
-const copyByHotkey = (e) => {}
-const pasteByHotkey = (e) => {}
-
 onMounted(() => {
   if (!isEmpty(props.collectionNumberList)) queryElementsTree()
   // 根据操作系统动态绑定快捷键
-  // document.addEventListener('keydown', cutByHotkey, false)
-  // document.addEventListener('keydown', copyByHotkey, false)
-  // document.addEventListener('keydown', pasteByHotkey, false)
+  eltreeRef.value.$el.addEventListener('keydown', cutByHotkey, false)
+  eltreeRef.value.$el.addEventListener('keydown', copyByHotkey, false)
+  eltreeRef.value.$el.addEventListener('keydown', pasteByHotkey, false)
 })
 
-onUnmounted(() => {
-  // 移除快捷键监听
-  // document.removeEventListener('keydown', cutByHotkey, false)
-  // document.removeEventListener('keydown', copyByHotkey, false)
-  // document.removeEventListener('keydown', pasteByHotkey, false)
+onBeforeUnmount(() => {
+  // 移除快捷键
+  eltreeRef.value.$el.removeEventListener('keydown', cutByHotkey, false)
+  eltreeRef.value.$el.removeEventListener('keydown', copyByHotkey, false)
+  eltreeRef.value.$el.removeEventListener('keydown', pasteByHotkey, false)
 })
 
 /**
@@ -262,89 +250,61 @@ const allowDrop = (draggingNode, dropNode, type) => {
 }
 
 /**
- * windows剪切元素快捷键
+ * 通过快捷键剪切元素至剪贴板
  */
-const handleCtrlX = () => {
-  if (!isWindows.value) return
-  const data = eltreeRef.value.getCurrentNode()
-  if (data.elementType === 'COLLECTION') return
-  pendingPaste.value = { ...data, pasteType: 'CUT' }
-  ElMessage({ message: '已剪切到剪贴板', type: 'info', duration: 1 * 1000 })
+const cutByHotkey = (e) => {
+  if (e.repeat) {
+    return
+  }
+  if (e.key == 'x' && isMacOS ? e.metaKey : e.ctrlKey) {
+    e.preventDefault() // 阻止浏览器默认快捷键
+    const data = eltreeRef.value.getCurrentNode()
+    if (data.elementType === 'COLLECTION') return
+    pendingPaste.value = { ...data, pasteType: 'CUT' }
+    ElMessage({ message: '已剪切到剪贴板', type: 'info', duration: 1 * 1000 })
+  }
 }
 
 /**
- * windows复制元素快捷键
+ * 通过快捷键复制元素至剪贴板
  */
-const handleCtrlC = () => {
-  if (!isWindows.value) return
-  const data = eltreeRef.value.getCurrentNode()
-  if (data.elementType === 'COLLECTION') return
-  pendingPaste.value = { ...data, pasteType: 'COPY' }
-  ElMessage({ message: '已复制到剪贴板', type: 'info', duration: 1 * 1000 })
+const copyByHotkey = (e) => {
+  if (e.repeat) {
+    return
+  }
+  if (e.key == 'c' && isMacOS ? e.metaKey : e.ctrlKey) {
+    e.preventDefault() // 阻止浏览器默认快捷键
+    const data = eltreeRef.value.getCurrentNode()
+    if (data.elementType === 'COLLECTION') return
+    pendingPaste.value = { ...data, pasteType: 'COPY' }
+    ElMessage({ message: '已复制到剪贴板', type: 'info', duration: 1 * 1000 })
+  }
 }
 
 /**
- * windows粘贴元素快捷键
+ * 通过快捷键粘贴元素
  */
-const handleCtrlV = () => {
-  if (!isWindows.value) return
-  const target = eltreeRef.value.getCurrentNode()
-  target &&
-    ElementService.pasteElement({
-      sourceNo: pendingPaste.value.elementNo,
-      targetNo: target.elementNo,
-      pasteType: pendingPaste.value.pasteType
-    }).then(() => {
-      // 清空剪贴板
-      if (pendingPaste.value.pasteType === 'CUT') pendingPaste.value = null
-      // 重新查询列表
-      queryElementsTree()
-      // 成功提示
-      ElMessage({ message: '剪贴成功', type: 'info', duration: 2 * 1000 })
-    })
-}
-
-/**
- * macos复制元素快捷键
- */
-const handleMetaX = () => {
-  if (!isMacOS.value) return
-  const data = eltreeRef.value.getCurrentNode()
-  if (data.elementType === 'COLLECTION') return
-  pendingPaste.value = { ...data, pasteType: 'CUT' }
-  ElMessage({ message: '已剪切', type: 'info', duration: 1 * 1000 })
-}
-
-/**
- * macos复制元素快捷键
- */
-const handleMetaC = () => {
-  if (!isMacOS.value) return
-  const data = eltreeRef.value.getCurrentNode()
-  if (data.elementType === 'COLLECTION') return
-  pendingPaste.value = { ...data, pasteType: 'COPY' }
-  ElMessage({ message: '已复制', type: 'info', duration: 1 * 1000 })
-}
-
-/**
- * macos粘贴元素快捷键
- */
-const handleMetaV = () => {
-  if (!isMacOS.value) return
-  const target = eltreeRef.value.getCurrentNode()
-  target &&
-    ElementService.pasteElement({
-      sourceNo: pendingPaste.value.elementNo,
-      targetNo: target.elementNo,
-      pasteType: pendingPaste.value.pasteType
-    }).then(() => {
-      // 清空剪贴板
-      if (pendingPaste.value.pasteType === 'CUT') pendingPaste.value = null
-      // 成功提示
-      ElMessage({ message: '剪贴成功', type: 'info', duration: 2 * 1000 })
-      // 重新查询列表
-      queryElementsTree()
-    })
+const pasteByHotkey = (e) => {
+  if (e.repeat) {
+    return
+  }
+  if (e.key == 'v' && isMacOS ? e.metaKey : e.ctrlKey) {
+    e.preventDefault() // 阻止浏览器默认快捷键
+    const target = eltreeRef.value.getCurrentNode()
+    target &&
+      ElementService.pasteElement({
+        sourceNo: pendingPaste.value.elementNo,
+        targetNo: target.elementNo,
+        pasteType: pendingPaste.value.pasteType
+      }).then(() => {
+        // 清空剪贴板
+        if (pendingPaste.value.pasteType === 'CUT') pendingPaste.value = null
+        // 重新查询列表
+        queryElementsTree()
+        // 成功提示
+        ElMessage({ message: '剪贴成功', type: 'info', duration: 2 * 1000 })
+      })
+  }
 }
 
 defineExpose({
